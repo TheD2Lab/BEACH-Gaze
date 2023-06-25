@@ -88,6 +88,7 @@ public class saccade {
 		
 		double peakVelocity = 0;
 		double conversionRate = 0.0264583333;
+		double velocityThreshold = 700; // Maximum possible saccadic velocity
 		
 		for (int i = 1; i < saccadePoints.size(); i++) {
 			Double[] currPoint = saccadePoints.get(i);
@@ -104,7 +105,7 @@ public class saccade {
 			
 			double velocity = amplitude/timeDifference;
 			
-			if (velocity > peakVelocity) {
+			if (velocity > peakVelocity && velocity <= velocityThreshold) {
 				peakVelocity = velocity;
 			}
 		}
