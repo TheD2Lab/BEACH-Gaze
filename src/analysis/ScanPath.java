@@ -26,6 +26,11 @@ public class ScanPath {
 	private String outputPath;
 	private static final double APPROVEDINTERVAL = 1.5;
 
+	/**
+	 * creates the required folder
+	 * @param fixationFile
+	 * @param outputPath
+	 */
 	public ScanPath(String fixationFile, String outputPath)
 	{
 		this.fixationFile = fixationFile;
@@ -36,6 +41,9 @@ public class ScanPath {
 
 	}
 
+	/**
+	 * runs all the possible scan path
+	 */
 	public void runAllClimbScan() throws Exception
 	{
 		TScan();
@@ -47,7 +55,9 @@ public class ScanPath {
 		avgScanPercentage(outputPath + "percentage.csv");
 
 	}
-	//parses the files and puts all the needed value in a hashmap
+	/**
+	 * parses the files and puts all the needed value in a hashmap
+	 */
 	private void parseFile()
 	{
 		FileReader fileReader;
@@ -87,7 +97,9 @@ public class ScanPath {
 	}
 
 
-	//Good
+	/**
+	 * Checks if the user does a T-scan of the instrument
+	 */
 	public void TScan() throws IOException
 	{
 		//AS, AI,HI,ALT
@@ -157,6 +169,9 @@ public class ScanPath {
 		}
 	}
 
+	/**
+	 * checks if the user scans the primary instrument scan with airspeed being one of the scanned instruments
+	 */
 	public void primaryInstrumentAS() throws IOException
 	{
 		Iterator<Entry<Double,String>> aoiIterator = aoi.entrySet().iterator();
@@ -221,6 +236,9 @@ public class ScanPath {
 		}
 	}
 
+	/**
+	 * checks if the user scans the primary instrument scan with vertical speed indicator being one of the scanned instruments
+	 */
 	public void primaryInstrumentVSI() throws IOException
 	{
 		Iterator<Entry<Double,String>> aoiIterator = aoi.entrySet().iterator();
@@ -284,6 +302,9 @@ public class ScanPath {
 		}
 	}
 
+	/**
+	 * checks if the user is using this method when the aircraft is ascending
+	 */
 	public void pitchTriangle() throws IOException
 	{
 		Iterator<Entry<Double,String>> aoiIterator = aoi.entrySet().iterator();
@@ -351,6 +372,9 @@ public class ScanPath {
 		}
 	}
 
+	/**
+	 * check if the user does a radial scan. One of the few scans that looks at all 6 instruments
+	 */
 	public void radialScan() throws IOException
 	{
 
@@ -440,7 +464,9 @@ public class ScanPath {
 	}
 
 
-
+	/**
+	 * check if the user does a circular scan. One of the few scans that looks at all 6 instruments
+	 */
 	public void circularScan() throws Exception 
 	{
 		String[]order = {"Airspeed", "Horizontal Altitude", "MSL Altitude", "Vertical Speed", "Heading", "Turn Coordinator"};
@@ -517,6 +543,13 @@ public class ScanPath {
 		}
 	}
 
+	/**
+	 * creates a file for each scanpath based on the given start and end time
+	 * @param inputFile
+	 * @param outputFile
+	 * @param start
+	 * @param end
+	 */
 	private static void writeToFile(String inputFile, String outputFile, double start, double end) throws IOException
 	{
 		FileWriter outputFileWriter = new FileWriter(new File (outputFile));
@@ -585,6 +618,10 @@ public class ScanPath {
 	}
 
 
+	/**
+	 * finds the percentage of each scan paths and outputting the results into a csv file
+	 * @param outputFile
+	 */
 	public void avgScanPercentage(String outputFile) throws IOException
 	{
 		double totalTimes = 0; 

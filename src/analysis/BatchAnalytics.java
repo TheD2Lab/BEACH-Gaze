@@ -207,7 +207,7 @@ public class BatchAnalytics {
 		
 	}
 
-	/*
+	/**
 	 *	runs the analysis on all the files submitted
 	 *	@param	outputLocation	the path where the generated files will reside
 	 *	@param	partInfo		a hashmap with the key being the participants name and value being the parent folder of both the gaze and fixation file
