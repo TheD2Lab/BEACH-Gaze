@@ -53,6 +53,8 @@ public class fixation {
         ArrayList<Object> allCoordinates = new ArrayList<>();
         List<Point2D.Double> allPoints = new ArrayList<>();
         ArrayList<Object> saccadeDetails = new ArrayList<>();
+        // TODO discuss if this should be added to saccadeDetails
+        ArrayList<Double> allSaccadeVelocities = new ArrayList<>();
 
         FileWriter outputFileWriter = new FileWriter(new File (outputFile));
         CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
@@ -60,10 +62,12 @@ public class fixation {
         	 FileReader fileReader = new FileReader(inputFile);
              CSVReader csvReader = new CSVReader(fileReader);
              String[] nextLine = csvReader.readNext();
+             // idk why we don't to call Arrays.asList(nextLine) once
              int fixationDurationIndex = Arrays.asList(nextLine).indexOf("FPOGD");
              int fixationIDIndex = Arrays.asList(nextLine).indexOf("FPOGID");
              int fixationXIndex = Arrays.asList(nextLine).indexOf("FPOGX");
              int fixationYIndex = Arrays.asList(nextLine).indexOf("FPOGY");
+             int saccadeVelocityIndex = Arrays.asList(nextLine).indexOf("SACCADE_VEL");
              int timestampIndex = -1;
          	for(int i = 0; i < nextLine.length; i++)
          	{
@@ -87,6 +91,8 @@ public class fixation {
                 double x = Double.valueOf(eachFixationX) * SCREEN_WIDTH;
                 double y = Double.valueOf(eachFixationY) * SCREEN_HEIGHT;
 
+                double eachSaccadeVelocity = Double.valueOf(nextLine[saccadeVelocityIndex]);
+
                 Point2D.Double eachPoint = new Point2D.Double(x,y);
 
                 Double[] eachCoordinate = new Double[3];
@@ -106,6 +112,7 @@ public class fixation {
                 allCoordinates.add(eachCoordinate);
                 allPoints.add(eachPoint);
                 saccadeDetails.add(eachSaccadeDetail);
+                allSaccadeVelocities.add(eachSaccadeVelocity);
             }
 
             ArrayList<String>headers = new ArrayList<>();
@@ -177,6 +184,22 @@ public class fixation {
 
             headers.add("Max. saccade duration");
             data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allSaccadeDurations)));
+
+            // TODO add saccade velocity columns
+            headers.add("mean saccade velocity");
+            data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allSaccadeVelocities)));
+
+            headers.add("median saccade velocity");
+            data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allSaccadeVelocities)));
+
+            headers.add("StDev of saccade velocity");
+            data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allSaccadeVelocities)));
+
+            headers.add("Min. saccade velocity");
+            data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allSaccadeVelocities)));
+            
+            headers.add("Max. saccade velocity");
+            data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allSaccadeVelocities)));
 
             headers.add("scanpath duration");
             data.add(String.valueOf(getScanpathDuration(allFixationDurations, allSaccadeDurations)));
