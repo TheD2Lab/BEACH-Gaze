@@ -63,6 +63,7 @@ public class fixation {
             CSVReader csvReader = new CSVReader(fileReader);
             String[] nextLine = csvReader.readNext();
             List<String> list = Arrays.asList(nextLine);
+            
             int fixationDurationIndex = list.indexOf("FPOGD");
             int fixationIDIndex = list.indexOf("FPOGID");
             int fixationXIndex = list.indexOf("FPOGX");
@@ -77,9 +78,10 @@ public class fixation {
          	}
          	
          	HashMap<String, Double> aoiProbability = new HashMap<String, Double>();
-
+         	HashMap<String, HashMap<String, Double>> transitionProbability = new HashMap<String, HashMap<String, Double>>();
+         	String lastAoi = "";
+         	
             while((nextLine = csvReader.readNext()) != null) {
-
                 //get each fixation's duration
                 String fixationDurationSeconds = nextLine[fixationDurationIndex];
                 double eachDuration = Double.valueOf(fixationDurationSeconds);
@@ -113,16 +115,26 @@ public class fixation {
                 String aoi = nextLine[aoiIndex];
             	if (aoi.equals(""))
             		continue;
-            	else if (aoiProbability.containsKey(aoi))
+            	else if (aoiProbability.containsKey(aoi)) {
             		aoiProbability.put(aoi, aoiProbability.get(aoi) + 1);
+            		HashMap<String, Double> relationMatrix = transitionProbability.get(lastAoi);
+            		if (!lastAoi.equals("") && relationMatrix.containsKey(aoi)) {
+            			double count = relationMatrix.get(aoi);
+            			relationMatrix.put(aoi, count + 1);
+            		}
+            		
+            	}
             	else {
             		String[] aois = aoi.split("-");
             		
             		for (int i = 0; i < aois.length; i++) {
             			if (!aoiProbability.containsKey(aois[i]))
             				aoiProbability.put(aois[i], 1.0);
+                			transitionProbability.put(aois[i], new HashMap<String,Double>());
             		}
             	}
+            	lastAoi = aoi;
+            	
             }
             
             int fixationCount = Integer.valueOf(getFixationCount(inputFile));
@@ -133,6 +145,22 @@ public class fixation {
             	System.out.println(AOIFixationCount);
             	System.out.println(probability);
             	entry.setValue(probability);
+            }
+            
+            for (Map.Entry<String, HashMap<String, Double>> entry : transitionProbability.entrySet()) {
+            	
+            	int aoiTransitions = 0;
+            	for (Map.Entry<String, Double> edge : entry.getValue().entrySet()) {
+            		
+            		aoiTransitions += edge.getValue();
+            		
+            	}
+            	for (Map.Entry<String, Double> edge : entry.getValue().entrySet()) {
+            		
+            		edge.setValue(edge.getValue()/aoiTransitions);
+            		
+            	}
+            	
             }
 
             ArrayList<String> headers = new ArrayList<>();
@@ -274,6 +302,9 @@ public class fixation {
             
             headers.add("stationary entropy");
             data.add(String.valueOf(getStationaryEntropy(aoiProbability)));
+            
+            headers.add("transition entropy");
+            data.add(String.valueOf(getTransitionEntropy(aoiProbability,transitionProbability)));
 
             outputCSVWriter.writeNext(headers.toArray(new String[headers.size()]));
             outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
@@ -409,5 +440,20 @@ public class fixation {
 		};
 		
 		return stationaryEntropy;
+	}
+	
+	public static double getTransitionEntropy(HashMap<String, Double> aoiProbability, HashMap<String,HashMap<String,Double>> transitionMatrix){
+		
+		
+    	double transitionEntropy = 0;
+		for (Map.Entry<String,HashMap<String,Double>> entry : transitionMatrix.entrySet()) {
+    		double pijSum = 0;
+    		for (Map.Entry<String, Double> edge : entry.getValue().entrySet()) {
+    			pijSum += edge.getValue() * Math.log(edge.getValue());
+    		}
+    		transitionEntropy += pijSum * -aoiProbability.get(entry.getKey());
+    	}
+		
+		return transitionEntropy;
 	}
 }
