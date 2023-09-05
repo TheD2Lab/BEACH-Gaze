@@ -117,10 +117,15 @@ public class fixation {
             		continue;
             	else if (aoiProbability.containsKey(aoi)) {
             		aoiProbability.put(aoi, aoiProbability.get(aoi) + 1);
-            		HashMap<String, Double> relationMatrix = transitionProbability.get(lastAoi);
-            		if (!lastAoi.equals("") && relationMatrix.containsKey(aoi)) {
-            			double count = relationMatrix.get(aoi);
-            			relationMatrix.put(aoi, count + 1);
+            		if (!lastAoi.equals("")) {
+            			System.out.println("Not blank");
+            			HashMap<String, Double> relationMatrix = transitionProbability.get(lastAoi);
+            			if (relationMatrix.containsKey(aoi)) {
+	            			double count = relationMatrix.get(aoi);
+	            			relationMatrix.put(aoi, count + 1);
+            			} else {
+            				relationMatrix.put(aoi, 1.0);
+            			}
             		}
             		
             	}
@@ -129,8 +134,10 @@ public class fixation {
             		
             		for (int i = 0; i < aois.length; i++) {
             			if (!aoiProbability.containsKey(aois[i]))
+            			{
             				aoiProbability.put(aois[i], 1.0);
                 			transitionProbability.put(aois[i], new HashMap<String,Double>());
+            			}
             		}
             	}
             	lastAoi = aoi;
@@ -146,6 +153,7 @@ public class fixation {
             	System.out.println(probability);
             	entry.setValue(probability);
             }
+            
             
             for (Map.Entry<String, HashMap<String, Double>> entry : transitionProbability.entrySet()) {
             	
