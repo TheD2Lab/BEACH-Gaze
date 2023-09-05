@@ -36,8 +36,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
+import java.util.HashMap;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -57,22 +59,24 @@ public class fixation {
         FileWriter outputFileWriter = new FileWriter(new File (outputFile));
         CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
         try {
-        	 FileReader fileReader = new FileReader(inputFile);
-             CSVReader csvReader = new CSVReader(fileReader);
-             String[] nextLine = csvReader.readNext();
-             int fixationDurationIndex = Arrays.asList(nextLine).indexOf("FPOGD");
-             int fixationIDIndex = Arrays.asList(nextLine).indexOf("FPOGID");
-             int fixationXIndex = Arrays.asList(nextLine).indexOf("FPOGX");
-             int fixationYIndex = Arrays.asList(nextLine).indexOf("FPOGY");
-             int timestampIndex = -1;
+        	FileReader fileReader = new FileReader(inputFile);
+            CSVReader csvReader = new CSVReader(fileReader);
+            String[] nextLine = csvReader.readNext();
+            List<String> list = Arrays.asList(nextLine);
+            int fixationDurationIndex = list.indexOf("FPOGD");
+            int fixationIDIndex = list.indexOf("FPOGID");
+            int fixationXIndex = list.indexOf("FPOGX");
+            int fixationYIndex = list.indexOf("FPOGY");
+            int aoiIndex = list.indexOf("AOI");
+            int timestampIndex = -1;
          	for(int i = 0; i < nextLine.length; i++)
          	{
          		if(nextLine[i].contains("TIME") && timestampIndex == -1) {
          			timestampIndex = i;
          		}
          	}
-
-
+         	
+         	HashMap<String, Double> aoiProbability = new HashMap<String, Double>();
 
             while((nextLine = csvReader.readNext()) != null) {
 
@@ -101,18 +105,41 @@ public class fixation {
                 eachSaccadeDetail[1] = eachDuration;
                 eachSaccadeDetail[2] = fixationID;
 
-
                 allFixationDurations.add(eachDuration);
                 allCoordinates.add(eachCoordinate);
                 allPoints.add(eachPoint);
                 saccadeDetails.add(eachSaccadeDetail);
+                
+                String aoi = nextLine[aoiIndex];
+            	if (aoi.equals(""))
+            		continue;
+            	else if (aoiProbability.containsKey(aoi))
+            		aoiProbability.put(aoi, aoiProbability.get(aoi) + 1);
+            	else {
+            		String[] aois = aoi.split("-");
+            		
+            		for (int i = 0; i < aois.length; i++) {
+            			if (!aoiProbability.containsKey(aois[i]))
+            				aoiProbability.put(aois[i], 1.0);
+            		}
+            	}
+            }
+            
+            int fixationCount = Integer.valueOf(getFixationCount(inputFile));
+            for (Map.Entry<String, Double> entry : aoiProbability.entrySet()) {
+            	Double AOIFixationCount = entry.getValue();
+            	Double probability = AOIFixationCount/fixationCount;
+            	System.out.println(entry.getKey());
+            	System.out.println(AOIFixationCount);
+            	System.out.println(probability);
+            	entry.setValue(probability);
             }
 
-            ArrayList<String>headers = new ArrayList<>();
-            ArrayList<String>data = new ArrayList<>();
+            ArrayList<String> headers = new ArrayList<>();
+            ArrayList<String> data = new ArrayList<>();
 
             headers.add("total number of fixations");
-            data.add(String.valueOf(getFixationCount(inputFile)));
+            data.add(String.valueOf(fixationCount));
 
             headers.add("sum of all fixation duration");
             data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allFixationDurations)));
@@ -244,6 +271,9 @@ public class fixation {
             
             headers.add("Average Blink Rate per Minute");
             data.add(blinkRate(inputFile));
+            
+            headers.add("stationary entropy");
+            data.add(String.valueOf(getStationaryEntropy(aoiProbability)));
 
             outputCSVWriter.writeNext(headers.toArray(new String[headers.size()]));
             outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
@@ -370,5 +400,14 @@ public class fixation {
 		double saccadeDuration = descriptiveStats.getSumOfDoubles(allSaccadeDurations);
 		return fixationDuration/saccadeDuration;
 	}
-
+	
+	public static double getStationaryEntropy(HashMap<String, Double> aoiProbability) {
+		double stationaryEntropy = 0;
+		for (Map.Entry<String, Double> entry : aoiProbability.entrySet()) {
+			double probability = entry.getValue();
+			stationaryEntropy += -probability * Math.log10(probability);
+		};
+		
+		return stationaryEntropy;
+	}
 }
