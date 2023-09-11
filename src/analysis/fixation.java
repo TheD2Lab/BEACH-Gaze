@@ -79,7 +79,7 @@ public class fixation {
          	
          	HashMap<String, Double> aoiProbability = new HashMap<String, Double>();
          	HashMap<String, HashMap<String, Double>> transitionProbability = new HashMap<String, HashMap<String, Double>>();
-         	String lastAoi = "";
+         	String[] lastAoiSet = {""};
          	
             while((nextLine = csvReader.readNext()) != null) {
                 //get each fixation's duration
@@ -111,27 +111,38 @@ public class fixation {
                 allCoordinates.add(eachCoordinate);
                 allPoints.add(eachPoint);
                 saccadeDetails.add(eachSaccadeDetail);
-                
-                String aoi = nextLine[aoiIndex];
-            	if (aoi.equals(""))
-            		continue;
-            	else if (aoiProbability.containsKey(aoi)) {
-            		aoiProbability.put(aoi, aoiProbability.get(aoi) + 1);
-            		if (!lastAoi.equals("")) {
-            			HashMap<String, Double> relationMatrix = transitionProbability.get(lastAoi);
-            			if (relationMatrix.containsKey(aoi)) {
-	            			double count = relationMatrix.get(aoi);
-	            			relationMatrix.put(aoi, count + 1);
-            			} else {
-            				relationMatrix.put(aoi, 1.0);
-            			}
-            		}
-            		
-            	} else {
-            		aoiProbability.put(aoi, 1.0);
-        			transitionProbability.put(aoi, new HashMap<String,Double>());
-            	}
-            	lastAoi = aoi;
+                try {
+	                String aoiString = nextLine[aoiIndex];
+	                String[] aoiSet = aoiString.split("-");
+	                for (int i = 0; i < aoiSet.length; i++) {
+	                	String aoi = aoiSet[i];
+	                	for (int k = 0; k < lastAoiSet.length; k++) {
+	                		String lastAoi = lastAoiSet[k];
+			            	if (aoi.equals("") || lastAoi.equals(""))
+			            		continue;
+			            	else if (aoiProbability.containsKey(aoi)) {
+			            		aoiProbability.put(aoi, aoiProbability.get(aoi) + 1);
+			            		if (!lastAoi.equals("")) {
+			            			HashMap<String, Double> relationMatrix = transitionProbability.get(lastAoi);
+			            			if (relationMatrix.containsKey(aoi)) {
+				            			double count = relationMatrix.get(aoi);
+				            			relationMatrix.put(aoi, count + 1);
+			            			} else {
+			            				relationMatrix.put(aoi, 1.0);
+			            			}
+			            		}
+			            		
+			            	} else {
+			            		aoiProbability.put(aoi, 1.0);
+			        			transitionProbability.put(aoi, new HashMap<String,Double>());
+			            	}
+	                	}
+	                }
+	            	lastAoiSet = aoiString.split("-");
+                } catch (Exception e) {
+                	System.out.println("AOI tracking failed:");
+                	System.out.println(e.toString());
+                }
             	
             }
             
