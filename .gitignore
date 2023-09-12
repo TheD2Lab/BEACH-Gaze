@@ -11,3 +11,7 @@ bin/
 desktop.ini
 .DS_Store
 */DS_Store
+
+# Ashley stuff
+AOI_data/
+.vscode/
