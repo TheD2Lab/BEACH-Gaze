@@ -112,7 +112,9 @@ public class fixation {
                 allCoordinates.add(eachCoordinate);
                 allPoints.add(eachPoint);
                 saccadeDetails.add(eachSaccadeDetail);
-                allSaccadeVelocities.add(eachSaccadeVelocity);
+                if (eachSaccadeVelocity > 0) {
+                    allSaccadeVelocities.add(eachSaccadeVelocity);
+                }
             }
 
             ArrayList<String>headers = new ArrayList<>();
