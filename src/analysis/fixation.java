@@ -52,7 +52,7 @@ public class fixation {
         ArrayList<Double> allFixationDurations = new ArrayList<>();
         ArrayList<Object> allCoordinates = new ArrayList<>();
         List<Point2D.Double> allPoints = new ArrayList<>();
-        ArrayList<Object> saccadeDetails = new ArrayList<>();
+        ArrayList<Double[]> saccadeDetails = new ArrayList<>();
 
         FileWriter outputFileWriter = new FileWriter(new File (outputFile));
         CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
@@ -111,6 +111,7 @@ public class fixation {
             ArrayList<String>headers = new ArrayList<>();
             ArrayList<String>data = new ArrayList<>();
 
+
             headers.add("total number of fixations");
             data.add(String.valueOf(getFixationCount(inputFile)));
 
@@ -132,22 +133,9 @@ public class fixation {
             headers.add("Max. fixation duration (ms)");
             data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allFixationDurations)));
 
-            ArrayList<Double> allFixationRates = getFixationRates(saccadeDetails);
-
-            headers.add("mean fixation rate (fixations per 10 seconds)");
-            data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allFixationRates)));
-
-            headers.add("median fixation rate (fixations per 10 seconds)");
-            data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allFixationRates)));
-
-            headers.add("StDev of fixation rate (fixations per 10 seconds)");
-            data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allFixationRates)));
-
-            headers.add("Min. fixation rate (fixations per 10 seconds)");
-            data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allFixationRates)));
-            
-            headers.add("Max. fixation rate (fixations per 10 seconds)");
-            data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allFixationRates)));
+            double fixationRate = getFixationRate(allFixationDurations.size(), saccadeDetails.get(saccadeDetails.size() -1)[0]);
+            headers.add("fixation rate (per sec)");
+            data.add(String.valueOf(fixationRate));
 
             Double[] allSaccadeLengths = saccade.getAllSaccadeLength(allCoordinates);
 
@@ -388,29 +376,7 @@ public class fixation {
 		return fixationDuration/saccadeDuration;
 	}
 
-    // TODO make this more readable and discuss best way to obtain timestamp
-    public static ArrayList<Double> getFixationRates(ArrayList<Object> allSaccadeDetails) {
-        final double timeUnit = 10;  // 10 seconds
-        ArrayList<Double> allFixationRates = new ArrayList<>();
-        double timeWindow = timeUnit;
-        double eachFixationRate = 0;
-        
-        for (int i = 0; i < allSaccadeDetails.size(); i++) {
-            // might be better to just put at in processFixation
-            Double[] eachDetails = (Double[]) allSaccadeDetails.get(i);
-            Double timestamp = eachDetails[0];
-
-            // assumes timestamp is strictly increasing each entry
-            if (timestamp < timeWindow) {
-                eachFixationRate++;
-            }else {
-                allFixationRates.add(eachFixationRate);
-                timeWindow += timeUnit;
-                eachFixationRate = 1;
-            }
-        }
-        // allFixationRates.add(eachFixationRate);
-
-        return allFixationRates;
+    public static double getFixationRate(double count, double time) {
+        return count/time;
     }
 }

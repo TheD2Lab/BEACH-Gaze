@@ -146,7 +146,7 @@ public class AOI {
             	HashMap<Integer, Integer> fixCount = new HashMap<Integer, Integer>();
             	ArrayList<Double> allFixationDurations = new ArrayList<Double>();
             	ArrayList<Object> allCoordinates = new ArrayList<Object>();
-            	ArrayList<Object> saccadeDetails = new ArrayList<Object>();
+            	ArrayList<Double[]> saccadeDetails = new ArrayList<Double[]>();
             	
             	// Iterate through each AOI data to populate the above lists
             	for (int i = 0; i < aoiData.size(); i++) {
