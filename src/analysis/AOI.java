@@ -66,10 +66,14 @@ public class AOI {
             
             // Iterate through input file and group points by AOI
             HashMap<String, ArrayList<String[]>> map = new HashMap<String, ArrayList<String[]>>();
+				double totalFixations = 0;
+				double totalFixDuration = 0;
             while ((nextLine = csvReader.readNext()) != null) {
             	// If the data point is not part of an AOI, skip it
             	// Else if we've already encountered this AOI, add it to it's corresponding list
             	// Otherwise create a new list if it's a new AOI
+					totalFixations++;
+					totalFixDuration += Double.valueOf(nextLine[fixDurIndex]);
             	String aoi = nextLine[aoiIndex];
             	if (aoi.equals(""))
             		continue;
@@ -97,7 +101,9 @@ public class AOI {
         	
         	// Fixation columns
         	headers.add("Fixation Count");
+			headers.add("Proportion of fixations");
         	headers.add("Total Duration");
+			headers.add("Proportion of Duration");
         	headers.add("mean fixation duration (ms)");
         	headers.add("median fixation duration (ms)");
         	headers.add("StDev of fixation durations (ms)");
@@ -145,7 +151,6 @@ public class AOI {
             	
             	ArrayList<String[]> aoiData = map.get(aoi);
             	ArrayList<Point2D.Double> allPoints = new ArrayList<Point2D.Double>();
-            	HashMap<Integer, Integer> fixCount = new HashMap<Integer, Integer>();
             	ArrayList<Double> allFixationDurations = new ArrayList<Double>();
             	ArrayList<Object> allCoordinates = new ArrayList<Object>();
             	ArrayList<Object> saccadeDetails = new ArrayList<Object>();
@@ -190,21 +195,28 @@ public class AOI {
             	ArrayList<Double> allRelativeDegrees = angle.getAllRelativeAngles(allCoordinates);
             	
             	// Calculate the convex hull and its area 
+					if (allPoints.size() > 2 ) {
             	List<Point2D.Double> boundingPoints = convexHull.getConvexHull(allPoints);
             	Point2D[] points = fixation.listToArray(boundingPoints);
             	data.add(String.valueOf(convexHull.getPolygonArea(points)));
+					} else {
+						data.add(filler);
+					}
             	
 					data.add(String.valueOf(allFixationDurations.size()));
 					// check that there were fixations
 					if (allFixationDurations.size() > 0) {
-						data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allFixationDurations)));
+						data.add(String.valueOf(allFixationDurations.size()/totalFixations));
+						double aoiTotalDuration = descriptiveStats.getSumOfDoubles(allFixationDurations);
+						data.add(String.valueOf(aoiTotalDuration));
+						data.add(String.valueOf(aoiTotalDuration/totalFixDuration));
 						data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allFixationDurations)));
 						data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allFixationDurations)));
 						data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allFixationDurations)));
 						data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allFixationDurations)));
 						data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allFixationDurations)));
 					} else {
-						for (int i = 0; i < 6; i++) {
+						for (int i = 0; i < 8; i++) {
 							data.add(filler);
 						}
 					}
@@ -245,17 +257,21 @@ public class AOI {
 					}
 
 					if (allAbsoluteDegrees.size() > 0) {
-					data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allRelativeDegrees)));
-					data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allRelativeDegrees)));
-					data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allRelativeDegrees)));
-					data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allRelativeDegrees)));
-					data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allRelativeDegrees)));
-					data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allRelativeDegrees)));
+						data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allRelativeDegrees)));
+						data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allRelativeDegrees)));
+						data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allRelativeDegrees)));
+						data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allRelativeDegrees)));
+						data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allRelativeDegrees)));
+						data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allRelativeDegrees)));
+					} else {
+						for (int i = 0; i < 6; i++) {
+							data.add(filler);
+						}
 					}
 					
 					data.add(String.valueOf(getAvgPeakSaccadeVelocity(map.get(aoi), peakVelocityIndex)));
             	
-                // Write the data into the .csv file as a new row
+               // Write the data into the .csv file as a new row
                outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
             }
             
