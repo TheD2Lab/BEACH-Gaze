@@ -94,7 +94,7 @@ public class AOI {
 					continue;
 				}
 				else {
-					String aoiPair = prevAoi + "-" + aoi;
+					String aoiPair = prevAoi + " -> " + aoi;
 					aoiTransitions.put(aoiPair, aoiTransitions.getOrDefault(aoiPair, 0)+1);
 					prevAoi = aoi;
 				}
@@ -342,6 +342,8 @@ public class AOI {
 			headers.add("AOI name");
 			headers.add("Proportion of fixations spent in AOI");
 			headers.add("Proportion of fixations durations spent in AOI");
+
+			outputCSVWriter.writeNext(headers.toArray(new String[headers.size()]));
 
 			for (String aoi : map.keySet()) {
 				ArrayList<String> data = new ArrayList<>();
