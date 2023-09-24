@@ -52,7 +52,7 @@ public class fixation {
         ArrayList<Double> allFixationDurations = new ArrayList<>();
         ArrayList<Object> allCoordinates = new ArrayList<>();
         List<Point2D.Double> allPoints = new ArrayList<>();
-        ArrayList<Object> saccadeDetails = new ArrayList<>();
+        ArrayList<Double[]> saccadeDetails = new ArrayList<>();
 
         FileWriter outputFileWriter = new FileWriter(new File (outputFile));
         CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
