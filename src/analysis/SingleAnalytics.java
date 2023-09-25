@@ -246,7 +246,7 @@ public class SingleAnalytics {
 		String graphGazeResults = "/" + pName + "_graphGZDResults.csv";
 		String graphGazeOutput = outputFolderPath + graphGazeResults;
 
-		String aoiOutput = outputFolderPath + "/AOI/";
+		String aoiOutput = outputFolderPath + "/" + pName + "_AOI/";
 		ScanPath scanPath = new ScanPath(gazepointFXDPath, outputFolderPath);
 		try {
 			scanPath.runAllClimbScan();

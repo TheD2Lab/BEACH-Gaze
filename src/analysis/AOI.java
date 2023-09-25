@@ -93,11 +93,11 @@ public class AOI {
 				if (aoi.equals(prevAoi)) {
 					continue;
 				}
-				else {
+				else if (!prevAoi.equals("")) {
 					String aoiPair = prevAoi + " -> " + aoi;
 					aoiTransitions.put(aoiPair, aoiTransitions.getOrDefault(aoiPair, 0)+1);
-					prevAoi = aoi;
 				}
+				prevAoi = aoi;
 			}
 
 			csvReader.close();
@@ -291,7 +291,7 @@ public class AOI {
 				}
 
 				// relative degrees
-				if (allAbsoluteDegrees.size() > 0) {
+				if (allRelativeDegrees.size() > 0) {
 					data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allRelativeDegrees)));
 					data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allRelativeDegrees)));
 					data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allRelativeDegrees)));
