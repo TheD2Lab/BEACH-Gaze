@@ -21,8 +21,18 @@ import com.opencsv.exceptions.CsvValidationException;
 public class AOI {
 
 	private static final String filler = "~";
-	
-	public static void processAOIs(String inputFile, String outputLocation, String name, int SCREEN_WIDTH, int SCREEN_HEIGHT) throws IOException, CsvValidationException {		
+
+	/**
+	 * Calculates descriptive gaze measures, transition features, and proportionate features for AOIs from a fixation csv file.
+	 * Generates a sub-directory in the output location containing three csv files.
+	 * @param inputFile fixation csv file
+	 * @param outputLocation directory to save files
+	 * @param name participant ID
+	 * @param SCREEN_WIDTH width in pixels
+	 * @param SCREEN_HEIGHT height in pixels
+	 * @throws CsvValidationException
+	 */
+	public static void processAOIs(String inputFile, String outputLocation, String name, int SCREEN_WIDTH, int SCREEN_HEIGHT) throws CsvValidationException {		
 		try {
 			// Read input CSV file and initalize the column indexes for the data needed
 			FileReader fileReader = new FileReader(inputFile);
@@ -104,12 +114,16 @@ public class AOI {
 
 			// create AOI directory
 			new File(outputLocation).mkdirs();
+
+			// calculates DGMs
 			String aoiFdxResults = outputLocation + name + "_aoi_graphFDXResults.csv";
 			writeFDXResults(aoiFdxResults, map, SCREEN_WIDTH, SCREEN_HEIGHT, csvIndexes, totalFixations, totalFixDuration);
 
+			// calculate transition features
 			String transFeatures = outputLocation + name + "_aoi_transitionFeatures.csv";
 			writeTransitions(transFeatures, aoiTransitions);
 
+			// calculate proportionate features
 			String proportionateFeatures = outputLocation + name + "_aoi_proportionateFeatures.csv";
 			writeProportionate(proportionateFeatures, map, csvIndexes, totalFixations, totalFixDuration);
 
@@ -122,6 +136,9 @@ public class AOI {
 	   }
 	}
 
+	/*
+	 * calculates descriptive gaze measures and saves to csv file.
+	 */
 	private static void writeFDXResults(String outputFile, HashMap<String, ArrayList<String[]>> map, int SCREEN_WIDTH, int SCREEN_HEIGHT,
 		Indexes csvIndexes, double totalFixations, double totalFixDuration) {
 		
@@ -331,9 +348,13 @@ public class AOI {
 		}
 	}
 
+	/*
+	 * Calculates comparative/proportionate AOI features and saves values to csv file.
+	 */
 	private static void writeProportionate(String outputFile, HashMap<String, ArrayList<String[]>> map,
-	Indexes csvIndexes, double totalFixations, double totalFixDuration) {
-			ArrayList<String> headers = new ArrayList<>();
+		Indexes csvIndexes, double totalFixations, double totalFixDuration) {
+
+		ArrayList<String> headers = new ArrayList<>();
 
 		try {
 			FileWriter outputFileWriter = new FileWriter(new File (outputFile));
@@ -378,6 +399,9 @@ public class AOI {
 	   }
 	}
 	
+	/*
+	 * Calculates transition AOI features and saves values to a csv file.
+	 */
 	private static void writeTransitions(String outputFile, HashMap<String, Integer> aoiTransitions) {
 
 		double totalTrans = getTotalTransitions(aoiTransitions);
@@ -415,6 +439,12 @@ public class AOI {
 	   }
 	}
 
+	/**
+	 * Calculates the average peak saccade velocity.
+	 * @param data gaze data
+	 * @param peakVelocityIndex index of peak saccade velocity
+	 * @return double average peak saccade velocity
+	 */
 	public static double getAvgPeakSaccadeVelocity(ArrayList<String[]> data, int peakVelocityIndex) {
 		double total = 0;
 		
@@ -426,6 +456,9 @@ public class AOI {
 	}
 
 
+	/*
+	 * returns total number of transitions between all AOIs
+	 */
 	private static int getTotalTransitions(HashMap<String, Integer> aoiTransitions) {
 		int total = 0;
 		for (int value : aoiTransitions.values()) {
@@ -434,17 +467,26 @@ public class AOI {
 		return total;
 	}	
 
+	/*
+	 * error logging
+	 */
 	private static void ioExceptionMessage(String fileName, IOException e) {
 		systemLogger.writeToSystemLog(Level.WARNING, WindowOperations.class.getName(), "Error reading file " + fileName + "\n" + e.toString());
 	   System.out.println("Error reading file '" + fileName + "'");
 	}
 
+	/*
+	 * error logging
+	 */
 	private static void fileNotFoundMessage(String fileName, FileNotFoundException e) {
 		systemLogger.writeToSystemLog(Level.WARNING, WindowOperations.class.getName(), "Unable to open file " + fileName + "\n" + e.toString());
 		System.out.println("Unable to open file '" + fileName + "'");
 	}
 
-	static class Indexes {
+	/*
+	 * Nested class to store column indexes for gaze data.
+	 */
+	private static class Indexes {
 		int aoiIndex = -1, xIndex = -1, yIndex = -1, fixDurIndex = -1, fixIdIndex = -1, timeIndex = -1, peakVelocityIndex = -1, blinkRateIndex = -1;
 	}
 
