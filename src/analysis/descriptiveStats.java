@@ -98,7 +98,7 @@ public class descriptiveStats {
 		if (allDoubles.length%2 == 1){
 			return allDoubles[allDoubles.length/2];
 		}else{
-			return (allDoubles[allDoubles.length/2] + allDoubles[allDoubles.length/2+1])/2;
+			return (allDoubles[allDoubles.length/2-1] + allDoubles[allDoubles.length/2])/2;
 		}
 
 	}

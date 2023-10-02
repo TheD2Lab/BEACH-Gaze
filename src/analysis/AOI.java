@@ -28,7 +28,7 @@ public class AOI {
 	 * @param SCREEN_HEIGHT height in pixels
 	 * @throws CsvValidationException
 	 */
-	public static void processAOIs(String inputFile, String outputLocation, String name, int SCREEN_WIDTH, int SCREEN_HEIGHT) throws CsvValidationException {		
+	public static void processAOIs(String inputFile, String outputLocation, String name, int SCREEN_WIDTH, int SCREEN_HEIGHT) {		
 		try (
 			FileReader fileReader = new FileReader(inputFile);
 			CSVReader csvReader = new CSVReader(fileReader);
@@ -122,13 +122,13 @@ public class AOI {
 			String proportionateFeatures = outputLocation + name + "_aoi_proportionateFeatures.csv";
 			writeProportionate(proportionateFeatures, map, csvIndexes, totalFixations, totalFixDuration);
 
-		}
-		catch(FileNotFoundException e) {
+		} catch(FileNotFoundException e) {
 			fileNotFoundMessage(inputFile, e);
-	   }
-		catch(IOException e) {
+	   } catch(IOException e) {
 			ioExceptionMessage(inputFile, e);
-	   }
+	   } catch (CsvValidationException e) {
+			csvValidationExceptionMessage(inputFile, e);
+		} 
 	}
 
 	/*
@@ -330,7 +330,7 @@ public class AOI {
 				
 				outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
 			}
-			systemLogger.writeToSystemLog(Level.INFO, WindowOperations.class.getName(), "Done writing AOI fixation results to " + outputFile);
+			systemLogger.writeToSystemLog(Level.INFO, AOI.class.getName(), "Done writing AOI fixation results to " + outputFile);
 		}
 		catch(FileNotFoundException e) {
 			fileNotFoundMessage(outputFile, e);
@@ -377,7 +377,7 @@ public class AOI {
 				// Write the data into the .csv file as a new row
 				outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
 			}
-			systemLogger.writeToSystemLog(Level.INFO, WindowOperations.class.getName(), "Done writing AOI proportionate features to " + outputFile);
+			systemLogger.writeToSystemLog(Level.INFO, AOI.class.getName(), "Done writing AOI proportionate features to " + outputFile);
 
 		}
 		catch(FileNotFoundException e) {
@@ -415,7 +415,7 @@ public class AOI {
 				data.add(proportion);
 				outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
 			}
-			systemLogger.writeToSystemLog(Level.INFO, WindowOperations.class.getName(), "Done writing AOI transition data to " + outputFile );
+			systemLogger.writeToSystemLog(Level.INFO, AOI.class.getName(), "Done writing AOI transition data to " + outputFile );
 		}
 		catch(FileNotFoundException e) {
 			fileNotFoundMessage(outputFile, e);
@@ -457,7 +457,7 @@ public class AOI {
 	 * error logging
 	 */
 	private static void ioExceptionMessage(String fileName, IOException e) {
-		systemLogger.writeToSystemLog(Level.WARNING, WindowOperations.class.getName(), "Error reading file " + fileName + "\n" + e.toString());
+		systemLogger.writeToSystemLog(Level.WARNING, AOI.class.getName(), "Error reading file " + fileName + "\n" + e.toString());
 	   System.out.println("Error reading file '" + fileName + "'");
 	}
 
@@ -465,8 +465,13 @@ public class AOI {
 	 * error logging
 	 */
 	private static void fileNotFoundMessage(String fileName, FileNotFoundException e) {
-		systemLogger.writeToSystemLog(Level.WARNING, WindowOperations.class.getName(), "Unable to open file " + fileName + "\n" + e.toString());
+		systemLogger.writeToSystemLog(Level.WARNING, AOI.class.getName(), "Unable to open file " + fileName + "\n" + e.toString());
 		System.out.println("Unable to open file '" + fileName + "'");
+	}
+
+	private static void csvValidationExceptionMessage(String fileName, CsvValidationException e) {
+		systemLogger.writeToSystemLog(Level.WARNING, AOI.class.getName(), "Problem reading from " + fileName + "\n" + e.toString());
+		System.out.println("Problem reading from '" + fileName + "'");
 	}
 
 	/*
