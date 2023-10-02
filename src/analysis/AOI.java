@@ -9,11 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
-
-import org.netlib.util.doubleW;
-
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
@@ -33,10 +29,11 @@ public class AOI {
 	 * @throws CsvValidationException
 	 */
 	public static void processAOIs(String inputFile, String outputLocation, String name, int SCREEN_WIDTH, int SCREEN_HEIGHT) throws CsvValidationException {		
-		try {
-			// Read input CSV file and initalize the column indexes for the data needed
+		try (
 			FileReader fileReader = new FileReader(inputFile);
 			CSVReader csvReader = new CSVReader(fileReader);
+		){
+			// Read input CSV file and initalize the column indexes for the data needed
 			String[] nextLine = csvReader.readNext();
 			
 			// Locate the indexes for required fields
@@ -110,8 +107,6 @@ public class AOI {
 				prevAoi = aoi;
 			}
 
-			csvReader.close();
-
 			// create AOI directory
 			new File(outputLocation).mkdirs();
 
@@ -142,11 +137,11 @@ public class AOI {
 	private static void writeFDXResults(String outputFile, HashMap<String, ArrayList<String[]>> map, int SCREEN_WIDTH, int SCREEN_HEIGHT,
 		Indexes csvIndexes, double totalFixations, double totalFixDuration) {
 		
-		try {
+		try (
 			// Initializing output writers
 			FileWriter outputFileWriter = new FileWriter(outputFile);
 			CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
-			
+		){
 			// Initialize list of headers and write it to the output .csv file
 			ArrayList<String> headers = new ArrayList<>();
 			headers.add("AOI Name");
@@ -335,9 +330,6 @@ public class AOI {
 				
 				outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
 			}
-			
-			outputCSVWriter.close();
-			System.out.println("Done writing AOI fixation results to" + outputFile);
 			systemLogger.writeToSystemLog(Level.INFO, WindowOperations.class.getName(), "Done writing AOI fixation results to " + outputFile);
 		}
 		catch(FileNotFoundException e) {
@@ -356,10 +348,10 @@ public class AOI {
 
 		ArrayList<String> headers = new ArrayList<>();
 
-		try {
+		try (
 			FileWriter outputFileWriter = new FileWriter(new File (outputFile));
 			CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
-
+		){
 			headers.add("AOI name");
 			headers.add("Proportion of fixations spent in AOI");
 			headers.add("Proportion of fixations durations spent in AOI");
@@ -385,9 +377,6 @@ public class AOI {
 				// Write the data into the .csv file as a new row
 				outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
 			}
-
-			outputCSVWriter.close();
-			System.out.println("Done writing AOI proportionate features to " + outputFile);
 			systemLogger.writeToSystemLog(Level.INFO, WindowOperations.class.getName(), "Done writing AOI proportionate features to " + outputFile);
 
 		}
@@ -407,9 +396,10 @@ public class AOI {
 		double totalTrans = getTotalTransitions(aoiTransitions);
 		ArrayList<String> headers = new ArrayList<>();
 
-		try {
+		try (
 			FileWriter outputFileWriter = new FileWriter(new File (outputFile));
 			CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
+		){
 
 			headers.add("AOI Pair");
 			headers.add("Transition Count");
@@ -425,10 +415,6 @@ public class AOI {
 				data.add(proportion);
 				outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
 			}
-
-			outputCSVWriter.close();
-			outputFileWriter.close();
-			System.out.println("Done writing AOI transition data to" + outputFile);
 			systemLogger.writeToSystemLog(Level.INFO, WindowOperations.class.getName(), "Done writing AOI transition data to " + outputFile );
 		}
 		catch(FileNotFoundException e) {
