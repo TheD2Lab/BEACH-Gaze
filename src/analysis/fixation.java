@@ -79,6 +79,7 @@ public class fixation {
          	
          	HashMap<String, Double> aoiProbability = new HashMap<String, Double>();
          	HashMap<String, HashMap<String, Double>> transitionProbability = new HashMap<String, HashMap<String, Double>>();
+         	ArrayList<String> aoiSequence = new ArrayList<String>();
          	String lastAoi = "";
          	
             while((nextLine = csvReader.readNext()) != null) {
@@ -113,6 +114,8 @@ public class fixation {
                 saccadeDetails.add(eachSaccadeDetail);
                 
                 String aoi = nextLine[aoiIndex];
+                aoiSequence.add(aoi);
+                
             	if (aoi.equals(""))
             		continue;
             	else if (aoiProbability.containsKey(aoi)) {
@@ -147,19 +150,13 @@ public class fixation {
             
             
             for (Map.Entry<String, HashMap<String, Double>> entry : transitionProbability.entrySet()) {
-            	
             	int aoiTransitions = 0;
             	for (Map.Entry<String, Double> edge : entry.getValue().entrySet()) {
-            		
             		aoiTransitions += edge.getValue();
-            		
             	}
             	for (Map.Entry<String, Double> edge : entry.getValue().entrySet()) {
-            		
             		edge.setValue(edge.getValue()/aoiTransitions);
-            		
             	}
-            	
             }
 
             ArrayList<String> headers = new ArrayList<>();
@@ -309,6 +306,8 @@ public class fixation {
             outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
             outputCSVWriter.close();
             csvReader.close();
+            
+            generateAOISequenceFile(aoiSequence, outputFile);
 
             systemLogger.writeToSystemLog(Level.INFO, fixation.class.getName(), "done writing fixation data to " + outputFile);
 
@@ -454,5 +453,52 @@ public class fixation {
     	}
 		
 		return transitionEntropy;
+	}
+	
+	public static void generateAOISequenceFile(ArrayList<String> aoiSequence, String outputFile) {
+		String participant = outputFile.substring(outputFile.lastIndexOf("/") + 1, outputFile.lastIndexOf("_"));
+		String dir = outputFile.substring(0, outputFile.lastIndexOf("/"));
+		String header = ">participant = " + participant;
+		String sequence = "";
+		
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		int asciiTable = 65;
+		
+		for (String aoi : aoiSequence) {
+			if (!map.containsKey(aoi)) {
+				map.put(aoi,map.size() + asciiTable);
+			}
+			
+			int ascii = map.get(aoi);
+			char c = (char)ascii;
+			
+			sequence += c;
+		}
+		
+		File aoiDescriptions = new File(dir + "/aoiDescriptions.txt");
+		File sequences = new File(dir + "/sequences.txt");
+		
+		try {
+			FileWriter aoiWriter = new FileWriter(aoiDescriptions);
+			FileWriter sequencesWriter = new FileWriter(sequences);
+			
+			sequencesWriter.write(header += "\n");
+			sequencesWriter.write(sequence);
+			
+			System.out.println("Sequence: " + sequence);
+			
+			for (String aoi: map.keySet()) {
+				int ascii = map.get(aoi);
+				char c = (char)ascii;
+				
+				aoiWriter.write(c + ", " + aoi + ", " + "\n");
+			}
+			
+			aoiWriter.close();
+			sequencesWriter.close();
+			
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 	}
 }
