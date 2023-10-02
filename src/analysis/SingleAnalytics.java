@@ -263,7 +263,7 @@ public class SingleAnalytics {
 			modifier.csvToARFF(graphGazeOutput);
 	
 			//combining all result files
-			modifier.mergingResultFiles(gazepointFXDPath, graphEventOutput, graphGazeOutput, outputFolderPath + "/combineResults.csv");
+			modifier.mergingResultFiles(graphFixationOutput, graphEventOutput, graphGazeOutput, outputFolderPath + "/combineResults.csv");
 			modifier.csvToARFF(outputFolderPath + "/combineResults.csv");
 	
 			// Analyze AOI data
