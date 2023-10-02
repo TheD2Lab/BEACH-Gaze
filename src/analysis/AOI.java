@@ -16,6 +16,7 @@ import com.opencsv.exceptions.CsvValidationException;
 
 public class AOI {
 
+	// Placeholder symbol for when value cannot be calculated
 	private static final String filler = "~";
 
 	/**
@@ -26,7 +27,6 @@ public class AOI {
 	 * @param name participant ID
 	 * @param SCREEN_WIDTH width in pixels
 	 * @param SCREEN_HEIGHT height in pixels
-	 * @throws CsvValidationException
 	 */
 	public static void processAOIs(String inputFile, String outputLocation, String name, int SCREEN_WIDTH, int SCREEN_HEIGHT) {		
 		try (
@@ -135,7 +135,7 @@ public class AOI {
 	 * calculates descriptive gaze measures and saves to csv file.
 	 */
 	private static void writeFDXResults(String outputFile, HashMap<String, ArrayList<String[]>> map, int SCREEN_WIDTH, int SCREEN_HEIGHT,
-		Indexes csvIndexes, double totalFixations, double totalFixDuration) {
+			Indexes csvIndexes, double totalFixations, double totalFixDuration) {
 		
 		try (
 			// Initializing output writers
@@ -478,7 +478,14 @@ public class AOI {
 	 * Nested class to store column indexes for gaze data.
 	 */
 	private static class Indexes {
-		int aoiIndex = -1, xIndex = -1, yIndex = -1, fixDurIndex = -1, fixIdIndex = -1, timeIndex = -1, peakVelocityIndex = -1, blinkRateIndex = -1;
+		int aoiIndex = -1;
+		int xIndex = -1;
+		int yIndex = -1;
+		int fixDurIndex = -1;
+		int fixIdIndex = -1;
+		int timeIndex = -1;
+		int peakVelocityIndex = -1;
+		int blinkRateIndex = -1;
 	}
 
 }
