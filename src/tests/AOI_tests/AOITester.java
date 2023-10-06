@@ -17,60 +17,60 @@ import analysis.WindowOperations;
 
 public class AOITester {
 
-   final static int SCREEN_WIDTH = 1920;
+	final static int SCREEN_WIDTH = 1920;
 	final static int SCREEN_HEIGHT = 1080;
-   private static String inputFile;
-   private static String outputFolder;
-   private static String expectedFolder;
-   private static String name = "Test";
-   public static void main(String[] args) {
+	private static String inputFile;
+	private static String outputFolder;
+	private static String expectedFolder;
+	private static String name = "Test";
+	public static void main(String[] args) {
 
-      // Change directory names if necessary
-      Path currentRelativePath = Paths.get("");
-      String currentPath = currentRelativePath.toAbsolutePath().toString() + "/src/tests/AOI_tests/";
-      inputFile = currentPath + "/aoi_test_data.csv";
-      outputFolder = currentPath + "/output/";
-      expectedFolder = currentPath + "/expected_output/";
-      systemLogger.createSystemLog(outputFolder);
+		// Change directory names if necessary
+		Path currentRelativePath = Paths.get("");
+		String currentPath = currentRelativePath.toAbsolutePath().toString() + "/src/tests/AOI_tests/";
+		inputFile = currentPath + "/aoi_test_data.csv";
+		outputFolder = currentPath + "/output/";
+		expectedFolder = currentPath + "/expected_output/";
+		systemLogger.createSystemLog(outputFolder);
 
-      generateOutput();
-      checkProportionateFeatures();
-      checkTransitionFeatures();
-      systemLogger.writeToSystemLog(Level.INFO, AOITester.class.getName(), "AOI tests complete.");
-   }
+		generateOutput();
+		checkProportionateFeatures();
+		checkTransitionFeatures();
+		systemLogger.writeToSystemLog(Level.INFO, AOITester.class.getName(), "AOI tests complete.");
+	}
 
-   private static void generateOutput() {
-      AOI.processAOIs(inputFile, outputFolder, name, SCREEN_WIDTH, SCREEN_HEIGHT);
-   }
+	private static void generateOutput() {
+		AOI.processAOIs(inputFile, outputFolder, name, SCREEN_WIDTH, SCREEN_HEIGHT);
+	}
 
-   private static void checkProportionateFeatures() {
-      String expectedFile = expectedFolder + "/Expected_aoi_proportionateFeatures.csv";
-      String testFile = outputFolder + "/Test_aoi_proportionateFeatures.csv";
-      assert compareFiles(expectedFile, testFile) : "Incorrect Proportionate Features";
-   }
+	private static void checkProportionateFeatures() {
+		String expectedFile = expectedFolder + "/Expected_aoi_proportionateFeatures.csv";
+		String testFile = outputFolder + "/Test_aoi_proportionateFeatures.csv";
+		assert compareFiles(expectedFile, testFile) : "Incorrect Proportionate Features";
+	}
 
-   private static void checkTransitionFeatures() {
-      String expectedFile = expectedFolder + "/Expected_aoi_transitionFeatures.csv";
-      String testFile = outputFolder + "/Test_aoi_transitionFeatures.csv";
-      assert compareFiles(expectedFile, testFile) : "Incorrect Transition Features";
-   }
+	private static void checkTransitionFeatures() {
+		String expectedFile = expectedFolder + "/Expected_aoi_transitionFeatures.csv";
+		String testFile = outputFolder + "/Test_aoi_transitionFeatures.csv";
+		assert compareFiles(expectedFile, testFile) : "Incorrect Transition Features";
+	}
 
-   private static boolean compareFiles(String expectedFile, String testFile) {
-      String eLine;
-      String tLine;
-      try (
-         BufferedReader expectedCSV = new BufferedReader(new FileReader(expectedFile));
-         BufferedReader testFileCSV = new BufferedReader(new FileReader(testFile));
-      ){
-         while ((eLine = expectedCSV.readLine()) != null && (tLine = testFileCSV.readLine()) != null) {
-            if (!eLine.equalsIgnoreCase(tLine)) {
-               return false;
-            }
-         }
-         return true;
-      } catch (IOException e) {
-         systemLogger.writeToSystemLog(Level.WARNING, WindowOperations.class.getName(), "Could not compare " + expectedFile + " and " + testFile);
-      }
-      return false;
-   }
+	private static boolean compareFiles(String expectedFile, String testFile) {
+		String eLine;
+		String tLine;
+		try (
+			BufferedReader expectedCSV = new BufferedReader(new FileReader(expectedFile));
+			BufferedReader testFileCSV = new BufferedReader(new FileReader(testFile));
+		){
+			while ((eLine = expectedCSV.readLine()) != null && (tLine = testFileCSV.readLine()) != null) {
+				if (!eLine.equalsIgnoreCase(tLine)) {
+					return false;
+				}
+			}
+			return true;
+		} catch (IOException e) {
+			systemLogger.writeToSystemLog(Level.WARNING, WindowOperations.class.getName(), "Could not compare " + expectedFile + " and " + testFile);
+		}
+		return false;
+	}
 }
