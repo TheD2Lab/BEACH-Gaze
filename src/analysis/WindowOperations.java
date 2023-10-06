@@ -85,7 +85,7 @@ public class WindowOperations {
 	{
 		int endTime = windowSize;
 		int initialTime = 0;
-		String outputFile = outputFolder + "/snapshot_" + endTime + ".csv";
+		String outputFile = "/snapshot_" + endTime + ".csv";
 		try {
 			while(gazeWindow(inputFile,outputFile,outputFolder,initialTime,endTime))
 			{
@@ -125,21 +125,21 @@ public class WindowOperations {
 		
 		
 		FileWriter outputFileWriter = new FileWriter(new File (outputFile));
-        CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
-        FileReader inputFileReader = new FileReader(inputFilePath);
-        CSVReader inputCSVReader = new CSVReader(inputFileReader);
-        FileReader baselineFileReader = new FileReader(baselineFilePath);
-        CSVReader baselineCSVReader = new CSVReader(baselineFileReader);
-        //Grabs the baseline value based on the chosen header
+		CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
+		FileReader inputFileReader = new FileReader(inputFilePath);
+		CSVReader inputCSVReader = new CSVReader(inputFileReader);
+		FileReader baselineFileReader = new FileReader(baselineFilePath);
+		CSVReader baselineCSVReader = new CSVReader(baselineFileReader);
+		//Grabs the baseline value based on the chosen header
 
-        try
-        {	
+		try
+		{	
 
-        	//headers
-            String[]nextLine = baselineCSVReader.readNext();
-            nextLine = baselineCSVReader.readNext();
-            baseline = Double.valueOf(nextLine[baselineHeaderIndex]);
-        }
+		//headers
+			String[]nextLine = baselineCSVReader.readNext();
+			nextLine = baselineCSVReader.readNext();
+			baseline = Double.valueOf(nextLine[baselineHeaderIndex]);
+		}
         catch (Exception e)
         {
     		systemLogger.writeToSystemLog(Level.SEVERE, WindowOperations.class.getName(), "Error with event window baseline reading " + outputFile + "\n" + e.toString());
@@ -198,8 +198,8 @@ public class WindowOperations {
 	        			outputFile = outputFolderPath + "/event_" + index + ".csv";
 	        			outputCalcFile = outputFolderPath + "/eventCalc_" + index + ".csv";
 	        			outputFileWriter = new FileWriter(new File (outputFile));
-	        	        outputCSVWriter = new CSVWriter(outputFileWriter);
-	        	        outputCSVWriter.writeNext(header);
+						outputCSVWriter = new CSVWriter(outputFileWriter);
+						outputCSVWriter.writeNext(header);
 	        		}
         		}
         		else
@@ -250,53 +250,52 @@ public class WindowOperations {
 		try 
 		{
 		//header
-				String[]nextLine = csvReader.readNext();
-				outputCSVWriter.writeNext(nextLine);
-				
-				int timestampIndex = -1;
-				for(int i = 0; i < nextLine.length; i++)
+			String[]nextLine = csvReader.readNext();
+			outputCSVWriter.writeNext(nextLine);
+			
+			int timestampIndex = -1;
+			for(int i = 0; i < nextLine.length; i++)
+			{
+				if(nextLine[i].contains("TIME("))
 				{
-					if(nextLine[i].contains("TIME("))
-					{
-						timestampIndex = i;
-						break;
-					}
+					timestampIndex = i;
+					break;
 				}
-				
-				while((nextLine = csvReader.readNext()) != null) 
+			}
+			
+			while((nextLine = csvReader.readNext()) != null) 
+			{
+				if(Double.valueOf(nextLine[timestampIndex]) < start)
 				{
-					if(Double.valueOf(nextLine[timestampIndex]) < start)
-					{
-						continue;
-					}
-					else if(Double.valueOf(nextLine[timestampIndex]) > end)
-					{
-						break;
-					}
-					else
-					{
-						outputCSVWriter.writeNext(nextLine);
-					}
+					continue;
 				}
+				else if(Double.valueOf(nextLine[timestampIndex]) > end)
+				{
+					break;
+				}
+				else
+				{
+					outputCSVWriter.writeNext(nextLine);
+				}
+			}
 
-				if((nextLine = csvReader.readNext()).equals(null))
-				{
-					return false;
-				}
+			if((nextLine = csvReader.readNext()).equals(null))
+			{
+				return false;
+			}
 				
-		systemLogger.writeToSystemLog(Level.INFO, WindowOperations.class.getName(), "Successfully created file " + outputFile );
+			systemLogger.writeToSystemLog(Level.INFO, WindowOperations.class.getName(), "Successfully created file " + outputFile );
 		}
 		catch(NullPointerException ne)
 		{
-		System.out.println("done writing file: " + outputFile);
-		outputCSVWriter.close();
-		return false;
+			System.out.println("done writing file: " + outputFile);
+			outputCSVWriter.close();
+			return false;
 		}
 		catch(Exception e)
 		{
-		systemLogger.writeToSystemLog(Level.SEVERE, WindowOperations.class.getName(), "Error with window method  " + outputFile + "\n" + e.toString());
-		System.exit(0);
-
+			systemLogger.writeToSystemLog(Level.SEVERE, WindowOperations.class.getName(), "Error with window method  " + outputFile + "\n" + e.toString());
+			System.exit(0);
 		}
 		finally
 		{
@@ -305,7 +304,5 @@ public class WindowOperations {
 		}
 		return true;
 	}
-	
-	
 	
 }
