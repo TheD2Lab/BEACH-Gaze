@@ -16,29 +16,29 @@ import com.opencsv.exceptions.CsvValidationException;
 public class WindowOperations {
 
 	/**
-	 * Creates CSV files by dividing the data into nonoverlapping, fixed-size windows
+	 * Creates CSV files by dividing the data into nonoverlapping, fixed-size windows called digests.
 	 *  
 	 * @param inputFile		path of the input file that contains the data 
 	 * @param outputFolder 	path of the output folder where the windowed data will be stored
 	 * @param windowSize 	value that specifies the size of the window to be used in the operation
 	 * @throws CsvValidationException
 	 */
-	public static void continuousWindow(String inputFile, String outputFolder, int windowSize) throws CsvValidationException
+	public static void digestWindow(String inputFile, String outputFolder, int windowSize) throws CsvValidationException
 	{
 		int endTime = windowSize;
 		int initialTime = 0;
-		String outputFile = "/continuous_" + endTime + ".csv";
+		String outputFile = "/digest_" + endTime + ".csv";
 		try {
-			while(snapshot(inputFile,outputFile, outputFolder, initialTime,endTime))
+			while(gazeWindow(inputFile,outputFile, outputFolder, initialTime,endTime))
 			{
 				initialTime += windowSize;
 				endTime += windowSize;
-				outputFile = "/continuous_" + endTime + ".csv";
+				outputFile = "/digest_" + endTime + ".csv";
 			}
 		} 
 		catch (IOException e) 
 		{
-			 systemLogger.writeToSystemLog(Level.WARNING, WindowOperations.class.getName(), "Error with continuous window output " + outputFile + "\n" + e.toString());
+			 systemLogger.writeToSystemLog(Level.WARNING, WindowOperations.class.getName(), "Error with digest window output " + outputFile + "\n" + e.toString());
 		}
 
 	}
@@ -59,7 +59,7 @@ public class WindowOperations {
 		String outputFile = "/cumulative_" + endTime + ".csv";
 		try 
 		{
-			while(snapshot(inputFile,outputFile,outputFolder,initialTime,endTime))
+			while(gazeWindow(inputFile,outputFile,outputFolder,initialTime,endTime))
 			{
 				endTime += windowSize;
 				outputFile = "/cumulative_" + endTime + ".csv";
@@ -72,7 +72,7 @@ public class WindowOperations {
 	}
 	
 	/**
-	 * Creates CSV files by dividing the data into overlapping, fixed-size windows. 
+	 * Creates CSV files by dividing the data into overlapping, fixed-size windows called snapshots. 
 	 * The user has the ability to customize the degree of overlap and the size of the windows according to their preferences. 
 	 * 
 	 * @param inputFile		path of the input file that contains the data 
@@ -81,23 +81,23 @@ public class WindowOperations {
 	 * @param overlap		value the specifies the size of the overlap 
 	 * @throws CsvValidationException
 	 */
-	public static void overlappingWindow(String inputFile, String outputFolder, int windowSize, int overlap) throws CsvValidationException
+	public static void snapshotWindow(String inputFile, String outputFolder, int windowSize, int overlap) throws CsvValidationException
 	{
 		int endTime = windowSize;
 		int initialTime = 0;
-		String outputFile = outputFolder + "/overlap_" + endTime + ".csv";
+		String outputFile = "/snapshot_" + endTime + ".csv";
 		try {
-			while(snapshot(inputFile,outputFile,outputFolder,initialTime,endTime))
+			while(gazeWindow(inputFile,outputFile,outputFolder,initialTime,endTime))
 			{
 				initialTime = endTime - overlap;
 				endTime += windowSize;
-				outputFile = "/overlap_" + endTime + ".csv";
+				outputFile = "/snapshot_" + endTime + ".csv";
 				
 			}
 		} 
 		catch (IOException e) 
 		{
-			 systemLogger.writeToSystemLog(Level.WARNING, WindowOperations.class.getName(), "Error with overlapping window output " + outputFile + "\n" + e.toString());
+			 systemLogger.writeToSystemLog(Level.WARNING, WindowOperations.class.getName(), "Error with snapshot window output " + outputFile + "\n" + e.toString());
 		}
 	}
 	
@@ -109,7 +109,7 @@ public class WindowOperations {
 	 * @param outputFolderPath		path of the output folder where the windowed data will be stored
 	 * @param baselineFilePath 		path of the baseline file
 	 * @param baselineHeaderIndex	the index of the selected value in the baseline file 
-	 * @param inputHeaderIndex		the index of the selected value in the selected file 
+	 * @param inputHeaderIndex		the index of the selected value in the selected fileï¿½
 	 * @param maxDur				the max duration an event can continue
 	 * @throws IOException
 	 */
@@ -125,21 +125,21 @@ public class WindowOperations {
 		
 		
 		FileWriter outputFileWriter = new FileWriter(new File (outputFile));
-        CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
-        FileReader inputFileReader = new FileReader(inputFilePath);
-        CSVReader inputCSVReader = new CSVReader(inputFileReader);
-        FileReader baselineFileReader = new FileReader(baselineFilePath);
-        CSVReader baselineCSVReader = new CSVReader(baselineFileReader);
-        //Grabs the baseline value based on the chosen header
+		CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
+		FileReader inputFileReader = new FileReader(inputFilePath);
+		CSVReader inputCSVReader = new CSVReader(inputFileReader);
+		FileReader baselineFileReader = new FileReader(baselineFilePath);
+		CSVReader baselineCSVReader = new CSVReader(baselineFileReader);
+		//Grabs the baseline value based on the chosen header
 
-        try
-        {	
+		try
+		{	
 
-        	//headers
-            String[]nextLine = baselineCSVReader.readNext();
-            nextLine = baselineCSVReader.readNext();
-            baseline = Double.valueOf(nextLine[baselineHeaderIndex]);
-        }
+		//headers
+			String[]nextLine = baselineCSVReader.readNext();
+			nextLine = baselineCSVReader.readNext();
+			baseline = Double.valueOf(nextLine[baselineHeaderIndex]);
+		}
         catch (Exception e)
         {
     		systemLogger.writeToSystemLog(Level.SEVERE, WindowOperations.class.getName(), "Error with event window baseline reading " + outputFile + "\n" + e.toString());
@@ -198,8 +198,8 @@ public class WindowOperations {
 	        			outputFile = outputFolderPath + "/event_" + index + ".csv";
 	        			outputCalcFile = outputFolderPath + "/eventCalc_" + index + ".csv";
 	        			outputFileWriter = new FileWriter(new File (outputFile));
-	        	        outputCSVWriter = new CSVWriter(outputFileWriter);
-	        	        outputCSVWriter.writeNext(header);
+						outputCSVWriter = new CSVWriter(outputFileWriter);
+						outputCSVWriter.writeNext(header);
 	        		}
         		}
         		else
@@ -230,7 +230,7 @@ public class WindowOperations {
 	}
 	
 	/**
-	 * creates a CSV file containing all of the data points within the given start and end times based on the input file
+	 * creates a CSV file containing all of the data points within the given start and end times based on the input file.
 	 * 
 	 * @param inputFile		the CSV file containing the data points that will be copied
 	 * @param fileName		the name of the input CSV file
@@ -239,73 +239,70 @@ public class WindowOperations {
 	 * @param end			the end time
 	 * @return	boolean		true if the program was able to successfully execute it, false otherwise
 	 */
-	private static boolean snapshot(String inputFile, String fileName, String outputFolder, int start, int end) throws IOException, CsvValidationException
+	private static boolean gazeWindow(String inputFile, String fileName, String outputFolder, int start, int end) throws IOException, CsvValidationException
 	{
 		String outputFile = outputFolder + fileName;
 		FileWriter outputFileWriter = new FileWriter(new File (outputFile));
-        CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
-        FileReader fileReader = new FileReader(inputFile);
-        CSVReader csvReader = new CSVReader(fileReader);
+		CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
+		FileReader fileReader = new FileReader(inputFile);
+		CSVReader csvReader = new CSVReader(fileReader);
 
-        try 
-        {
-        	//header
-             String[]nextLine = csvReader.readNext();
-             outputCSVWriter.writeNext(nextLine);
-             
-             int timestampIndex = -1;
-             for(int i = 0; i < nextLine.length; i++)
-             {
-            	 if(nextLine[i].contains("TIME("))
-            	 {
-            		 timestampIndex = i;
-            		 break;
-            	 }
-             }
-             
-             while((nextLine = csvReader.readNext()) != null) 
-             {
-            	 if(Double.valueOf(nextLine[timestampIndex]) < start)
-            	 {
-            		 continue;
-            	 }
-            	 else if(Double.valueOf(nextLine[timestampIndex]) > end)
-            	 {
-            		 break;
-            	 }
-            	 else
-            	 {
-            		 outputCSVWriter.writeNext(nextLine);
-            	 }
-             }
+		try 
+		{
+		//header
+			String[]nextLine = csvReader.readNext();
+			outputCSVWriter.writeNext(nextLine);
+			
+			int timestampIndex = -1;
+			for(int i = 0; i < nextLine.length; i++)
+			{
+				if(nextLine[i].contains("TIME("))
+				{
+					timestampIndex = i;
+					break;
+				}
+			}
+			
+			while((nextLine = csvReader.readNext()) != null) 
+			{
+				if(Double.valueOf(nextLine[timestampIndex]) < start)
+				{
+					continue;
+				}
+				else if(Double.valueOf(nextLine[timestampIndex]) > end)
+				{
+					break;
+				}
+				else
+				{
+					outputCSVWriter.writeNext(nextLine);
+				}
+			}
 
-             if((nextLine = csvReader.readNext()).equals(null))
-             {
-            	 return false;
-             }
-             
-     		systemLogger.writeToSystemLog(Level.INFO, WindowOperations.class.getName(), "Successfully created file " + outputFile );
-        }
-        catch(NullPointerException ne)
-        {
-        	System.out.println("done writing file: " + outputFile);
-        	outputCSVWriter.close();
-        	return false;
-        }
-        catch(Exception e)
-        {
-    		systemLogger.writeToSystemLog(Level.SEVERE, WindowOperations.class.getName(), "Error with window method  " + outputFile + "\n" + e.toString());
-    		System.exit(0);
-
-        }
-        finally
-        {
-            outputCSVWriter.close();
-            csvReader.close();
-        }
-        return true;
+			if((nextLine = csvReader.readNext()).equals(null))
+			{
+				return false;
+			}
+				
+			systemLogger.writeToSystemLog(Level.INFO, WindowOperations.class.getName(), "Successfully created file " + outputFile );
+		}
+		catch(NullPointerException ne)
+		{
+			System.out.println("done writing file: " + outputFile);
+			outputCSVWriter.close();
+			return false;
+		}
+		catch(Exception e)
+		{
+			systemLogger.writeToSystemLog(Level.SEVERE, WindowOperations.class.getName(), "Error with window method  " + outputFile + "\n" + e.toString());
+			System.exit(0);
+		}
+		finally
+		{
+			outputCSVWriter.close();
+			csvReader.close();
+		}
+		return true;
 	}
-	
-	
 	
 }
