@@ -154,7 +154,7 @@ public class AOI {
                double y = Double.valueOf(entry[indexes.yIndex]) * SCREEN_HEIGHT;
                double id = Double.valueOf(entry[indexes.fixIdIndex]);
                double duration = Double.valueOf(entry[indexes.fixDurIndex]);
-               double timestamp = Double.valueOf(indexes.timeIndex);
+               double timestamp = Double.valueOf(entry[indexes.timeIndex]);
                
                
                // Add each point to a list
@@ -173,6 +173,7 @@ public class AOI {
                saccadeDetail[0] = timestamp;
                saccadeDetail[1] = duration;
                saccadeDetail[2] = id;
+
                saccadeDetails.add(saccadeDetail);
                
                // Add duration value to list
