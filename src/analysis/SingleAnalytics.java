@@ -293,39 +293,39 @@ public class SingleAnalytics {
 		
 		//create folder to put the analysis in
 		String dir = "/results/" + outputFolderPath.substring(outputFolderPath.lastIndexOf("/") + 1) + "/inputFiles/";
-		File windowFolder = new File(outputFolderPath + "/" + pName + "_WindowFolder");
-		windowFolder.mkdir();
-		String outputFolder = windowFolder.getPath();
+		File snapshotFolder = new File(outputFolderPath + "/" + pName + "_SnapshotFolder");
+		snapshotFolder.mkdir();
+		String outputFolder = snapshotFolder.getPath();
 		
 		GridBagConstraints c = new GridBagConstraints();
 		ButtonGroup bg = new ButtonGroup();
 		
 		JLabel qLabel = new JLabel("Please pick an option");		
 		JPanel optionsPanel = new JPanel(new FlowLayout());
-		JRadioButton digestsButton = new JRadioButton("Gaze Digests");
-		JRadioButton cumulativeButton = new JRadioButton("Cumulative Gaze");
-		JRadioButton snapshotButton = new JRadioButton("Gaze Snapshots");
-		JRadioButton gazeEventsButton = new JRadioButton("Gaze Events");
+		JRadioButton continuousSnapshotButton = new JRadioButton("Continuous Snapshot");
+		JRadioButton cumulativeSnapshotButton = new JRadioButton("Cumulative Snapshot");
+		JRadioButton overlappingSnapshotButton = new JRadioButton("Overlapping Snapshot");
+		JRadioButton eventAnalyticsButton = new JRadioButton("Event Analytics");
 		JRadioButton exitBtn = new JRadioButton("Exit");
 		JButton btn = new JButton("OK");
 
 		qLabel.setFont(new Font("Verdana", Font.PLAIN, 20));
-		digestsButton.setToolTipText("This option generates gaze data in a series of fixed, non-overlapping windows");
-		cumulativeButton.setToolTipText("This option generates gaze data in a series of expanding windows that increases with every interval");
-		snapshotButton.setToolTipText("This option generates gaze data in a series of fixed and overlapping windows");
-		gazeEventsButton.setToolTipText("This option generates a baseline file based on the first two minutes of the gaze data, and then compares it to the rest of the file");
+		continuousSnapshotButton.setToolTipText("This option generates gaze data in a series of fixed, non-overlapping windows");
+		cumulativeSnapshotButton.setToolTipText("This option generates gaze data in a series of expanding windows that increases with every interval");
+		overlappingSnapshotButton.setToolTipText("This option generates gaze data in a series of fixed and overlapping windows");
+		eventAnalyticsButton.setToolTipText("This option generates a baseline file based on the first two minutes of the gaze data, and then compares it to the rest of the file");
 		
 		//Adds all the JRadioButton to a layout
-		bg.add(digestsButton);
-		bg.add(cumulativeButton);
-		bg.add(snapshotButton);
-		bg.add(gazeEventsButton);
+		bg.add(continuousSnapshotButton);
+		bg.add(cumulativeSnapshotButton);
+		bg.add(overlappingSnapshotButton);
+		bg.add(eventAnalyticsButton);
 		bg.add(exitBtn);
 		//Adds all the JRadioButton to a a flow layout
-		optionsPanel.add(digestsButton);
-		optionsPanel.add(cumulativeButton);
-		optionsPanel.add(snapshotButton);
-		optionsPanel.add(gazeEventsButton);
+		optionsPanel.add(continuousSnapshotButton);
+		optionsPanel.add(cumulativeSnapshotButton);
+		optionsPanel.add(overlappingSnapshotButton);
+		optionsPanel.add(eventAnalyticsButton);
 		optionsPanel.add(exitBtn);
 		
 		c.gridx = 0;//set the x location of the grid for the next component
@@ -356,17 +356,17 @@ public class SingleAnalytics {
 			c.gridy = 0;
 			panel.add(image,c);
 			
-			if(digestsButton.isSelected()||cumulativeButton.isSelected())
+			if(continuousSnapshotButton.isSelected()||cumulativeSnapshotButton.isSelected())
 			{
-				gazeDigCumulAction(c, outputFolder,dir, digestsButton.isSelected());
+				contCumulWindowAction(c, outputFolder,dir, continuousSnapshotButton.isSelected());
 			}
-			else if(snapshotButton.isSelected())
+			else if(overlappingSnapshotButton.isSelected())
 			{
-				gazeSnapshotAction(c, outputFolder,dir);
+				overlappingWindowAction(c, outputFolder,dir);
 			}
-			else if(gazeEventsButton.isSelected())
+			else if(eventAnalyticsButton.isSelected())
 			{
-				gazeEventsAction(c, outputFolder,dir);	
+				eventWindowAction(c, outputFolder,dir);	
 			}
 		});
 		
@@ -374,14 +374,14 @@ public class SingleAnalytics {
 	}
 
 	/**
-	 * UI for both gaze digests and cumulative gaze windows.
+	 * UI for both continuous and cumulative window
 	 * 
 	 * @param	c					layout type
 	 * @param	outputFolder		the path where the generated files will reside
 	 * @param	dir					sets the directory 
-	 * @param	digestWindowSelect	returns true if the user selected gaze digest.
+	 * @param	contiWindowSelect	returns true if the user selected continuous window
 	 */
-	private static void gazeDigCumulAction(GridBagConstraints c, String outputFolder, String dir, boolean digestWindowSelected)
+	private static void contCumulWindowAction(GridBagConstraints c, String outputFolder, String dir, boolean contiWindowSelected)
 	{
 		JPanel userInputPanel = new JPanel(new FlowLayout());
 		String gazepointFile = modifier.fileChooser("Please select which file you would like to parse out", dir);
@@ -400,11 +400,11 @@ public class SingleAnalytics {
 		panel.revalidate();
 
 		contBtn.addActionListener(ev -> {
-			if(digestWindowSelected)
+			if(contiWindowSelected)
 			{
 				try 
 				{
-					WindowOperations.digestWindow(gazepointFile, outputFolder,Integer.parseInt(windowSizeInput.getText()) );
+					WindowOperations.continuousWindow(gazepointFile, outputFolder,Integer.parseInt(windowSizeInput.getText()) );
 				} 
 				catch (NumberFormatException | CsvValidationException e1) 
 				{
@@ -432,13 +432,13 @@ public class SingleAnalytics {
 	}
 	
 	/**
-	 * UI for gaze snapshots. Snapshots are partly overlapping windows.
+	 * UI for overlapping window
 	 * 
 	 * @param	c					layout type
 	 * @param	outputFolder		the path where the generated files will reside
 	 * @param	dir					sets the directory 
 	 */
-	private static void gazeSnapshotAction(GridBagConstraints c, String outputFolder, String dir)
+	private static void overlappingWindowAction(GridBagConstraints c, String outputFolder, String dir)
 	{
 		JPanel userInputPanel0 = new JPanel(new FlowLayout());
 		JPanel userInputPanel1 = new JPanel(new FlowLayout());
@@ -466,7 +466,7 @@ public class SingleAnalytics {
 		overlappingBtn.addActionListener(ev -> {
 			try 
 			{
-				WindowOperations.snapshotWindow(gazepointFile, outputFolder,Integer.parseInt(windowSizeInput.getText()), Integer.parseInt(overlappingInput.getText()) );
+				WindowOperations.overlappingWindow(gazepointFile, outputFolder,Integer.parseInt(windowSizeInput.getText()), Integer.parseInt(overlappingInput.getText()) );
 			} 
 			catch (NumberFormatException | CsvValidationException e1) 
 			{
@@ -479,13 +479,13 @@ public class SingleAnalytics {
 	}
 	
 	/**
-	 * UI for gaze events.
+	 * UI for event window
 	 * 
 	 * @param	c					layout type
 	 * @param	outputFolder		the path where the generated files will reside
 	 * @param	dir					sets the directory 
 	 */
-	private static void gazeEventsAction(GridBagConstraints c, String outputFolder, String dir)
+	private static void eventWindowAction(GridBagConstraints c, String outputFolder, String dir)
 	{
 		String gazepointFilePath = modifier.fileChooser("Please select your gaze file", dir);
 		String baselineFilePath = outputFolderPath + "/baseline.csv";

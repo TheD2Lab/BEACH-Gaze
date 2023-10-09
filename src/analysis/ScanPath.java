@@ -34,9 +34,9 @@ public class ScanPath {
 	public ScanPath(String fixationFile, String outputPath)
 	{
 		this.fixationFile = fixationFile;
-		File scanPathFolder = new File(outputPath + "/ScanPathFolder/");
+		File snapshotFolder = new File(outputPath + "/ScanPathFolder/");
 		this.outputPath = outputPath + "/ScanPathFolder/";
-		scanPathFolder.mkdir();
+		snapshotFolder.mkdir();
 		parseFile();
 
 	}
