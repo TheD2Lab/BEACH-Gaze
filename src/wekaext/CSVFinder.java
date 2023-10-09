@@ -6,10 +6,10 @@ import java.util.Scanner;
 import java.util.regex.*;
 
 public class CSVFinder {
-//	This program will merge all the participants gaze windows correlating to the 
+//	This program will merge all the participants snapshots correlating to the 
 //	window size must create folder where you want data stored before running this
 	
-//	root directory refers to the folder with all participants folders and their gaze windows.
+//	root directory refers to the folder with all participants folders and their snapshots
 
 	public static void main(String[] args) {
 		
