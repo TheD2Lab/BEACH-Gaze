@@ -246,9 +246,7 @@ public class SingleAnalytics {
 		String graphGazeResults = "/" + pName + "_graphGZDResults.csv";
 		String graphGazeOutput = outputFolderPath + graphGazeResults;
 
-
-		String aoiResults = "/" + pName + "_aoiResults.csv";
-		String aoiOutput = outputFolderPath + aoiResults;
+		String aoiOutput = outputFolderPath + "/" + pName + "_AOI/";
 		ScanPath scanPath = new ScanPath(gazepointFXDPath, outputFolderPath);
 		try {
 			scanPath.runAllClimbScan();
@@ -269,7 +267,7 @@ public class SingleAnalytics {
 			modifier.csvToARFF(outputFolderPath + "/combineResults.csv");
 	
 			// Analyze AOI data
-			AOI.processAOIs(gazepointGZDPath, aoiOutput, SCREEN_WIDTH, SCREEN_HEIGHT);
+			AOI.processAOIs(paths[0], gazepointFXDPath, aoiOutput, pName, SCREEN_WIDTH, SCREEN_HEIGHT);
 		}
 		catch(Exception ex)
 		{
@@ -295,9 +293,9 @@ public class SingleAnalytics {
 		
 		//create folder to put the analysis in
 		String dir = "/results/" + outputFolderPath.substring(outputFolderPath.lastIndexOf("/") + 1) + "/inputFiles/";
-		File windowFolder = new File(outputFolderPath + "/" + pName + "_WindowFolder");
-		windowFolder.mkdir();
-		String outputFolder = windowFolder.getPath();
+		File snapshotFolder = new File(outputFolderPath + "/" + pName + "_SnapshotFolder");
+		snapshotFolder.mkdir();
+		String outputFolder = snapshotFolder.getPath();
 		
 		GridBagConstraints c = new GridBagConstraints();
 		ButtonGroup bg = new ButtonGroup();

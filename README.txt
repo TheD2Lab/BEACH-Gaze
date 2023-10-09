@@ -21,8 +21,8 @@ Setup
 		1) Clone the repository to your local machine using git or your preferred version control system.
 		2) Ensure that you have all the required libraries installed and run the program
 		3) Upon launching the program, the Data Analysis Page will initialize. Users can navigate through the various tabs located in the top left corner to access the desired analysis features. The program will prompt the user to input the gaze and fixation files, specify the desired location 
-		   for the output files, and provide the participant�s name for the output folder naming convention.
-		4) The program will then display a new screen where the user will have the option to select specific windows for the output. If the user chooses not to select a window, they can simply select the �Exit� option and submit, and the program will automatically terminate. However, if the user 
+		   for the output files, and provide the participant’s name for the output folder naming convention.
+		4) The program will then display a new screen where the user will have the option to select specific windows for the output. If the user chooses not to select a window, they can simply select the ”Exit” option and submit, and the program will automatically terminate. However, if the user 
 		   wishes to select a window, they can choose from the various options provided. For added convenience, hovering over the different options will reveal a hint describing the function of each option, providing guidance for those who may be unsure of which option to select.
 		
 		Four different window options:
@@ -94,8 +94,8 @@ Analysis
 			a text file that outlines what was successfully created or any errors that was encountered
 		InputFiles Folder: Updated Fixation and Gaze file
 			included the saccade velocity in both files
-		Window Folder (If yes was selected)
-			contains all the window files
+		Snapshot Folder (If yes was selected)
+			contains all the snapshot files
 
 Limitations
 	1) There are currently some sections of the codebase that rely on hard-coded locations that are specific to the paid version of Gazepoint. To ensure that the program functions correctly, it is important to avoid modifying the Gazepoint files in any way.
