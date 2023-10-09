@@ -302,30 +302,30 @@ public class SingleAnalytics {
 		
 		JLabel qLabel = new JLabel("Please pick an option");		
 		JPanel optionsPanel = new JPanel(new FlowLayout());
-		JRadioButton continuousSnapshotButton = new JRadioButton("Continuous Snapshot");
-		JRadioButton cumulativeSnapshotButton = new JRadioButton("Cumulative Snapshot");
-		JRadioButton overlappingSnapshotButton = new JRadioButton("Overlapping Snapshot");
-		JRadioButton eventAnalyticsButton = new JRadioButton("Event Analytics");
+		JRadioButton tumblingButton = new JRadioButton("Tumbling Window");
+		JRadioButton expandingButton = new JRadioButton("Expanding Window");
+		JRadioButton hoppingButton = new JRadioButton("Hopping Window");
+		JRadioButton eventButton = new JRadioButton("Event Window");
 		JRadioButton exitBtn = new JRadioButton("Exit");
 		JButton btn = new JButton("OK");
 
 		qLabel.setFont(new Font("Verdana", Font.PLAIN, 20));
-		continuousSnapshotButton.setToolTipText("This option generates gaze data in a series of fixed, non-overlapping windows");
-		cumulativeSnapshotButton.setToolTipText("This option generates gaze data in a series of expanding windows that increases with every interval");
-		overlappingSnapshotButton.setToolTipText("This option generates gaze data in a series of fixed and overlapping windows");
-		eventAnalyticsButton.setToolTipText("This option generates a baseline file based on the first two minutes of the gaze data, and then compares it to the rest of the file");
+		tumblingButton.setToolTipText("This option generates gaze data in a series of fixed, non-overlapping windows");
+		expandingButton.setToolTipText("This option generates gaze data in a series of expanding windows that increases with every interval");
+		hoppingButton.setToolTipText("This option generates gaze data in a series of fixed and overlapping windows");
+		eventButton.setToolTipText("This option generates a baseline file based on the first two minutes of the gaze data, and then compares it to the rest of the file");
 		
 		//Adds all the JRadioButton to a layout
-		bg.add(continuousSnapshotButton);
-		bg.add(cumulativeSnapshotButton);
-		bg.add(overlappingSnapshotButton);
-		bg.add(eventAnalyticsButton);
+		bg.add(tumblingButton);
+		bg.add(expandingButton);
+		bg.add(hoppingButton);
+		bg.add(eventButton);
 		bg.add(exitBtn);
 		//Adds all the JRadioButton to a a flow layout
-		optionsPanel.add(continuousSnapshotButton);
-		optionsPanel.add(cumulativeSnapshotButton);
-		optionsPanel.add(overlappingSnapshotButton);
-		optionsPanel.add(eventAnalyticsButton);
+		optionsPanel.add(tumblingButton);
+		optionsPanel.add(expandingButton);
+		optionsPanel.add(hoppingButton);
+		optionsPanel.add(eventButton);
 		optionsPanel.add(exitBtn);
 		
 		c.gridx = 0;//set the x location of the grid for the next component
@@ -356,15 +356,15 @@ public class SingleAnalytics {
 			c.gridy = 0;
 			panel.add(image,c);
 			
-			if(continuousSnapshotButton.isSelected()||cumulativeSnapshotButton.isSelected())
+			if(tumblingButton.isSelected()||expandingButton.isSelected())
 			{
-				contCumulWindowAction(c, outputFolder,dir, continuousSnapshotButton.isSelected());
+				tumbleExpandAction(c, outputFolder,dir, tumblingButton.isSelected());
 			}
-			else if(overlappingSnapshotButton.isSelected())
+			else if(hoppingButton.isSelected())
 			{
-				overlappingWindowAction(c, outputFolder,dir);
+				hoppingWindowAction(c, outputFolder,dir);
 			}
-			else if(eventAnalyticsButton.isSelected())
+			else if(eventButton.isSelected())
 			{
 				eventWindowAction(c, outputFolder,dir);	
 			}
@@ -374,14 +374,14 @@ public class SingleAnalytics {
 	}
 
 	/**
-	 * UI for both continuous and cumulative window
+	 * UI for both gaze tumbling and expanding windows.
 	 * 
 	 * @param	c					layout type
 	 * @param	outputFolder		the path where the generated files will reside
 	 * @param	dir					sets the directory 
-	 * @param	contiWindowSelect	returns true if the user selected continuous window
+	 * @param	tumblingWindowSelect	returns true if the user selected gaze tumbling.
 	 */
-	private static void contCumulWindowAction(GridBagConstraints c, String outputFolder, String dir, boolean contiWindowSelected)
+	private static void tumbleExpandAction(GridBagConstraints c, String outputFolder, String dir, boolean tumblingWindowSelected)
 	{
 		JPanel userInputPanel = new JPanel(new FlowLayout());
 		String gazepointFile = modifier.fileChooser("Please select which file you would like to parse out", dir);
@@ -400,11 +400,11 @@ public class SingleAnalytics {
 		panel.revalidate();
 
 		contBtn.addActionListener(ev -> {
-			if(contiWindowSelected)
+			if(tumblingWindowSelected)
 			{
 				try 
 				{
-					WindowOperations.continuousWindow(gazepointFile, outputFolder,Integer.parseInt(windowSizeInput.getText()) );
+					WindowOperations.tumblingWindow(gazepointFile, outputFolder,Integer.parseInt(windowSizeInput.getText()) );
 				} 
 				catch (NumberFormatException | CsvValidationException e1) 
 				{
@@ -418,7 +418,7 @@ public class SingleAnalytics {
 			{
 				try 
 				{
-					WindowOperations.cumulativeWindow(gazepointFile, outputFolder, Integer.parseInt(windowSizeInput.getText()));
+					WindowOperations.expandingWindow(gazepointFile, outputFolder, Integer.parseInt(windowSizeInput.getText()));
 				} 
 				catch (NumberFormatException | CsvValidationException e1) 
 				{
@@ -432,13 +432,13 @@ public class SingleAnalytics {
 	}
 	
 	/**
-	 * UI for overlapping window
+	 * UI for hopping windows. 
 	 * 
 	 * @param	c					layout type
 	 * @param	outputFolder		the path where the generated files will reside
 	 * @param	dir					sets the directory 
 	 */
-	private static void overlappingWindowAction(GridBagConstraints c, String outputFolder, String dir)
+	private static void hoppingWindowAction(GridBagConstraints c, String outputFolder, String dir)
 	{
 		JPanel userInputPanel0 = new JPanel(new FlowLayout());
 		JPanel userInputPanel1 = new JPanel(new FlowLayout());
@@ -466,7 +466,7 @@ public class SingleAnalytics {
 		overlappingBtn.addActionListener(ev -> {
 			try 
 			{
-				WindowOperations.overlappingWindow(gazepointFile, outputFolder,Integer.parseInt(windowSizeInput.getText()), Integer.parseInt(overlappingInput.getText()) );
+				WindowOperations.hoppingWindow(gazepointFile, outputFolder,Integer.parseInt(windowSizeInput.getText()), Integer.parseInt(overlappingInput.getText()) );
 			} 
 			catch (NumberFormatException | CsvValidationException e1) 
 			{
@@ -479,7 +479,7 @@ public class SingleAnalytics {
 	}
 	
 	/**
-	 * UI for event window
+	 * UI for event windows.
 	 * 
 	 * @param	c					layout type
 	 * @param	outputFolder		the path where the generated files will reside
