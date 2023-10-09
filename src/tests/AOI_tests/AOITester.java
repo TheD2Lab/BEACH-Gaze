@@ -19,7 +19,8 @@ public class AOITester {
 
 	final static int SCREEN_WIDTH = 1920;
 	final static int SCREEN_HEIGHT = 1080;
-	private static String inputFile;
+	private static String fixationFile;
+	private static String allGazeFile;
 	private static String outputFolder;
 	private static String expectedFolder;
 	private static String name = "Test";
@@ -28,7 +29,8 @@ public class AOITester {
 		// Change directory names if necessary
 		Path currentRelativePath = Paths.get("");
 		String currentPath = currentRelativePath.toAbsolutePath().toString() + "/src/tests/AOI_tests/";
-		inputFile = currentPath + "/aoi_test_data.csv";
+		fixationFile = currentPath + "/aoi_test_fixations.csv";
+		allGazeFile = currentPath + "/aoi_test_all_gaze.csv";
 		outputFolder = currentPath + "/output/";
 		expectedFolder = currentPath + "/expected_output/";
 		systemLogger.createSystemLog(outputFolder);
@@ -40,7 +42,7 @@ public class AOITester {
 	}
 
 	private static void generateOutput() {
-		AOI.processAOIs(inputFile, outputFolder, name, SCREEN_WIDTH, SCREEN_HEIGHT);
+		AOI.processAOIs(allGazeFile, fixationFile, outputFolder, name, SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
 
 	private static void checkProportionateFeatures() {
