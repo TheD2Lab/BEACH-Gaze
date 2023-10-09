@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -17,125 +18,58 @@ import com.opencsv.exceptions.CsvValidationException;
 public class AOI {
 
    // Placeholder symbol for when value cannot be calculated
-   private static final String filler = "~";
+
+   private String name;
+   private ArrayList<String[]> fixData;
+   private int numBlinks = 0;
+   private double durationViewed = 0;
+
+   private AOI(String name) {
+      this.name = name;
+      this.fixData = new ArrayList<>();
+   }
+
+   private static final String filler = "NaN"; //
 
    /**
     * Calculates descriptive gaze measures, transition features, and proportionate features for AOIs from a fixation csv file.
     * Generates a sub-directory in the output location containing three csv files.
-    * @param inputFile fixation csv file
+    * @param rawAllGazeFile raw all gaze csv file
+    * @param cleanFixationFile cleansed fixation csv file
     * @param outputLocation directory to save files
     * @param name participant ID
     * @param SCREEN_WIDTH width in pixels
     * @param SCREEN_HEIGHT height in pixels
     */
-   public static void processAOIs(String inputFile, String outputLocation, String name, int SCREEN_WIDTH, int SCREEN_HEIGHT) {		
-      try (
-         FileReader fileReader = new FileReader(inputFile);
-         CSVReader csvReader = new CSVReader(fileReader);
-      ){
-         // Read input CSV file and initalize the column indexes for the data needed
-         String[] nextLine = csvReader.readNext();
-         
-         // Locate the indexes for required fields
-         Indexes csvIndexes = new Indexes();
-         
-         for (int i = 0; i < nextLine.length; i++) {
-            String header = nextLine[i];
-            
-            if (header.contains("TIME") && !header.contains("TICK")) {
-               csvIndexes.timeIndex = i;
-               continue;
-            }
-            switch(header) {
-               case "AOI":
-                  csvIndexes.aoiIndex = i;
-                  break;
-               case "FPOGX":
-                  csvIndexes.xIndex = i;
-                  break;
-               case "FPOGY":
-                  csvIndexes.yIndex = i;
-                  break;
-               case "FPOGD":
-                  csvIndexes.fixDurIndex = i;
-                  break;
-               case "FPOGID":
-                  csvIndexes.fixIdIndex = i;
-                  break;
-               case "SACCADE_PV":
-                  csvIndexes.peakVelocityIndex = i;
-                  break;
-               case "BKPMIN":
-                  csvIndexes.blinkRateIndex = i;
-                  break;
-               default:
-                  break;
-            }
-         }
-         
-         // Iterate through input file and group points by AOI
-         HashMap<String, ArrayList<String[]>> map = new HashMap<String, ArrayList<String[]>>();
-         HashMap<String, Integer> aoiTransitions = new HashMap<>();
-         double totalFixations = 0;
-         double totalFixDuration = 0;
-         String prevAoi = "";
-         while ((nextLine = csvReader.readNext()) != null) {
-            // If the data point is not part of an AOI, skip it
-            // Else if we've already encountered this AOI, add it to it's corresponding list
-            // Otherwise create a new list if it's a new AOI
-            totalFixations++;
-            totalFixDuration += Double.valueOf(nextLine[csvIndexes.fixDurIndex]);
-            String aoi = nextLine[csvIndexes.aoiIndex];
-            if (aoi.equals("")) {
-               prevAoi = aoi;
-               continue;
-            }
-            else {
-               if (!map.containsKey(aoi))
-                  map.put(aoi, new ArrayList<String[]>());
-               map.get(aoi).add(nextLine);
-            }
+   public static void processAOIs(String rawAllGazeFile, String cleanFixationFile, String outputLocation, String name, int SCREEN_WIDTH, int SCREEN_HEIGHT) {		
+      HashMap<String, AOI> aoiMap = new HashMap<String, AOI>();
+      HashMap<String, Integer> aoiTransitions = new HashMap<>();
+      Indexes csvIndexes = new Indexes();
+      processAllGazeFile(rawAllGazeFile, aoiMap, csvIndexes);
 
-            // count AOI transitions
-            if (aoi.equals(prevAoi)) {
-               continue;
-            }
-            else if (!prevAoi.equals("")) {
-               String aoiPair = prevAoi + " -> " + aoi;
-               aoiTransitions.put(aoiPair, aoiTransitions.getOrDefault(aoiPair, 0)+1);
-            }
-            prevAoi = aoi;
-         }
+      double[] fixTotals = processFixationFile(cleanFixationFile, aoiMap, aoiTransitions, csvIndexes);
+      // create AOI directory
+      new File(outputLocation).mkdirs();
 
-         // create AOI directory
-         new File(outputLocation).mkdirs();
+      // calculates DGMs
+      String aoiFdxResults = outputLocation + name + "_aoi_graphFDXResults.csv";
+      writeFDXResults(aoiFdxResults, aoiMap, SCREEN_WIDTH, SCREEN_HEIGHT, csvIndexes, fixTotals[0], fixTotals[1]);
 
-         // calculates DGMs
-         String aoiFdxResults = outputLocation + name + "_aoi_graphFDXResults.csv";
-         writeFDXResults(aoiFdxResults, map, SCREEN_WIDTH, SCREEN_HEIGHT, csvIndexes, totalFixations, totalFixDuration);
+      // calculate transition features
+      String transFeatures = outputLocation + name + "_aoi_transitionFeatures.csv";
+      writeTransitions(transFeatures, aoiTransitions);
 
-         // calculate transition features
-         String transFeatures = outputLocation + name + "_aoi_transitionFeatures.csv";
-         writeTransitions(transFeatures, aoiTransitions);
+      // calculate proportionate features
+      String proportionateFeatures = outputLocation + name + "_aoi_proportionateFeatures.csv";
+      writeProportionate(proportionateFeatures, aoiMap, csvIndexes, fixTotals[0], fixTotals[1]);
 
-         // calculate proportionate features
-         String proportionateFeatures = outputLocation + name + "_aoi_proportionateFeatures.csv";
-         writeProportionate(proportionateFeatures, map, csvIndexes, totalFixations, totalFixDuration);
-
-      } catch(FileNotFoundException e) {
-         fileNotFoundMessage(inputFile, e);
-      } catch(IOException e) {
-         ioExceptionMessage(inputFile, e);
-      } catch (CsvValidationException e) {
-         csvValidationExceptionMessage(inputFile, e);
-      } 
    }
 
    /*
     * calculates descriptive gaze measures and saves to csv file.
     */
-   private static void writeFDXResults(String outputFile, HashMap<String, ArrayList<String[]>> map, int SCREEN_WIDTH, int SCREEN_HEIGHT,
-         Indexes csvIndexes, double totalFixations, double totalFixDuration) {
+   private static void writeFDXResults(String outputFile, Map<String, AOI> aoiMap, int SCREEN_WIDTH, int SCREEN_HEIGHT,
+         Indexes indexes, double totalFixations, double totalFixDuration) {
       
       try (
          // Initializing output writers
@@ -193,31 +127,34 @@ public class AOI {
 
          headers.add("convex hull area");
          headers.add("Average Peak Saccade Velocity");
+         headers.add("Average Blink Rate per Minute");
          
          outputCSVWriter.writeNext(headers.toArray(new String[headers.size()]));
 
          // Iterate through each AOI and calculate their gaze analytics
-         for (String aoi : map.keySet()) {
+         for (AOI aoi : aoiMap.values()) {
             // Data row for output .csv file
+            if (aoi.fixData.size() == 0) {
+               continue;
+            }
             ArrayList<String> data = new ArrayList<>();
-            data.add(aoi);
+            data.add(aoi.name);
             
-            ArrayList<String[]> aoiData = map.get(aoi);
             ArrayList<Point2D.Double> allPoints = new ArrayList<Point2D.Double>();
             ArrayList<Double> fixationDurations = new ArrayList<Double>();
             ArrayList<Object> allCoordinates = new ArrayList<Object>();
             ArrayList<Double[]> saccadeDetails = new ArrayList<Double[]>();
             
             // Iterate through each AOI data to populate the above lists
-            for (int i = 0; i < aoiData.size(); i++) {
-               String[] entry = aoiData.get(i);
+            for (int i = 0; i < aoi.fixData.size(); i++) {
+               String[] entry = aoi.fixData.get(i);
                
                // Initalize details about each fixation
-               double x = Double.valueOf(entry[csvIndexes.xIndex]) * SCREEN_WIDTH;
-               double y = Double.valueOf(entry[csvIndexes.yIndex]) * SCREEN_HEIGHT;
-               double id = Double.valueOf(entry[csvIndexes.fixIdIndex]);
-               double duration = Double.valueOf(entry[csvIndexes.fixDurIndex]);
-               double timestamp = Double.valueOf(csvIndexes.timeIndex);
+               double x = Double.valueOf(entry[indexes.xIndex]) * SCREEN_WIDTH;
+               double y = Double.valueOf(entry[indexes.yIndex]) * SCREEN_HEIGHT;
+               double id = Double.valueOf(entry[indexes.fixIdIndex]);
+               double duration = Double.valueOf(entry[indexes.fixDurIndex]);
+               double timestamp = Double.valueOf(indexes.timeIndex);
                
                
                // Add each point to a list
@@ -242,6 +179,7 @@ public class AOI {
                fixationDurations.add(duration);
                
             }
+            
             Double[] allSaccadeLengths = saccade.getAllSaccadeLength(allCoordinates);
             ArrayList<Double> allSaccadeDurations = saccade.getAllSaccadeDurations(saccadeDetails);
             ArrayList<Double> allAbsoluteDegrees = angle.getAllAbsoluteAngles(allCoordinates);
@@ -258,7 +196,8 @@ public class AOI {
                data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(fixationDurations)));
                data.add(String.valueOf(descriptiveStats.getMinOfDoubles(fixationDurations)));
                data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(fixationDurations)));
-            } else {
+            } 
+            else {
                for (int i = 0; i < 8; i++) {
                   data.add(filler);
                }
@@ -282,7 +221,8 @@ public class AOI {
 
                data.add(String.valueOf(fixation.getScanpathDuration(fixationDurations, allSaccadeDurations)));
                data.add(String.valueOf(fixation.getFixationToSaccadeRatio(fixationDurations, allSaccadeDurations)));
-            } else {
+            } 
+            else {
                for (int i = 0; i < 14; i++) {
                   data.add(filler);
                }
@@ -296,7 +236,8 @@ public class AOI {
                data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allAbsoluteDegrees)));
                data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allAbsoluteDegrees)));
                data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allAbsoluteDegrees)));
-            } else {
+            } 
+            else {
                for (int i = 0; i < 6; i++) {
                   data.add(filler);
                }
@@ -310,7 +251,8 @@ public class AOI {
                data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allRelativeDegrees)));
                data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allRelativeDegrees)));
                data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allRelativeDegrees)));
-            } else {
+            } 
+            else {
                for (int i = 0; i < 6; i++) {
                   data.add(filler);
                }
@@ -321,13 +263,13 @@ public class AOI {
             List<Point2D.Double> boundingPoints = convexHull.getConvexHull(allPoints);
             Point2D[] points = fixation.listToArray(boundingPoints);
             data.add(String.valueOf(convexHull.getPolygonArea(points)));
-            } else {
+            } 
+            else {
                data.add(filler);
             }
             
-            data.add(String.valueOf(getAvgPeakSaccadeVelocity(map.get(aoi), csvIndexes.peakVelocityIndex)));
-            
-            
+            data.add(String.valueOf(getAvgPeakSaccadeVelocity(aoi.fixData, indexes.peakVelocityIndex)));
+            data.add(String.valueOf(aoi.getBlinkRate()));
             outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
          }
          systemLogger.writeToSystemLog(Level.INFO, AOI.class.getName(), "Done writing AOI fixation results to " + outputFile);
@@ -343,8 +285,8 @@ public class AOI {
    /*
     * Calculates comparative/proportionate AOI features and saves values to csv file.
     */
-   private static void writeProportionate(String outputFile, HashMap<String, ArrayList<String[]>> map,
-      Indexes csvIndexes, double totalFixations, double totalFixDuration) {
+   private static void writeProportionate(String outputFile, Map<String, AOI> map, Indexes csvIndexes,
+         double totalFixations, double totalFixDuration) {
 
       ArrayList<String> headers = new ArrayList<>();
 
@@ -358,19 +300,18 @@ public class AOI {
 
          outputCSVWriter.writeNext(headers.toArray(new String[headers.size()]));
 
-         for (String aoi : map.keySet()) {
+         for (AOI aoi : map.values()) {
             ArrayList<String> data = new ArrayList<>();
-            ArrayList<String[]> aoiData = map.get(aoi);
             ArrayList<Double> fixationDurations = new ArrayList<Double>();
             double aoiTotalDuration = 0;				
 
-            for (String[] entry : aoiData) {
+            for (String[] entry : aoi.fixData) {
                double duration = Double.valueOf(entry[csvIndexes.fixDurIndex]);
                fixationDurations.add(duration);
                aoiTotalDuration += duration;
             }
 
-            data.add(aoi);
+            data.add(aoi.name);
             data.add(String.valueOf(fixationDurations.size()/totalFixations));
             data.add(String.valueOf(aoiTotalDuration/totalFixDuration));
 
@@ -391,7 +332,7 @@ public class AOI {
    /*
     * Calculates transition AOI features and saves values to a csv file.
     */
-   private static void writeTransitions(String outputFile, HashMap<String, Integer> aoiTransitions) {
+   private static void writeTransitions(String outputFile, Map<String, Integer> aoiTransitions) {
 
       double totalTrans = getTotalTransitions(aoiTransitions);
       ArrayList<String> headers = new ArrayList<>();
@@ -441,11 +382,129 @@ public class AOI {
       return total / data.size();
    }
 
+   /*
+    * Uses raw all gaze file to find number of blinks and duration viewed for each AOI
+    */
+   private static void processAllGazeFile(String inputFile, Map<String, AOI> aois, Indexes csvIndexes) {
+      try (
+         FileReader fileReader = new FileReader(inputFile);
+         CSVReader csvReader = new CSVReader(fileReader);
+      ){
+         // Read input CSV file and initalize the column indexes for the data needed
+         String[] nextLine = csvReader.readNext();     
+         csvIndexes.findIndexes(nextLine);
+         
+         // Iterate through input file and group points by AOI
+         double prevTime = 0;
+         double curTime = 0;
+         String aoiName = "";    // "" or AOI name
+         int blinkID = 0;
+         int prevBlinkID = 0;
+
+         while ((nextLine = csvReader.readNext()) != null) {
+            aoiName = nextLine[csvIndexes.aoiIndex];
+            curTime = Double.valueOf(nextLine[csvIndexes.timeIndex]);
+
+            if (!aoiName.equals("")) {
+               // add AOI to map
+               if (!aois.containsKey(aoiName))
+                  aois.put(aoiName, new AOI(aoiName));
+
+               AOI aoi = aois.get(aoiName);
+
+               blinkID = Integer.valueOf(nextLine[csvIndexes.blinkIdIndex]);
+               // count blinks
+               if (blinkID != 0 && blinkID != prevBlinkID) {
+                  aoi.numBlinks++;
+                  prevBlinkID = blinkID;
+               }
+
+               // Assumption: entire time was in AOI
+               aoi.durationViewed += curTime - prevTime;
+               
+            }
+            prevTime = curTime;  
+         }
+      }
+      catch (FileNotFoundException e){
+         fileNotFoundMessage(inputFile, e);
+      }
+      catch (IOException e) {
+         ioExceptionMessage(inputFile, e);
+      } catch (CsvValidationException e) {
+         csvValidationExceptionMessage(inputFile, e);
+      }
+   }
+
+   /*
+    * Separates fixations into AOIs. Excludes multi-AOI fixations
+    */
+   private static double[] processFixationFile(String inputFile, Map<String, AOI> aoiMap,
+         Map<String, Integer> aoiTransitions, Indexes csvIndexes) {
+      double[] totals = {0,0}; // number of fixations, total fixation duration
+      try (
+         FileReader fileReader = new FileReader(inputFile);
+         CSVReader csvReader = new CSVReader(fileReader);
+      ){
+         // Read input CSV file and initalize the column indexes for the data needed
+         String[] nextLine = csvReader.readNext();
+         csvIndexes.findIndexes(nextLine);
+         
+         // Iterate through input file and group points by AOI
+
+         String prevAoiName = "";   // AOI attributed to last fixation
+         String aoiName = "";    // "" or AOI name
+
+         while ((nextLine = csvReader.readNext()) != null) {
+            aoiName = nextLine[csvIndexes.aoiIndex];
+            totals[0]++;
+            totals[1] += Double.valueOf(nextLine[csvIndexes.fixDurIndex]);
+
+            // excludes non-AOIs or multi AOI fixations
+            if (aoiMap.containsKey(aoiName)) {
+               aoiMap.get(aoiName).fixData.add(nextLine);
+
+               // count AOI transitions
+               if (aoiName.equals(prevAoiName)) {
+                  continue;
+               }
+               else if (!aoiMap.containsKey(prevAoiName)) {
+                  String aoiPair = prevAoiName + " -> " + aoiName;
+                  aoiTransitions.put(aoiPair, aoiTransitions.getOrDefault(aoiPair, 0)+1);
+               }
+            }
+            prevAoiName = aoiName;
+         }
+      }
+      catch (FileNotFoundException e) {
+         fileNotFoundMessage(inputFile, e);
+      }
+      catch (IOException e) {
+         ioExceptionMessage(inputFile, e);
+      } 
+      catch (CsvValidationException e) {
+         csvValidationExceptionMessage(inputFile, e);
+      } 
+      return totals;
+   }
+
+   /*
+    * calculated blink rate
+    */
+   private double getBlinkRate() {
+      if (this.durationViewed > 0) {
+         return this.numBlinks / (this.durationViewed / 60);
+      }
+      else {
+         return 0;
+      }
+   }
+
 
    /*
     * returns total number of transitions between all AOIs
     */
-   private static int getTotalTransitions(HashMap<String, Integer> aoiTransitions) {
+   private static int getTotalTransitions(Map<String, Integer> aoiTransitions) {
       int total = 0;
       for (int value : aoiTransitions.values()) {
          total += value;
@@ -485,7 +544,50 @@ public class AOI {
       int fixIdIndex = -1;
       int timeIndex = -1;
       int peakVelocityIndex = -1;
-      int blinkRateIndex = -1;
+      int blinkIdIndex = -1;
+
+         /*
+    * Modifies an Indexes object to have indexes are important data columns in the csv file.
+    */
+      private void findIndexes(String[] headers) {
+      // Locate the indexes for required fields
+         for (int i = 0; i < headers.length; i++) {
+            String header = headers[i];
+
+            if (this.timeIndex == -1) {
+               if (header.contains("TIME") && !header.contains("TICK")) {
+                  this.timeIndex = i;
+                  continue;
+               }
+            }
+            
+            switch(header) {
+               case "AOI":
+                  this.aoiIndex = i;
+                  break;
+               case "FPOGX":
+                  this.xIndex = i;
+                  break;
+               case "FPOGY":
+                  this.yIndex = i;
+                  break;
+               case "FPOGD":
+                  this.fixDurIndex = i;
+                  break;
+               case "FPOGID":
+                  this.fixIdIndex = i;
+                  break;
+               case "SACCADE_PV":
+                  this.peakVelocityIndex = i;
+                  break;
+               case "BKID":
+                  this.blinkIdIndex = i;
+                  break;
+               default:
+                  break;
+            }
+         }
+      }
    }
 
 }

@@ -267,7 +267,7 @@ public class SingleAnalytics {
 			modifier.csvToARFF(outputFolderPath + "/combineResults.csv");
 	
 			// Analyze AOI data
-			AOI.processAOIs(gazepointFXDPath, aoiOutput, pName, SCREEN_WIDTH, SCREEN_HEIGHT);
+			AOI.processAOIs(paths[0], gazepointFXDPath, aoiOutput, pName, SCREEN_WIDTH, SCREEN_HEIGHT);
 		}
 		catch(Exception ex)
 		{
