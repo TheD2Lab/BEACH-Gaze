@@ -293,9 +293,9 @@ public class SingleAnalytics {
 		
 		//create folder to put the analysis in
 		String dir = "/results/" + outputFolderPath.substring(outputFolderPath.lastIndexOf("/") + 1) + "/inputFiles/";
-		File snapshotFolder = new File(outputFolderPath + "/" + pName + "_SnapshotFolder");
-		snapshotFolder.mkdir();
-		String outputFolder = snapshotFolder.getPath();
+		File windowFolder = new File(outputFolderPath + "/" + pName + "_windowFolder");
+		windowFolder.mkdir();
+		String outputFolder = windowFolder.getPath();
 		
 		GridBagConstraints c = new GridBagConstraints();
 		ButtonGroup bg = new ButtonGroup();

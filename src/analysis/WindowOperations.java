@@ -29,7 +29,7 @@ public class WindowOperations {
 		int initialTime = 0;
 		String outputFile = "/tumbling_" + endTime + ".csv";
 		try {
-			while(snapshot(inputFile,outputFile, outputFolder, initialTime,endTime))
+			while(windows(inputFile,outputFile, outputFolder, initialTime,endTime))
 			{
 				initialTime += windowSize;
 				endTime += windowSize;
@@ -59,7 +59,7 @@ public class WindowOperations {
 		String outputFile = "/expanding_" + endTime + ".csv";
 		try 
 		{
-			while(snapshot(inputFile,outputFile,outputFolder,initialTime,endTime))
+			while(windows(inputFile,outputFile,outputFolder,initialTime,endTime))
 			{
 				endTime += windowSize;
 				outputFile = "/expanding" + endTime + ".csv";
@@ -87,7 +87,7 @@ public class WindowOperations {
 		int initialTime = 0;
 		String outputFile = "/hopping_" + endTime + ".csv";
 		try {
-			while(snapshot(inputFile,outputFile,outputFolder,initialTime,endTime))
+			while(windows(inputFile,outputFile,outputFolder,initialTime,endTime))
 			{
 				initialTime = endTime - overlap;
 				endTime += windowSize;
@@ -239,7 +239,7 @@ public class WindowOperations {
 	 * @param end			the end time
 	 * @return	boolean		true if the program was able to successfully execute it, false otherwise
 	 */
-	private static boolean snapshot(String inputFile, String fileName, String outputFolder, int start, int end) throws IOException, CsvValidationException
+	private static boolean windows(String inputFile, String fileName, String outputFolder, int start, int end) throws IOException, CsvValidationException
 	{
 		String outputFile = outputFolder + fileName;
 		FileWriter outputFileWriter = new FileWriter(new File (outputFile));
