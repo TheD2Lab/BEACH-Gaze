@@ -26,14 +26,14 @@ Setup
 		   wishes to select a window, they can choose from the various options provided. For added convenience, hovering over the different options will reveal a hint describing the function of each option, providing guidance for those who may be unsure of which option to select.
 		
 		Four different window options:
-			Gaze Digests: This option generates gaze data in a series of fixed, non-overlapping windows.
-			Cumulative Gaze: This option generates gaze data in a series of expanding windows that increases with every interval.
-			Gaze Snapshots: This option generates gaze data in a series of fixed and overlapping windows.
-			Gaze Events: This option generates a baseline file based on the first two minutes of the gaze data, and then compares it to the rest of the file. If the data exceeds the baseline value, it will be counted as an event, and the program will continue to search for the next event within a 
+			Tumbling Window: This option generates gaze data in a series of fixed, non-overlapping windows.
+			Expanding Window: This option generates gaze data in a series of expanding windows that increases with every interval.
+			Hopping Window: This option generates gaze data in a series of fixed and overlapping windows.
+			Event Window: This option generates a baseline file based on the first two minutes of the gaze data, and then compares it to the rest of the file. If the data exceeds the baseline value, it will be counted as an event, and the program will continue to search for the next event within a 
 							 specified time period. If no event is found, the program will close at a specific period. If another event is found, the session window will continue searching.
 
 		5) Depending on the option you selected, the program will ask for different input. For the first three options, the program will ask you to select the window size and/or overlapping amount (both in terms of time in seconds).
-		6) If you choose the last option, Event Analytics, the program will ask you which gaze or fixation file you would like to analyze. The program will create a baseline file based on the first two minutes and then ask you to pick a baseline value and a value from the file you inputted to compare 
+		6) If you choose the last option, Event Window, the program will ask you which gaze or fixation file you would like to analyze. The program will create a baseline file based on the first two minutes and then ask you to pick a baseline value and a value from the file you inputted to compare 
 		   to each other, as well as a maximum duration of an event.
 
 Analysis

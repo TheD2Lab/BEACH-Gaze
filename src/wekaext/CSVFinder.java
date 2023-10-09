@@ -52,7 +52,7 @@ public class CSVFinder {
 				return;
 			}
 
-			Pattern pattern = Pattern.compile("p\\d+_cumulative_" + currentInteger + "_combineResults\\.csv");
+			Pattern pattern = Pattern.compile("p\\d+_expanding_" + currentInteger + "_combineResults\\.csv");
 
 			try {
 				Files.walk(root.toPath()).filter(Files::isRegularFile)
