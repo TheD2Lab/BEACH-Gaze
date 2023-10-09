@@ -52,7 +52,7 @@ public class saccade {
 	//e.g. given a fixation A that has timestamp T1 and duration D1,
 	//and a subsequent fixation B that has timestamp T2 and duration T2,
 	//the saccade duration between A and B is: T2-(T1+D1)
-	public static ArrayList<Double> getAllSaccadeDurations(ArrayList<Object> saccadeDetails){
+	public static ArrayList<Double> getAllSaccadeDurations(ArrayList<Double[]> saccadeDetails){
 		ArrayList<Double> allSaccadeDurations = new ArrayList<>();
 		for (int i=0; (i+1)<saccadeDetails.size(); i++){
 			Double[] currentDetail = (Double[]) saccadeDetails.get(i);

@@ -246,9 +246,7 @@ public class SingleAnalytics {
 		String graphGazeResults = "/" + pName + "_graphGZDResults.csv";
 		String graphGazeOutput = outputFolderPath + graphGazeResults;
 
-
-		String aoiResults = "/" + pName + "_aoiResults.csv";
-		String aoiOutput = outputFolderPath + aoiResults;
+		String aoiOutput = outputFolderPath + "/" + pName + "_AOI/";
 		ScanPath scanPath = new ScanPath(gazepointFXDPath, outputFolderPath);
 		try {
 			scanPath.runAllClimbScan();
@@ -269,7 +267,7 @@ public class SingleAnalytics {
 			modifier.csvToARFF(outputFolderPath + "/combineResults.csv");
 	
 			// Analyze AOI data
-			AOI.processAOIs(gazepointGZDPath, aoiOutput, SCREEN_WIDTH, SCREEN_HEIGHT);
+			AOI.processAOIs(paths[0], gazepointFXDPath, aoiOutput, pName, SCREEN_WIDTH, SCREEN_HEIGHT);
 		}
 		catch(Exception ex)
 		{
