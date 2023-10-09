@@ -36,8 +36,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
+import java.util.HashMap;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -54,32 +56,36 @@ public class fixation {
 		List<Point2D.Double> allPoints = new ArrayList<>();
 		ArrayList<Double[]> saccadeDetails = new ArrayList<>();
 
-		FileWriter outputFileWriter = new FileWriter(new File (outputFile));
-		CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
-		try {
-			 FileReader fileReader = new FileReader(inputFile);
-			 CSVReader csvReader = new CSVReader(fileReader);
-			 String[] nextLine = csvReader.readNext();
-			 int fixationDurationIndex = Arrays.asList(nextLine).indexOf("FPOGD");
-			 int fixationIDIndex = Arrays.asList(nextLine).indexOf("FPOGID");
-			 int fixationXIndex = Arrays.asList(nextLine).indexOf("FPOGX");
-			 int fixationYIndex = Arrays.asList(nextLine).indexOf("FPOGY");
-			 int timestampIndex = -1;
-		 	for(int i = 0; i < nextLine.length; i++)
-		 	{
-		 		if(nextLine[i].contains("TIME") && timestampIndex == -1) {
-		 			timestampIndex = i;
-		 		}
-		 	}
-
-
-
-			while((nextLine = csvReader.readNext()) != null) {
-
-				//get each fixation's duration
-				String fixationDurationSeconds = nextLine[fixationDurationIndex];
-				double eachDuration = Double.valueOf(fixationDurationSeconds);
-				double fixationID = Double.valueOf(nextLine[fixationIDIndex]);
+        FileWriter outputFileWriter = new FileWriter(new File (outputFile));
+        CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
+        try {
+        	FileReader fileReader = new FileReader(inputFile);
+            CSVReader csvReader = new CSVReader(fileReader);
+            String[] nextLine = csvReader.readNext();
+            List<String> list = Arrays.asList(nextLine);
+            
+            int fixationDurationIndex = list.indexOf("FPOGD");
+            int fixationIDIndex = list.indexOf("FPOGID");
+            int fixationXIndex = list.indexOf("FPOGX");
+            int fixationYIndex = list.indexOf("FPOGY");
+            int aoiIndex = list.indexOf("AOI");
+            int timestampIndex = -1;
+         	for(int i = 0; i < nextLine.length; i++)
+         	{
+         		if(nextLine[i].contains("TIME") && timestampIndex == -1) {
+         			timestampIndex = i;
+         		}
+         	}
+         	
+         	HashMap<String, Double> aoiProbability = new HashMap<String, Double>();
+         	HashMap<String, HashMap<String, Double>> transitionProbability = new HashMap<String, HashMap<String, Double>>();
+         	String lastAoi = "";
+         	
+            while((nextLine = csvReader.readNext()) != null) {
+                //get each fixation's duration
+                String fixationDurationSeconds = nextLine[fixationDurationIndex];
+                double eachDuration = Double.valueOf(fixationDurationSeconds);
+                double fixationID = Double.valueOf(nextLine[fixationIDIndex]);
 
 				//get each fixation's (x,y) coordinates
 				String eachFixationX = nextLine[fixationXIndex];
@@ -102,17 +108,66 @@ public class fixation {
 				eachSaccadeDetail[2] = fixationID;
 
 
-				allFixationDurations.add(eachDuration);
-				allCoordinates.add(eachCoordinate);
-				allPoints.add(eachPoint);
-				saccadeDetails.add(eachSaccadeDetail);
-			}
+                allFixationDurations.add(eachDuration);
+                allCoordinates.add(eachCoordinate);
+                allPoints.add(eachPoint);
+                saccadeDetails.add(eachSaccadeDetail);
+                
+                String aoi = nextLine[aoiIndex];
+            	if (aoi.equals(""))
+            		continue;
+            	else if (aoiProbability.containsKey(aoi)) {
+            		aoiProbability.put(aoi, aoiProbability.get(aoi) + 1);
+            		if (!lastAoi.equals("")) {
+            			HashMap<String, Double> relationMatrix = transitionProbability.get(lastAoi);
+            			if (relationMatrix.containsKey(aoi)) {
+	            			double count = relationMatrix.get(aoi);
+	            			relationMatrix.put(aoi, count + 1);
+            			} else {
+            				relationMatrix.put(aoi, 1.0);
+            			}
+            		}
+            		
+            	} else {
+            		aoiProbability.put(aoi, 1.0);
+        			transitionProbability.put(aoi, new HashMap<String,Double>());
+            	}
+            	lastAoi = aoi;
+            	
+            }
+            
+            int fixationCount = Integer.valueOf(getFixationCount(inputFile));
+            for (Map.Entry<String, Double> entry : aoiProbability.entrySet()) {
+            	Double AOIFixationCount = entry.getValue();
+            	Double probability = AOIFixationCount/fixationCount;
+            	System.out.println(entry.getKey());
+            	System.out.println(AOIFixationCount);
+            	System.out.println(probability);
+            	entry.setValue(probability);
+            }
+            
+            
+            for (Map.Entry<String, HashMap<String, Double>> entry : transitionProbability.entrySet()) {
+            	
+            	int aoiTransitions = 0;
+            	for (Map.Entry<String, Double> edge : entry.getValue().entrySet()) {
+            		
+            		aoiTransitions += edge.getValue();
+            		
+            	}
+            	for (Map.Entry<String, Double> edge : entry.getValue().entrySet()) {
+            		
+            		edge.setValue(edge.getValue()/aoiTransitions);
+            		
+            	}
+            	
+            }
 
-			ArrayList<String>headers = new ArrayList<>();
-			ArrayList<String>data = new ArrayList<>();
+            ArrayList<String> headers = new ArrayList<>();
+            ArrayList<String> data = new ArrayList<>();
 
-			headers.add("total number of fixations");
-			data.add(String.valueOf(getFixationCount(inputFile)));
+            headers.add("total number of fixations");
+            data.add(String.valueOf(fixationCount));
 
 			headers.add("sum of all fixation duration");
 			data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allFixationDurations)));
@@ -236,19 +291,25 @@ public class fixation {
 			List<Point2D.Double> boundingPoints = convexHull.getConvexHull(allPoints);
 			Point2D[] points = listToArray(boundingPoints);
 
-			headers.add("convex hull area");
-			data.add(String.valueOf(convexHull.getPolygonArea(points)));
-			
-			headers.add("Average Peak Saccade Velocity");
-			data.add(avgPeakSaccadeVelocity(inputFile, outputFile));
-			
-			headers.add("Average Blink Rate per Minute");
-			data.add(blinkRate(inputFile));
+            headers.add("convex hull area");
+            data.add(String.valueOf(convexHull.getPolygonArea(points)));
+            
+            headers.add("Average Peak Saccade Velocity");
+            data.add(avgPeakSaccadeVelocity(inputFile, outputFile));
+            
+            headers.add("Average Blink Rate per Minute");
+            data.add(blinkRate(inputFile));
+            
+            headers.add("stationary entropy");
+            data.add(String.valueOf(getStationaryEntropy(aoiProbability)));
+            
+            headers.add("transition entropy");
+            data.add(String.valueOf(getTransitionEntropy(aoiProbability,transitionProbability)));
 
-			outputCSVWriter.writeNext(headers.toArray(new String[headers.size()]));
-			outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
-			outputCSVWriter.close();
-			csvReader.close();
+            outputCSVWriter.writeNext(headers.toArray(new String[headers.size()]));
+            outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
+            outputCSVWriter.close();
+            csvReader.close();
 
 			systemLogger.writeToSystemLog(Level.INFO, fixation.class.getName(), "done writing fixation data to " + outputFile);
 
@@ -370,5 +431,29 @@ public class fixation {
 		double saccadeDuration = descriptiveStats.getSumOfDoubles(allSaccadeDurations);
 		return fixationDuration/saccadeDuration;
 	}
-
+	
+	public static double getStationaryEntropy(HashMap<String, Double> aoiProbability) {
+		double stationaryEntropy = 0;
+		for (Map.Entry<String, Double> entry : aoiProbability.entrySet()) {
+			double probability = entry.getValue();
+			stationaryEntropy += -probability * Math.log10(probability);
+		};
+		
+		return stationaryEntropy;
+	}
+	
+	public static double getTransitionEntropy(HashMap<String, Double> aoiProbability, HashMap<String,HashMap<String,Double>> transitionMatrix){
+		
+		
+    	double transitionEntropy = 0;
+		for (Map.Entry<String,HashMap<String,Double>> entry : transitionMatrix.entrySet()) {
+    		double pijSum = 0;
+    		for (Map.Entry<String, Double> edge : entry.getValue().entrySet()) {
+    			pijSum += edge.getValue() * Math.log(edge.getValue());
+    		}
+    		transitionEntropy += pijSum * -aoiProbability.get(entry.getKey());
+    	}
+		
+		return transitionEntropy;
+	}
 }
