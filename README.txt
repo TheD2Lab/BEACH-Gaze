@@ -94,8 +94,8 @@ Analysis
 			a text file that outlines what was successfully created or any errors that was encountered
 		InputFiles Folder: Updated Fixation and Gaze file
 			included the saccade velocity in both files
-		Snapshot Folder (If yes was selected)
-			contains all the snapshot files
+		Window Folder (If yes was selected)
+			contains all the Window files
 
 Limitations
 	1) There are currently some sections of the codebase that rely on hard-coded locations that are specific to the paid version of Gazepoint. To ensure that the program functions correctly, it is important to avoid modifying the Gazepoint files in any way.
