@@ -83,11 +83,11 @@ public class AOI {
 			// fixation columns
 			headers.add("total number of fixations");
 			headers.add("sum of all fixation duration");
-			headers.add("mean fixation duration (ms)");
-			headers.add("median fixation duration (ms)");
-			headers.add(" StDev of fixation durations (ms)");
-			headers.add("Min. fixation duration (ms)");
-			headers.add("Max. fixation duration (ms)");
+			headers.add("mean fixation duration (s)");
+			headers.add("median fixation duration (s)");
+			headers.add(" StDev of fixation durations (s)");
+			headers.add("Min. fixation duration (s)");
+			headers.add("Max. fixation duration (s)");
 
 			// saccade columns
 			headers.add("total number of saccades");
@@ -97,12 +97,12 @@ public class AOI {
 			headers.add("StDev of saccade lengths");
 			headers.add("min saccade length");
 			headers.add("max saccade length");
-			headers.add("sum of all saccade durations");
-			headers.add("mean saccade duration");
-			headers.add("median saccade duration");
-			headers.add("StDev of saccade durations");
-			headers.add("Min. saccade duration");
-			headers.add("Max. saccade duration");
+			headers.add("sum of all saccade durations (s)");
+			headers.add("mean saccade duration (s)");
+			headers.add("median saccade duration (s)");
+			headers.add("StDev of saccade durations (s)");
+			headers.add("Min. saccade duration (s)");
+			headers.add("Max. saccade duration (s)");
 
 			// fixation v. saccade
 			headers.add("scanpath duration");
@@ -469,7 +469,7 @@ public class AOI {
 					if (aoiName.equals(prevAoiName)) {
 						continue;
 					}
-					else if (!aoiMap.containsKey(prevAoiName)) {
+					else if (aoiMap.containsKey(prevAoiName)) {
 						String aoiPair = prevAoiName + " -> " + aoiName;
 						aoiTransitions.put(aoiPair, aoiTransitions.getOrDefault(aoiPair, 0)+1);
 					}
@@ -547,22 +547,18 @@ public class AOI {
 		int peakVelocityIndex = -1;
 		int blinkIdIndex = -1;
 
-			/*
+	/*
 	 * Modifies an Indexes object to have indexes are important data columns in the csv file.
 	 */
 		private void findIndexes(String[] headers) {
 		// Locate the indexes for required fields
 			for (int i = 0; i < headers.length; i++) {
 				String header = headers[i];
-
-				if (this.timeIndex == -1) {
-					if (header.contains("TIME") && !header.contains("TICK")) {
-						this.timeIndex = i;
-						continue;
-					}
-				}
 				
 				switch(header) {
+					case "FPOGS":
+						this.timeIndex = i;
+						break;
 					case "AOI":
 						this.aoiIndex = i;
 						break;

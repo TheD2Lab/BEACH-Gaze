@@ -306,6 +306,4 @@ public class WindowOperations {
         return true;
 	}
 	
-	
-	
 }
