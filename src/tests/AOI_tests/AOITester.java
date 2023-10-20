@@ -1,5 +1,6 @@
 package tests.AOI_tests;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -32,6 +33,7 @@ public class AOITester {
 		fixationFile = currentPath + "/aoi_test_fixations.csv";
 		allGazeFile = currentPath + "/aoi_test_all_gaze.csv";
 		outputFolder = currentPath + "/output/";
+		new File(outputFolder).mkdirs();
 		expectedFolder = currentPath + "/expected_output/";
 		systemLogger.createSystemLog(outputFolder);
 
@@ -71,7 +73,7 @@ public class AOITester {
 			}
 			return true;
 		} catch (IOException e) {
-			systemLogger.writeToSystemLog(Level.WARNING, WindowOperations.class.getName(), "Could not compare " + expectedFile + " and " + testFile);
+			systemLogger.writeToSystemLog(Level.WARNING, AOITester.class.getName(), "Could not compare " + expectedFile + " and " + testFile);
 		}
 		return false;
 	}

@@ -69,13 +69,7 @@ public class fixation {
             int fixationXIndex = list.indexOf("FPOGX");
             int fixationYIndex = list.indexOf("FPOGY");
             int aoiIndex = list.indexOf("AOI");
-            int timestampIndex = -1;
-         	for(int i = 0; i < nextLine.length; i++)
-         	{
-         		if(nextLine[i].contains("TIME") && timestampIndex == -1) {
-         			timestampIndex = i;
-         		}
-         	}
+            int timestampIndex = list.indexOf("FPOGS");
          	
          	HashMap<String, Double> aoiProbability = new HashMap<String, Double>();
          	HashMap<String, HashMap<String, Double>> transitionProbability = new HashMap<String, HashMap<String, Double>>();
