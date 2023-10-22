@@ -50,11 +50,11 @@ public class fixation {
 
 	public static void processFixation(String inputFile, String outputFile, int SCREEN_WIDTH, int SCREEN_HEIGHT) throws IOException, CsvValidationException{
 
-        String line = null;
-        ArrayList<Double> allFixationDurations = new ArrayList<>();
-        ArrayList<Object> allCoordinates = new ArrayList<>();
-        List<Point2D.Double> allPoints = new ArrayList<>();
-        ArrayList<Object> saccadeDetails = new ArrayList<>();
+		String line = null;
+		ArrayList<Double> allFixationDurations = new ArrayList<>();
+		ArrayList<Object> allCoordinates = new ArrayList<>();
+		List<Point2D.Double> allPoints = new ArrayList<>();
+		ArrayList<Double[]> saccadeDetails = new ArrayList<>();
 
         FileWriter outputFileWriter = new FileWriter(new File (outputFile));
         CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
@@ -69,13 +69,7 @@ public class fixation {
             int fixationXIndex = list.indexOf("FPOGX");
             int fixationYIndex = list.indexOf("FPOGY");
             int aoiIndex = list.indexOf("AOI");
-            int timestampIndex = -1;
-         	for(int i = 0; i < nextLine.length; i++)
-         	{
-         		if(nextLine[i].contains("TIME") && timestampIndex == -1) {
-         			timestampIndex = i;
-         		}
-         	}
+            int timestampIndex = list.indexOf("FPOGS");
          	
          	HashMap<String, Double> aoiProbability = new HashMap<String, Double>();
          	HashMap<String, HashMap<String, Double>> transitionProbability = new HashMap<String, HashMap<String, Double>>();
@@ -88,25 +82,26 @@ public class fixation {
                 double eachDuration = Double.valueOf(fixationDurationSeconds);
                 double fixationID = Double.valueOf(nextLine[fixationIDIndex]);
 
-                //get each fixation's (x,y) coordinates
-                String eachFixationX = nextLine[fixationXIndex];
-                String eachFixationY = nextLine[fixationYIndex];
-                double x = Double.valueOf(eachFixationX) * SCREEN_WIDTH;
-                double y = Double.valueOf(eachFixationY) * SCREEN_HEIGHT;
+				//get each fixation's (x,y) coordinates
+				String eachFixationX = nextLine[fixationXIndex];
+				String eachFixationY = nextLine[fixationYIndex];
+				double x = Double.valueOf(eachFixationX) * SCREEN_WIDTH;
+				double y = Double.valueOf(eachFixationY) * SCREEN_HEIGHT;
 
-                Point2D.Double eachPoint = new Point2D.Double(x,y);
+				Point2D.Double eachPoint = new Point2D.Double(x,y);
 
-                Double[] eachCoordinate = new Double[3];
-                eachCoordinate[0] = x;
-                eachCoordinate[1] = y;
-                eachCoordinate[2] = fixationID;
+				Double[] eachCoordinate = new Double[3];
+				eachCoordinate[0] = x;
+				eachCoordinate[1] = y;
+				eachCoordinate[2] = fixationID;
 
-                //get timestamp of each fixation
-                double timestamp = Double.valueOf(nextLine[timestampIndex]);
-                Double[] eachSaccadeDetail = new Double[3];
-                eachSaccadeDetail[0] = timestamp;
-                eachSaccadeDetail[1] = eachDuration;
-                eachSaccadeDetail[2] = fixationID;
+				//get timestamp of each fixation
+				double timestamp = Double.valueOf(nextLine[timestampIndex]);
+				Double[] eachSaccadeDetail = new Double[3];
+				eachSaccadeDetail[0] = timestamp;
+				eachSaccadeDetail[1] = eachDuration;
+				eachSaccadeDetail[2] = fixationID;
+
 
                 allFixationDurations.add(eachDuration);
                 allCoordinates.add(eachCoordinate);
@@ -165,127 +160,127 @@ public class fixation {
             headers.add("total number of fixations");
             data.add(String.valueOf(fixationCount));
 
-            headers.add("sum of all fixation duration");
-            data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allFixationDurations)));
+			headers.add("sum of all fixation duration");
+			data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allFixationDurations)));
 
-            headers.add("mean fixation duration (ms)");
-            data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allFixationDurations)));
+			headers.add("mean fixation duration (ms)");
+			data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allFixationDurations)));
 
-            headers.add("median fixation duration (ms)");
-            data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allFixationDurations)));
+			headers.add("median fixation duration (ms)");
+			data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allFixationDurations)));
 
-            headers.add(" StDev of fixation durations (ms)");
-            data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allFixationDurations)));
+			headers.add(" StDev of fixation durations (ms)");
+			data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allFixationDurations)));
 
-            headers.add("Min. fixation duration (ms)");
-            data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allFixationDurations)));
+			headers.add("Min. fixation duration (ms)");
+			data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allFixationDurations)));
 
-            headers.add("Max. fixation duration (ms)");
-            data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allFixationDurations)));
+			headers.add("Max. fixation duration (ms)");
+			data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allFixationDurations)));
 
-            Double[] allSaccadeLengths = saccade.getAllSaccadeLength(allCoordinates);
+			Double[] allSaccadeLengths = saccade.getAllSaccadeLength(allCoordinates);
 
-            headers.add("total number of saccades");
-            data.add(String.valueOf(allSaccadeLengths.length));
+			headers.add("total number of saccades");
+			data.add(String.valueOf(allSaccadeLengths.length));
 
-            headers.add("sum of all saccade length");
-            data.add(String.valueOf(descriptiveStats.getSum(allSaccadeLengths)));
+			headers.add("sum of all saccade length");
+			data.add(String.valueOf(descriptiveStats.getSum(allSaccadeLengths)));
 
-            headers.add("mean saccade length");
-            data.add(String.valueOf(descriptiveStats.getMean(allSaccadeLengths)));
-
-
-            headers.add("median saccade length");
-            data.add(String.valueOf(descriptiveStats.getMedian(allSaccadeLengths)));
-
-            headers.add("StDev of saccade lengths");
-            data.add(String.valueOf(descriptiveStats.getStDev(allSaccadeLengths)));
-
-            headers.add("min saccade length");
-            data.add(String.valueOf(descriptiveStats.getMin(allSaccadeLengths)));
+			headers.add("mean saccade length");
+			data.add(String.valueOf(descriptiveStats.getMean(allSaccadeLengths)));
 
 
-            headers.add("max saccade length");
-            data.add(String.valueOf(descriptiveStats.getMax(allSaccadeLengths)));
+			headers.add("median saccade length");
+			data.add(String.valueOf(descriptiveStats.getMedian(allSaccadeLengths)));
 
-            ArrayList<Double> allSaccadeDurations = saccade.getAllSaccadeDurations(saccadeDetails);
+			headers.add("StDev of saccade lengths");
+			data.add(String.valueOf(descriptiveStats.getStDev(allSaccadeLengths)));
 
-            headers.add("sum of all saccade durations");
-            data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allSaccadeDurations)));
-
-            headers.add("mean saccade duration");
-            data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allSaccadeDurations)));
-
-            headers.add("median saccade duration");
-            data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allSaccadeDurations)));
+			headers.add("min saccade length");
+			data.add(String.valueOf(descriptiveStats.getMin(allSaccadeLengths)));
 
 
-            headers.add("StDev of saccade durations");
-            data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allSaccadeDurations)));
+			headers.add("max saccade length");
+			data.add(String.valueOf(descriptiveStats.getMax(allSaccadeLengths)));
 
-            headers.add("Min. saccade duration");
-            data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allSaccadeDurations)));
+			ArrayList<Double> allSaccadeDurations = saccade.getAllSaccadeDurations(saccadeDetails);
 
-            headers.add("Max. saccade duration");
-            data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allSaccadeDurations)));
+			headers.add("sum of all saccade durations");
+			data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allSaccadeDurations)));
 
-            headers.add("scanpath duration");
-            data.add(String.valueOf(getScanpathDuration(allFixationDurations, allSaccadeDurations)));
+			headers.add("mean saccade duration");
+			data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allSaccadeDurations)));
 
-
-            headers.add("fixation to saccade ratio");
-            data.add(String.valueOf(getFixationToSaccadeRatio(allFixationDurations, allSaccadeDurations)));
-
-            ArrayList<Double> allAbsoluteDegrees = angle.getAllAbsoluteAngles(allCoordinates);
-
-            headers.add("sum of all absolute degrees");
-            data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allAbsoluteDegrees)));
-
-            headers.add("mean absolute degree");
-            data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allAbsoluteDegrees)));
-
-            headers.add("median absolute degree");
-            data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allAbsoluteDegrees)));
-
-            headers.add("StDev of absolute degrees");
-            data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allAbsoluteDegrees)));
+			headers.add("median saccade duration");
+			data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allSaccadeDurations)));
 
 
-            headers.add("min absolute degree");
-            data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allAbsoluteDegrees)));
+			headers.add("StDev of saccade durations");
+			data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allSaccadeDurations)));
+
+			headers.add("Min. saccade duration");
+			data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allSaccadeDurations)));
+
+			headers.add("Max. saccade duration");
+			data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allSaccadeDurations)));
+
+			headers.add("scanpath duration");
+			data.add(String.valueOf(getScanpathDuration(allFixationDurations, allSaccadeDurations)));
 
 
-            headers.add("max absolute degree");
-            data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allAbsoluteDegrees)));
+			headers.add("fixation to saccade ratio");
+			data.add(String.valueOf(getFixationToSaccadeRatio(allFixationDurations, allSaccadeDurations)));
+
+			ArrayList<Double> allAbsoluteDegrees = angle.getAllAbsoluteAngles(allCoordinates);
+
+			headers.add("sum of all absolute degrees");
+			data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allAbsoluteDegrees)));
+
+			headers.add("mean absolute degree");
+			data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allAbsoluteDegrees)));
+
+			headers.add("median absolute degree");
+			data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allAbsoluteDegrees)));
+
+			headers.add("StDev of absolute degrees");
+			data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allAbsoluteDegrees)));
 
 
-            ArrayList<Double> allRelativeDegrees = angle.getAllRelativeAngles(allCoordinates);
-
-            headers.add("sum of all relative degrees");
-            data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allRelativeDegrees)));
-
-            headers.add("mean relative degree");
-            data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allRelativeDegrees)));
-
-            headers.add("median relative degree");
-            data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allRelativeDegrees)));
-
-            headers.add("StDev of relative degrees");
-            data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allRelativeDegrees)));
-
-            headers.add("min relative degree");
-            data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allRelativeDegrees)));
+			headers.add("min absolute degree");
+			data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allAbsoluteDegrees)));
 
 
-            headers.add("max relative degree");
-            data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allRelativeDegrees)));
+			headers.add("max absolute degree");
+			data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allAbsoluteDegrees)));
 
-            //getting the convex hull using Graham Scan
-            //i.e. Choose point p with smallest y-coordinate.
-            //Sort points by polar angle with p to get simple polygon.
-            //Consider points in order, and discard those that would create a clockwise turn.
-            List<Point2D.Double> boundingPoints = convexHull.getConvexHull(allPoints);
-            Point2D[] points = listToArray(boundingPoints);
+
+			ArrayList<Double> allRelativeDegrees = angle.getAllRelativeAngles(allCoordinates);
+
+			headers.add("sum of all relative degrees");
+			data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allRelativeDegrees)));
+
+			headers.add("mean relative degree");
+			data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allRelativeDegrees)));
+
+			headers.add("median relative degree");
+			data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allRelativeDegrees)));
+
+			headers.add("StDev of relative degrees");
+			data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allRelativeDegrees)));
+
+			headers.add("min relative degree");
+			data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allRelativeDegrees)));
+
+
+			headers.add("max relative degree");
+			data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allRelativeDegrees)));
+
+			//getting the convex hull using Graham Scan
+			//i.e. Choose point p with smallest y-coordinate.
+			//Sort points by polar angle with p to get simple polygon.
+			//Consider points in order, and discard those that would create a clockwise turn.
+			List<Point2D.Double> boundingPoints = convexHull.getConvexHull(allPoints);
+			Point2D[] points = listToArray(boundingPoints);
 
             headers.add("convex hull area");
             data.add(String.valueOf(convexHull.getPolygonArea(points)));
@@ -309,18 +304,18 @@ public class fixation {
             
             generateAOISequenceFile(aoiSequence, outputFile);
 
-            systemLogger.writeToSystemLog(Level.INFO, fixation.class.getName(), "done writing fixation data to " + outputFile);
+			systemLogger.writeToSystemLog(Level.INFO, fixation.class.getName(), "done writing fixation data to " + outputFile);
 
 
-        }
-        catch(FileNotFoundException ex) 
-        {
-            systemLogger.writeToSystemLog(Level.WARNING, fixation.class.getName(), "Error with outputFile " + outputFile + "\n" + ex.toString());
-        }
-        catch(IOException ex) 
-        {
-        	systemLogger.writeToSystemLog(Level.WARNING, fixation.class.getName(), "Error with outputFile " + outputFile + "\n" + ex.toString());
-        }
+		}
+		catch(FileNotFoundException ex) 
+		{
+			systemLogger.writeToSystemLog(Level.WARNING, fixation.class.getName(), "Error with outputFile " + outputFile + "\n" + ex.toString());
+		}
+		catch(IOException ex) 
+		{
+			systemLogger.writeToSystemLog(Level.WARNING, fixation.class.getName(), "Error with outputFile " + outputFile + "\n" + ex.toString());
+		}
 	}
 
 	public static String[] lineToArray(String lineOfData){
@@ -339,10 +334,10 @@ public class fixation {
 
 	public static Point2D.Double[] listToArray(List<Point2D.Double> allPoints){
 		Point2D.Double[] points = new Point2D.Double[allPoints.size()];
-        for(int i=0; i<points.length; i++){
-        	points[i] = allPoints.get(i);
-        }
-        return points;
+		for(int i=0; i<points.length; i++){
+			points[i] = allPoints.get(i);
+		}
+		return points;
 	}
 
 	public static String getFixationCount(String inputFile) throws IOException 

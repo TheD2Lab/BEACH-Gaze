@@ -25,14 +25,14 @@ Required libraries:
 4. After selecting the gaze file, the program will ask you to select the corresponding fixation file.
 5. A prompt will then appear asking you to select the location where you would like all the output files to be saved.
 6. The program will then ask you to input the name of the folder/participant.
-7. Once the program finishes analyzing and outputting the initial data, it will ask whether or not you would like to generate snapshots of the gaze/fixation data.
-    * If you select yes then the program will give you four different snapshot options:
-        - Continuous Snapshot: This option generates gaze data in a series of fixed, nonoverlapping windows.
-        - Cumulative Snapshot: This option generates gaze data in a series of expanding windows that increases with every interval.
-        - Overlapping Snapshot: This option generates gaze data in a series of fixed and overlapping windows.
-        - Event Analytics: This option generates a baseline file based on the first two minutes of the gaze data, and then compares it to the rest of the file. If the data exceeds the baseline value, it will be counted as an event, and the program will continue to search for the next event within a specified time period. If no event is found, the program will close at a specific period. If another event is found, the session window will continue searching.
+7. Once the program finishes analyzing and outputting the initial data, it will ask whether or not you would like to generate schedules pr even-based windows of the gaze/fixation data.
+    * If you select yes then the program will give you four different window options:
+        - Tumbling Window: This option generates gaze data in a series of fixed, nonoverlapping windows.
+        - Expanding Window: This option generates gaze data in a series of expanding windows that increases with every interval.
+        - Hopping Window This option generates gaze data in a series of fixed and overlapping windows.
+        - Event Window: This option generates a baseline file based on the first two minutes of the gaze data, and then compares it to the rest of the file. If the data exceeds the baseline value, it will be counted as an event, and the program will continue to search for the next event within a specified time period. If no event is found, the program will close at a specific period. If another event is found, the session window will continue searching.
 8. Depending on the option you choose, the program will ask for different input. For the first three options, the program will ask you to select the window size and/or overlapping amount (both in terms of time in seconds).
-9. If you choose the last option, Event Analytics, the program will ask you which gaze or fixation file you would like to analyze. The program will create a baseline file based on the first two minutes and then ask you to pick a baseline value and a value from the file you inputted to compare 
+9. If you choose the last option, Event Window, the program will ask you which gaze or fixation file you would like to analyze. The program will create a baseline file based on the first two minutes and then ask you to pick a baseline value and a value from the file you inputted to compare 
     to each other, as well as a maximum duration of an event.
 
 # Analysis
@@ -97,8 +97,8 @@ Required libraries:
         a text file that outlines what was successfully created or any errors that was encountered
     InputFiles Folder: Updated Fixation and Gaze file
         included the saccade velocity in both files
-    Snapshot Folder (If yes was selected)
-        contains all the snapshot files
+    Window Folder (If yes was selected)
+        contains all the window files
 
 # Limitations
 

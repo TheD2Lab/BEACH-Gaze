@@ -25,6 +25,8 @@ package analysis;
  */
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 
 public class saccade {
@@ -48,11 +50,23 @@ public class saccade {
 		//return allLengths;
 	}
 
-	//the saccade duration is the duration between two fixations
-	//e.g. given a fixation A that has timestamp T1 and duration D1,
-	//and a subsequent fixation B that has timestamp T2 and duration T2,
-	//the saccade duration between A and B is: T2-(T1+D1)
-	public static ArrayList<Double> getAllSaccadeDurations(ArrayList<Object> saccadeDetails){
+	/**
+	 * Calculates saccade duration between sequential fixatiion.
+	 * The saccade duration is the duration between two fixations
+	 * e.g. given a fixation A that has timestamp T1 and duration D1,
+	 * and a subsequent fixation B that has timestamp T2 and duration T2,
+	 * the saccade duration between A and B is: T2-(T1+D1)
+	 * 
+	 * Note: Gazepoint analysis gives three time data values for each fixation.
+	 * 	TIME: time elapsed in seconds since the last system initialization
+	 * 	TIMETICK: CPU ticks recorded at time as TIME, can be used to synchronize data with other applications
+	 * 	FPOGS: The starting time of the fixation POG in seconds since the system initialization or calibration.
+	 * Make sure to use FPOGS as the timestamp when calculating saccade duration.
+	 * 
+	 * @param saccadeDetails start time, fixation duration, and ID for each fixation
+	 * @returns list of saccade durations in seconds
+	*/
+	public static ArrayList<Double> getAllSaccadeDurations(ArrayList<Double[]> saccadeDetails){
 		ArrayList<Double> allSaccadeDurations = new ArrayList<>();
 		for (int i=0; (i+1)<saccadeDetails.size(); i++){
 			Double[] currentDetail = (Double[]) saccadeDetails.get(i);
