@@ -453,7 +453,6 @@ public class fixation {
 	public static void generateAOISequenceFile(ArrayList<String> aoiSequence, String outputFile) {
 		String participant = outputFile.substring(outputFile.lastIndexOf("/") + 1, outputFile.lastIndexOf("_"));
 		String dir = outputFile.substring(0, outputFile.lastIndexOf("/"));
-		String header = ">participant = " + participant;
 		String sequence = "";
 		
 		HashMap<String, Integer> map = new HashMap<String, Integer>();
@@ -476,12 +475,8 @@ public class fixation {
 		try {
 			FileWriter aoiWriter = new FileWriter(aoiDescriptions);
 			FileWriter sequencesWriter = new FileWriter(sequences);
-			
-			sequencesWriter.write(header += "\n");
 			sequencesWriter.write(sequence);
-			
-			System.out.println("Sequence: " + sequence);
-			
+						
 			for (String aoi: map.keySet()) {
 				int ascii = map.get(aoi);
 				char c = (char)ascii;
