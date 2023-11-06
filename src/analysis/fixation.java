@@ -137,9 +137,6 @@ public class fixation {
             for (Map.Entry<String, Double> entry : aoiProbability.entrySet()) {
             	Double AOIFixationCount = entry.getValue();
             	Double probability = AOIFixationCount/fixationCount;
-            	System.out.println(entry.getKey());
-            	System.out.println(AOIFixationCount);
-            	System.out.println(probability);
             	entry.setValue(probability);
             }
             
