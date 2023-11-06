@@ -255,8 +255,8 @@ public class BatchAnalytics {
 		
 		int minPatternLength = 3; // The minimum length of a pattern
 		int maxPatternLength = 7; // The maxmimum length of a pattern
-		int minFrequency = 2; // The minimum frequency a pattern must occur to be considered valid
-		int minSequenceSize = 3; // The minimum amount of sequences a pattern must appear in to be considered valid
+		int minFrequency = 2; // The minimum frequency a pattern must occur to be outputted
+		int minSequenceSize = 3; // The minimum amount of sequences a pattern must appear in to be outputted
 		
 		discoverPatterns(expandedSequences, minPatternLength, maxPatternLength, minFrequency, minSequenceSize, outputLocation + "/expandedSequences.csv", descriptions, codes);
 		discoverPatterns(collapsedSequences, minPatternLength, maxPatternLength, minFrequency, minSequenceSize, outputLocation + "/collapsedSequences.csv", descriptions, codes);
@@ -272,9 +272,10 @@ public class BatchAnalytics {
 			outputCSVWriter.writeNext(aoiCodes);
 			outputCSVWriter.writeNext(new String[0]);
 			
-			 String[] headers = new String[] {"Pattern String", "Frequency", "Sequence Support", "Average Pattern Frequency", "Proportional Pattern Frequency"};
-		     outputCSVWriter.writeNext(headers);
-	
+			String[] headers = new String[] {"Pattern String", "Frequency", "Sequence Support", "Average Pattern Frequency", "Proportional Pattern Frequency"};
+		    outputCSVWriter.writeNext(headers);
+		     
+		    int totalPatternCount = 0;
 	        for (int patternLength = minPatternLength; patternLength <= maxPatternLength; patternLength++) {
 	        	HashMap<String, Integer> frequencyMap = new HashMap<String, Integer>();
 		        HashMap<String, ArrayList<String>> sequenceMap = new HashMap<String, ArrayList<String>>();
@@ -282,6 +283,7 @@ public class BatchAnalytics {
 	        	for (String s: sequences) {
 		            for (int i = 0; i < s.length() - patternLength; i++) {
 		                String patternString = s.substring(i, i + patternLength);
+		                totalPatternCount++;
 		
 		                int count = frequencyMap.containsKey(patternString) ? frequencyMap.get(patternString) + 1 : 1;
 		                frequencyMap.put(patternString, count);
@@ -295,7 +297,7 @@ public class BatchAnalytics {
 		        	int frequency = frequencyMap.get(s);
 		        	double sequenceSupport = (double) sequenceMap.get(s).size()/sequences.size();
 		        	double averagePatternFrequency = (double) frequencyMap.get(s)/sequences.size();
-		        	double proportionalPatternFrequency = (double) frequencyMap.get(s)/frequencyMap.keySet().size();
+		        	double proportionalPatternFrequency = (double) frequencyMap.get(s)/totalPatternCount;
 		        	
 		        	if (frequency >= minFrequency && sequenceMap.get(s).size() >= minSequenceSize) {
 		        		ArrayList<String> data = new ArrayList<String>();
