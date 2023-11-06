@@ -481,7 +481,8 @@ public class fixation {
 				int ascii = map.get(aoi);
 				char c = (char)ascii;
 				
-				aoiWriter.write(c + ", " + aoi + ", " + "\n");
+				aoi = aoi.equals("") ? "No AOI" : aoi;
+				aoiWriter.write(c + ", " + aoi + "\n");
 			}
 			
 			aoiWriter.close();

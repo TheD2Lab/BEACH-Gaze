@@ -234,9 +234,18 @@ public class BatchAnalytics {
 			reader = new BufferedReader(new FileReader(sequencesFile));
 			expandedSequences.add(reader.readLine());
 			
-			if (aoiDescriptions == null) {
-				aoiDescriptions = new File(currentPartFolderName + "/aoiDescriptions.txt");
-			}
+			File newDescriptions = new File(currentPartFolderName + "/aoiDescriptions.txt");
+			aoiDescriptions = aoiDescriptions == null || aoiDescriptions.length() < newDescriptions.length() ? newDescriptions : aoiDescriptions;
+		}
+		
+		ArrayList<String> descriptions = new ArrayList<String>();
+		ArrayList<String> codes = new ArrayList<String>();
+		reader = new BufferedReader(new FileReader(aoiDescriptions));
+		String line = "";
+		while ((line = reader.readLine()) != null) {
+			String[] tokens = line.split(",");
+			codes.add(tokens[0]);
+			descriptions.add(tokens[1]);
 		}
 		
 		ArrayList<String> collapsedSequences = new ArrayList<String>();
@@ -244,53 +253,63 @@ public class BatchAnalytics {
 			collapsedSequences.add(getCollapsedSequence(s));
 		}
 		
-		int patternLength = 4;
-		discoverPatterns(expandedSequences, patternLength, outputLocation + "/expandedSequences.csv");
-		discoverPatterns(collapsedSequences, patternLength, outputLocation + "/collapsedSequences.csv");
+		int minPatternLength = 3; // The minimum length of a pattern
+		int maxPatternLength = 7; // The maxmimum length of a pattern
+		int minFrequency = 2; // The minimum frequency a pattern must occur to be considered valid
+		int minSequenceSize = 3; // The minimum amount of sequences a pattern must appear in to be considered valid
+		
+		discoverPatterns(expandedSequences, minPatternLength, maxPatternLength, minFrequency, minSequenceSize, outputLocation + "/expandedSequences.csv", descriptions, codes);
+		discoverPatterns(collapsedSequences, minPatternLength, maxPatternLength, minFrequency, minSequenceSize, outputLocation + "/collapsedSequences.csv", descriptions, codes);
 	}
 	
-	private static void discoverPatterns(ArrayList<String> sequences, int patternLength, String outputFile) {
-		try {
+	private static void discoverPatterns(ArrayList<String> sequences, int minPatternLength, int maxPatternLength, int minFrequency, int minSequenceSize, String outputFile, ArrayList<String> descriptions, ArrayList<String> codes) throws IOException {
 			FileWriter outputFileWriter = new FileWriter(new File (outputFile));
 			CSVWriter outputCSVWriter = new CSVWriter(outputFileWriter);
-
-	        HashMap<String, Integer> frequencyMap = new HashMap<String, Integer>();
-	        HashMap<String, ArrayList<String>> sequenceMap = new HashMap<String, ArrayList<String>>();
+			
+			String[] aoiDescriptions = descriptions.toArray(new String[descriptions.size()]);
+			String[] aoiCodes = codes.toArray(new String[codes.size()]);
+			outputCSVWriter.writeNext(aoiDescriptions);
+			outputCSVWriter.writeNext(aoiCodes);
+			outputCSVWriter.writeNext(new String[0]);
+			
+			 String[] headers = new String[] {"Pattern String", "Frequency", "Sequence Support", "Average Pattern Frequency", "Proportional Pattern Frequency"};
+		     outputCSVWriter.writeNext(headers);
 	
-	        for (String s: sequences) {
-	            for (int i = 0; i < s.length() - patternLength; i++) {
-	                String patternString = s.substring(i, i + patternLength);
-	
-	                int count = frequencyMap.containsKey(patternString) ? frequencyMap.get(patternString) + 1 : 1;
-	                frequencyMap.put(patternString, count);
-	
-	                if (!sequenceMap.containsKey(patternString)) sequenceMap.put(patternString, new ArrayList<String>());
-	                if (!sequenceMap.get(patternString).contains(s)) sequenceMap.get(patternString).add(s);
-	            }
-	        }
-	        
-	        String[] headers = new String[] {"Pattern String", "Frequency", "Sequence Support", "Average Pattern Frequency", "Proportional Pattern Frequency"};
-	        outputCSVWriter.writeNext(headers);
-	        
-	        for(String s: frequencyMap.keySet()) {
-	        	int frequency = frequencyMap.get(s);
-	        	double sequenceSupport = (double) sequenceMap.get(s).size()/sequences.size();
-	        	double averagePatternFrequency = (double) frequencyMap.get(s)/sequences.size();
-	        	double proportionalPatternFrequency = (double) frequencyMap.get(s)/frequencyMap.keySet().size();
+	        for (int patternLength = minPatternLength; patternLength <= maxPatternLength; patternLength++) {
+	        	HashMap<String, Integer> frequencyMap = new HashMap<String, Integer>();
+		        HashMap<String, ArrayList<String>> sequenceMap = new HashMap<String, ArrayList<String>>();
+		        
+	        	for (String s: sequences) {
+		            for (int i = 0; i < s.length() - patternLength; i++) {
+		                String patternString = s.substring(i, i + patternLength);
+		
+		                int count = frequencyMap.containsKey(patternString) ? frequencyMap.get(patternString) + 1 : 1;
+		                frequencyMap.put(patternString, count);
+		
+		                if (!sequenceMap.containsKey(patternString)) sequenceMap.put(patternString, new ArrayList<String>());
+		                if (!sequenceMap.get(patternString).contains(s)) sequenceMap.get(patternString).add(s);
+		            }
+		        }
 	        	
-	        	ArrayList<String> data = new ArrayList<String>();
-	        	data.add(s);
-	        	data.add(String.valueOf(frequency));
-	        	data.add(String.valueOf(sequenceSupport));
-	        	data.add(String.valueOf(averagePatternFrequency));
-	        	data.add(String.valueOf(proportionalPatternFrequency));
-	        	outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
+	        	for(String s: frequencyMap.keySet()) {
+		        	int frequency = frequencyMap.get(s);
+		        	double sequenceSupport = (double) sequenceMap.get(s).size()/sequences.size();
+		        	double averagePatternFrequency = (double) frequencyMap.get(s)/sequences.size();
+		        	double proportionalPatternFrequency = (double) frequencyMap.get(s)/frequencyMap.keySet().size();
+		        	
+		        	if (frequency >= minFrequency && sequenceMap.get(s).size() >= minSequenceSize) {
+		        		ArrayList<String> data = new ArrayList<String>();
+			        	data.add(s);
+			        	data.add(String.valueOf(frequency));
+			        	data.add(String.valueOf(sequenceSupport));
+			        	data.add(String.valueOf(averagePatternFrequency));
+			        	data.add(String.valueOf(proportionalPatternFrequency));
+			        	outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
+		        	}
+		        }
 	        }
 	        
 	        outputCSVWriter.close();	        
-		} catch (Exception e) {
-			System.out.println(e);
-		}
 	}
 	
 	public static String getCollapsedSequence(String s) {
