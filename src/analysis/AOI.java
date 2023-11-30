@@ -303,17 +303,17 @@ public class AOI {
 
 			for (AOI aoi : map.values()) {
 				ArrayList<String> data = new ArrayList<>();
-				ArrayList<Double> fixationDurations = new ArrayList<Double>();
+				int fixCount = 0;
 				double aoiTotalDuration = 0;				
 
 				for (String[] entry : aoi.fixData) {
 					double duration = Double.valueOf(entry[csvIndexes.fixDurIndex]);
-					fixationDurations.add(duration);
+					fixCount++;
 					aoiTotalDuration += duration;
 				}
 
 				data.add(aoi.name);
-				data.add(String.valueOf(fixationDurations.size()/totalFixations));
+				data.add(String.valueOf(fixCount/totalFixations));
 				data.add(String.valueOf(aoiTotalDuration/totalFixDuration));
 
 				// Write the data into the .csv file as a new row
@@ -455,25 +455,26 @@ public class AOI {
 
 			String prevAoiName = "";   // AOI attributed to last fixation
 			String aoiName = "";    // "" or AOI name
+			int prevFixId = -1;
+			int fixId = -1;
 
 			while ((nextLine = csvReader.readNext()) != null) {
 				aoiName = nextLine[csvIndexes.aoiIndex];
+				fixId = Integer.valueOf(nextLine[csvIndexes.fixIdIndex]);
 				totals[0]++;
 				totals[1] += Double.valueOf(nextLine[csvIndexes.fixDurIndex]);
 
-				// excludes non-AOIs or multi AOI fixations
+				// excludes non-AOIs or multi AOI fixations. 
 				if (aoiMap.containsKey(aoiName)) {
 					aoiMap.get(aoiName).fixData.add(nextLine);
 
-					// count AOI transitions
-					if (aoiName.equals(prevAoiName)) {
-						continue;
-					}
-					else if (aoiMap.containsKey(prevAoiName)) {
+					// Count AOI transitions. Transitions must be from subsequential fixations
+					if (aoiMap.containsKey(prevAoiName) && fixId == prevFixId + 1) {
 						String aoiPair = prevAoiName + " -> " + aoiName;
 						aoiTransitions.put(aoiPair, aoiTransitions.getOrDefault(aoiPair, 0)+1);
 					}
 				}
+				prevFixId = fixId;
 				prevAoiName = aoiName;
 			}
 		}

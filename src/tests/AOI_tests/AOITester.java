@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.util.logging.Level;
 import analysis.systemLogger;
 import analysis.AOI;
-import analysis.WindowOperations;
 
 /**
  * AOITester class tests the AOI.processAOI outputs for correctness.
