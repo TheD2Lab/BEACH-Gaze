@@ -43,33 +43,38 @@ public class AOI {
 	 */
 	public static void processAOIs(String rawAllGazeFile, String cleanFixationFile, String outputLocation, String name, int SCREEN_WIDTH, int SCREEN_HEIGHT) {		
 		HashMap<String, AOI> aoiMap = new HashMap<String, AOI>();
-		HashMap<String, Integer> aoiTransitions = new HashMap<>();
+		HashMap<String, Integer[]> aoiTransitions = new HashMap<>();
 		Indexes csvIndexes = new Indexes();
 		processAllGazeFile(rawAllGazeFile, aoiMap, csvIndexes);
 
-		double[] fixTotals = processFixationFile(cleanFixationFile, aoiMap, aoiTransitions, csvIndexes);
+		AoiAccumulator totals = processFixationFile(cleanFixationFile, aoiMap, aoiTransitions, csvIndexes);
 		// create AOI directory
 		new File(outputLocation).mkdirs();
 
 		// calculates DGMs
 		String aoiFdxResults = outputLocation + name + "_aoi_graphFDXResults.csv";
-		writeFDXResults(aoiFdxResults, aoiMap, SCREEN_WIDTH, SCREEN_HEIGHT, csvIndexes, fixTotals[0], fixTotals[1]);
+		writeFDXResults(aoiFdxResults, aoiMap, SCREEN_WIDTH, SCREEN_HEIGHT, csvIndexes);
 
 		// calculate transition features
 		String transFeatures = outputLocation + name + "_aoi_transitionFeatures.csv";
-		writeTransitions(transFeatures, aoiTransitions);
+		writeTransitions(transFeatures, aoiTransitions, totals);
 
 		// calculate proportionate features
 		String proportionateFeatures = outputLocation + name + "_aoi_proportionateFeatures.csv";
-		writeProportionate(proportionateFeatures, aoiMap, csvIndexes, fixTotals[0], fixTotals[1]);
+		writeProportionate(proportionateFeatures, aoiMap, csvIndexes, totals);
 
 	}
 
-	/*
-	 * calculates descriptive gaze measures and saves to csv file.
+	/**
+	 * Calculates descriptive gaze measures and saves to csv file.
+	 * @param outputFile		the desired file path for the output file
+	 * @param aoiMap			names of the AOI as the key mapped to their fixations
+	 * @param SCREEN_WIDTH	the width of the monitor resolution used during the gaze recording in pixels 
+	 * @param SCREEN_HEIGHT	the height of the monitor resolution used during the gaze recording in pixels 
+	 * @param indexes			the indexes of data
 	 */
 	private static void writeFDXResults(String outputFile, Map<String, AOI> aoiMap, int SCREEN_WIDTH, int SCREEN_HEIGHT,
-			Indexes indexes, double totalFixations, double totalFixDuration) {
+			Indexes indexes) {
 		
 		try (
 			// Initializing output writers
@@ -283,11 +288,16 @@ public class AOI {
 		}
 	}
 
-	/*
-	 * Calculates comparative/proportionate AOI features and saves values to csv file.
+	/**
+	 * Calculates comparative and proportionate AOI features and saves values to a csv file.
+	 * @param outputFile string to the path of the output .csv file
+	 * @param map			names of AOI mapped to their fixations
+	 * @param csvIndexes	the indexes of data
+	 * @param totals		number of fixations, total fixation duration, number of transitions excluding self-transitions,
+	 * 						and number of transitions including self-transitions
 	 */
 	private static void writeProportionate(String outputFile, Map<String, AOI> map, Indexes csvIndexes,
-			double totalFixations, double totalFixDuration) {
+			AoiAccumulator totals) {
 
 		ArrayList<String> headers = new ArrayList<>();
 
@@ -313,8 +323,8 @@ public class AOI {
 				}
 
 				data.add(aoi.name);
-				data.add(String.valueOf(fixCount/totalFixations));
-				data.add(String.valueOf(aoiTotalDuration/totalFixDuration));
+				data.add(String.valueOf(fixCount/totals.numFixations));
+				data.add(String.valueOf(aoiTotalDuration/totals.totalFixDuration));
 
 				// Write the data into the .csv file as a new row
 				outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
@@ -330,12 +340,15 @@ public class AOI {
 		}
 	}
 	
-	/*
+	/**
 	 * Calculates transition AOI features and saves values to a csv file.
+	 * @param outputFile			string to the path of the output .csv file
+	 * @param aoiTransitions	name of the AOI mapped to the number of fixations that occur in the AOI
+	 * @param totals				number of fixations, total fixation duration, number of transitions excluding self-transitions,
+	 * 								and number of transitions including self-transitions 
 	 */
-	private static void writeTransitions(String outputFile, Map<String, Integer> aoiTransitions) {
+	private static void writeTransitions(String outputFile, Map<String, Integer[]> aoiTransitions, AoiAccumulator totals) {
 
-		double totalTrans = getTotalTransitions(aoiTransitions);
 		ArrayList<String> headers = new ArrayList<>();
 
 		try (
@@ -345,16 +358,20 @@ public class AOI {
 
 			headers.add("AOI Pair");
 			headers.add("Transition Count");
-			headers.add("Transition Proportion");
+			headers.add("Proportion excluding self-transitions");
+			headers.add("Proportion including self-transitions");
 
 			outputCSVWriter.writeNext(headers.toArray(new String[headers.size()]));
 
 			for (String key : aoiTransitions.keySet()) {
 				ArrayList<String> data = new ArrayList<>();
+				Integer[] transCount = aoiTransitions.get(key);
 				data.add(key);
-				data.add(aoiTransitions.get(key).toString());
-				String proportion = Double.toString(aoiTransitions.get(key)/ totalTrans);
-				data.add(proportion);
+				data.add(transCount[1].toString());
+				String exclusive = Double.toString(aoiTransitions.get(key)[0]/ totals.numTransExclusive);
+				data.add(exclusive);
+				String inclusive = Double.toString(aoiTransitions.get(key)[1]/ totals.numTransInclusive);
+				data.add(inclusive);
 				outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
 			}
 			systemLogger.writeToSystemLog(Level.INFO, AOI.class.getName(), "Done writing AOI transition data to " + outputFile );
@@ -386,7 +403,14 @@ public class AOI {
 	/*
 	 * Uses raw all gaze file to find number of blinks and duration viewed for each AOI
 	 */
-	private static void processAllGazeFile(String inputFile, Map<String, AOI> aois, Indexes csvIndexes) {
+	/**
+	 * Parses through the raw all gaze data to the finds the number of blinks that occurred in each AOI
+	 * and the duration each AOI was viewed. Adds each AOI name to a map passed into a function.
+	 * @param inputFile 	string to the path of the raw all gaze data file
+	 * @param aoiMap		names of the AOI as the key mapped to their fixations
+	 * @param csvIndexes	the indexes of data
+	 */
+	private static void processAllGazeFile(String inputFile, Map<String, AOI> aoiMap, Indexes csvIndexes) {
 		try (
 			FileReader fileReader = new FileReader(inputFile);
 			CSVReader csvReader = new CSVReader(fileReader);
@@ -408,10 +432,10 @@ public class AOI {
 
 				if (!aoiName.equals("")) {
 					// add AOI to map
-					if (!aois.containsKey(aoiName))
-						aois.put(aoiName, new AOI(aoiName));
+					if (!aoiMap.containsKey(aoiName))
+						aoiMap.put(aoiName, new AOI(aoiName));
 
-					AOI aoi = aois.get(aoiName);
+					AOI aoi = aoiMap.get(aoiName);
 
 					blinkID = Integer.valueOf(nextLine[csvIndexes.blinkIdIndex]);
 					// count blinks
@@ -437,12 +461,20 @@ public class AOI {
 		}
 	}
 
-	/*
-	 * Separates fixations into AOIs. Excludes multi-AOI fixations
+	/**
+	 * Parses through the fixation data to separate fixation into AOIs and maps the data to the AOI name. 
+	 * @param inputFile			a string to the path of the raw all gaze data file
+	 * @param aoiMap				names of the AOI as the key mapped to their fixations
+	 * @param aoiTransitions	name of the AOI mapped to the number of fixations that occur in the AOI
+	 * @param csvIndexes			the indexes of data
+	 * @return	accumulated AOI data including number of fixations, total fixation duration, number of transitions excluding self-transitions,
+	 * 			and number of transitions including self-transitions
 	 */
-	private static double[] processFixationFile(String inputFile, Map<String, AOI> aoiMap,
-			Map<String, Integer> aoiTransitions, Indexes csvIndexes) {
-		double[] totals = {0,0}; // number of fixations, total fixation duration
+	private static AoiAccumulator processFixationFile(String inputFile, Map<String, AOI> aoiMap,
+			Map<String, Integer[]> aoiTransitions, Indexes csvIndexes) {
+
+		AoiAccumulator totals = new AoiAccumulator();
+		
 		try (
 			FileReader fileReader = new FileReader(inputFile);
 			CSVReader csvReader = new CSVReader(fileReader);
@@ -461,8 +493,10 @@ public class AOI {
 			while ((nextLine = csvReader.readNext()) != null) {
 				aoiName = nextLine[csvIndexes.aoiIndex];
 				fixId = Integer.valueOf(nextLine[csvIndexes.fixIdIndex]);
-				totals[0]++;
-				totals[1] += Double.valueOf(nextLine[csvIndexes.fixDurIndex]);
+
+				// count fixation and add fixation duration
+				totals.numFixations++;
+				totals.totalFixDuration += Double.valueOf(nextLine[csvIndexes.fixDurIndex]);
 
 				// excludes non-AOIs or multi AOI fixations. 
 				if (aoiMap.containsKey(aoiName)) {
@@ -471,7 +505,21 @@ public class AOI {
 					// Count AOI transitions. Transitions must be from subsequential fixations
 					if (aoiMap.containsKey(prevAoiName) && fixId == prevFixId + 1) {
 						String aoiPair = prevAoiName + " -> " + aoiName;
-						aoiTransitions.put(aoiPair, aoiTransitions.getOrDefault(aoiPair, 0)+1);
+						Integer[] count;	// [0] excludes self-transition, [1] includes self-transition
+						if (aoiTransitions.containsKey(aoiPair)) {
+							count = aoiTransitions.get(aoiPair);
+						}
+						else {
+							count = new Integer[] {0,0};
+							aoiTransitions.put(aoiPair, count);
+						}
+						// count transitions
+						totals.numTransInclusive++;
+						count[1]++;
+						if (!prevAoiName.equals(aoiName)) {	// not self-transition check
+							totals.numTransExclusive++;
+							count[0]++;
+						}
 					}
 				}
 				prevFixId = fixId;
@@ -490,8 +538,9 @@ public class AOI {
 		return totals;
 	}
 
-	/*
-	 * calculated blink rate
+	/**
+	 * Calculates blink rate for a single AOI.
+	 * @return
 	 */
 	private double getBlinkRate() {
 		if (this.durationViewed > 0) {
@@ -502,40 +551,43 @@ public class AOI {
 		}
 	}
 
-
-	/*
-	 * returns total number of transitions between all AOIs
-	 */
-	private static int getTotalTransitions(Map<String, Integer> aoiTransitions) {
-		int total = 0;
-		for (int value : aoiTransitions.values()) {
-			total += value;
-		}
-		return total;
-	}	
-
-	/*
-	 * error logging
+	/**
+	 * Writes IO Exceptions to logger and terminal.
+	 * @param fileName file that caused exception
+	 * @param e error
 	 */
 	private static void ioExceptionMessage(String fileName, IOException e) {
 		systemLogger.writeToSystemLog(Level.WARNING, AOI.class.getName(), "Error reading file " + fileName + "\n" + e.toString());
 		System.out.println("Error reading file '" + fileName + "'");
 	}
 
-	/*
-	 * error logging
+	/**
+	 * Writes File Not Found Exception to the logger and terminal.
+	 * @param fileName file that caused exception
+	 * @param e error
 	 */
 	private static void fileNotFoundMessage(String fileName, FileNotFoundException e) {
 		systemLogger.writeToSystemLog(Level.WARNING, AOI.class.getName(), "Unable to open file " + fileName + "\n" + e.toString());
 		System.out.println("Unable to open file '" + fileName + "'");
 	}
 
+	/**
+	 * Writes CSV Validation Exception to the logger and terminal.
+	 * @param fileName file that caused exception
+	 * @param e error
+	 */
 	private static void csvValidationExceptionMessage(String fileName, CsvValidationException e) {
 		systemLogger.writeToSystemLog(Level.WARNING, AOI.class.getName(), "Problem reading from " + fileName + "\n" + e.toString());
 		System.out.println("Problem reading from '" + fileName + "'");
 	}
 
-	/*
+	/* 
+		Nested classes are typically bad practice but the repository seems to keep each feature isolated
+		to one file. The decision to have nested classes was to maintain the existing file structure while
+		avoiding using arrays with unlabeled the values.
+	*/
+
+	/**
 	 * Nested class to store column indexes for gaze data.
 	 */
 	private static class Indexes {
@@ -548,8 +600,9 @@ public class AOI {
 		int peakVelocityIndex = -1;
 		int blinkIdIndex = -1;
 
-	/*
+	/**
 	 * Modifies an Indexes object to have indexes are important data columns in the csv file.
+	 * @param headers the data column titles
 	 */
 		private void findIndexes(String[] headers) {
 		// Locate the indexes for required fields
@@ -586,6 +639,16 @@ public class AOI {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Holds accumulators for values in the fixation file. 
+	 */
+	private static class AoiAccumulator {
+		double numFixations = 0;
+		double totalFixDuration = 0;
+		double numTransExclusive = 0;
+		double numTransInclusive = 0;
 	}
 
 }
