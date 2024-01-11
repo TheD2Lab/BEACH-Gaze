@@ -6,5 +6,5 @@ package analysis;
  */
 
 public class FileHandler {
-    
+
 }
