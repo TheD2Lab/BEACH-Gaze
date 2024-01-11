@@ -1,28 +1,34 @@
 package analysis;
 
 import java.io.File;
+import java.util.HashMap;
 
 public class Parameters {
     /*
      * Format of a config file
      * UI and QuickStart creates Parameters object
      */
-    public String inputDirectory;
-    public String outputDirectory;
+    private String[] inputFiles;
+    private String outputDirectory;
 
-
-    public Parameters(String inputDirectory, String outputDirectory) { //Constructor with variables as the parameters
-        this.inputDirectory = inputDirectory;
+    /*
+     * Constructor with variables as the parameters
+     */
+    public Parameters(String[] inputFiles, String outputDirectory, HashMap<String, Integer> windowSettings) {
+        this.inputFiles = inputFiles;
         this.outputDirectory = outputDirectory;
     }
 
-    public Parameters(File parameters) { //Constructor with a file containing the parameters
+    /*
+     * Constructor with a file containing the parameters
+     */
+    public Parameters(File parameters) { 
         /*
          * Still needs code
          */
     }
 
-    public void SaveToJSON(String saveLocation) {
+    public void saveToJSON(String saveLocation) {
         FileHandler.SaveParametersAsJSON(this, saveLocation);
     }
 }
