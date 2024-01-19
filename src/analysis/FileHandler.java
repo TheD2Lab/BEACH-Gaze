@@ -47,7 +47,7 @@ public class FileHandler {
             JSONObject j = new JSONObject();  
 
             for (int i = 0; i < data.size(); i++) {
-                j.put(keys[i].toString(), data.get(keys[i]));
+                j.put(keys[i].toString(), (String)data.get(keys[i]));
             }
 
             return j;
@@ -60,13 +60,14 @@ public class FileHandler {
     }
     
     static public HashMap<String,String> loadParametersFromJSON(File filePath) {
-        HashMap<String, String> data = new HashMap<String, String>();
-
-        JSONParser parser = new JSONParser();
         try {
+
+            JSONParser parser = new JSONParser();
             Object obj = parser.parse(new FileReader(filePath));
             JSONObject jsonObject = (JSONObject)obj;
             Iterator<?> keys = jsonObject.keySet().iterator();
+
+            HashMap<String, String> data = new HashMap<String, String>();
 
             while (keys.hasNext()) {
                 String key = (String)keys.next();
@@ -74,26 +75,11 @@ public class FileHandler {
             }
 
             return data;
-            /*
-           String name = (String)jsonObject.get("Name");
-           String course = (String)jsonObject.get("Course");
-           JSONArray subjects = (JSONArray)jsonObject.get("Subjects");
-           System.out.println("Name: " + name);
-           System.out.println("Course: " + course);
-           System.out.println("Subjects:");
-           Iterator iterator = subjects.iterator();
-           while (iterator.hasNext()) {
-              System.out.println(iterator.next());
-            */
+
         } catch(Exception e) {
            e.printStackTrace();
 
            return null;
         }              
     }
-
-    /*
-     * Needs ability to read files still
-     * Potentially make FileHandler specifically for Parameters only? If not, buildJSON might be better placed in the Parameters object
-     */
 }
