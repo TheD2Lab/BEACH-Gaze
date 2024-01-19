@@ -1,6 +1,8 @@
 package analysis;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Parameters {
@@ -15,7 +17,7 @@ public class Parameters {
      * Constructor with variables as the parameters
      */
     public Parameters(String[] inputFiles, String outputDirectory, HashMap<String, Integer> windowSettings) {
-        this.inputFiles = inputFiles;
+        this.inputFiles = inputFiles.clone();
         this.outputDirectory = outputDirectory;
     }
 
@@ -26,9 +28,38 @@ public class Parameters {
         /*
          * Still needs code
          */
+        HashMap<String,String> data = loadFromJSON(parameters);
+        
+        this.outputDirectory = data.get("OutputDirectory");
+
+        inputFiles = data.get("InputFiles").replace("[", "").replace("]", "").split(", ").clone();
     }
 
-    public void saveToJSON(String saveLocation) {
-        FileHandler.SaveParametersAsJSON(this, saveLocation);
+    public void saveToJSON(String saveLocation, String saveName) {
+        HashMap<String, String> data = new HashMap<String, String>();
+        data.put("InputFiles", Arrays.toString(inputFiles));
+        data.put("OutputDirectory", outputDirectory);
+        System.out.println("Saving: "+data.toString());
+        FileHandler.SaveParametersAsJSON(data, saveLocation + "\\" + saveName);
+    }
+
+    public HashMap<String,String> loadFromJSON(File config) {
+        return FileHandler.loadParametersFromJSON(config);
+    }
+
+    public String toString() {
+        return "--Parameters-- \n InputFiles: ["+inputFiles.length+"] "+Arrays.toString(inputFiles)+" \n OutputDirectory: "+outputDirectory +"\n --End of Parameters--";
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Creating and saving Parameters!");
+        Parameters p = new Parameters(new String[]{"data\\Kayla_all_gaze.csv","data\\Esther Jung_all_gaze.csv"},"data\\presets", new HashMap<>());
+        p.saveToJSON("data\\presets","TestConfig.json");
+        System.out.println(p.toString());
+
+        System.out.println("Loading parameters!");
+
+        Parameters p2 = new Parameters(new File("data\\presets\\TestConfig.json"));
+        System.out.println(p2.toString());
     }
 }
