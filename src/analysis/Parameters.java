@@ -25,22 +25,18 @@ public class Parameters {
      * Constructor with a file containing the parameters
      */
     public Parameters(File parameters) { 
-        /*
-         * Still needs code
-         */
         HashMap<String,String> data = loadFromJSON(parameters);
         
         this.outputDirectory = data.get("OutputDirectory");
-
-        inputFiles = data.get("InputFiles").replace("[", "").replace("]", "").split(", ").clone();
+        inputFiles = data.get("InputFiles").replace("[", "").replace("]", "").split(", ").clone(); //Converts the JSON string back to a regular array
     }
 
-    public void saveToJSON(String saveLocation, String saveName) {
+    public void saveToJSON(String saveLocation, String fileName) {
         HashMap<String, String> data = new HashMap<String, String>();
         data.put("InputFiles", Arrays.toString(inputFiles));
         data.put("OutputDirectory", outputDirectory);
         System.out.println("Saving: "+data.toString());
-        FileHandler.SaveParametersAsJSON(data, saveLocation + "\\" + saveName);
+        FileHandler.SaveParametersAsJSON(data, saveLocation + "\\" + fileName);
     }
 
     public HashMap<String,String> loadFromJSON(File config) {
