@@ -28,57 +28,42 @@ public class FileHandler {
             pw.write(buildJSON(data).toString()); //Save data as JSON to file
             pw.flush();
             pw.close();
-
             System.out.println("Success!");
-
             return true;
         } catch (Exception e) {
-
             System.out.println(e.toString());
             return false;
-
         }
     }
 
     static private JSONObject buildJSON(HashMap<String,String> data) { //Builds a JSON object from the Parameters
         try {
-
             Object[] keys = data.keySet().toArray();
             JSONObject j = new JSONObject();  
-
             for (int i = 0; i < data.size(); i++) {
                 j.put(keys[i].toString(), (String)data.get(keys[i]));
             }
-
             return j;
         } catch (Exception e) {
-
             System.out.println(e.toString());
             return null;
-
         }        
     }
     
     static public HashMap<String,String> loadParametersFromJSON(File filePath) {
         try {
-
             JSONParser parser = new JSONParser();
             Object obj = parser.parse(new FileReader(filePath));
             JSONObject jsonObject = (JSONObject)obj;
             Iterator<?> keys = jsonObject.keySet().iterator();
-
             HashMap<String, String> data = new HashMap<String, String>();
-
             while (keys.hasNext()) {
                 String key = (String)keys.next();
                 data.put(key, (String)jsonObject.get(key));
             }
-
             return data;
-
         } catch(Exception e) {
            e.printStackTrace();
-
            return null;
         }              
     }

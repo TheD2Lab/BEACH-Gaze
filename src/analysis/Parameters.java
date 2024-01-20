@@ -25,8 +25,7 @@ public class Parameters {
      * Constructor with a file containing the parameters
      */
     public Parameters(File config) { 
-        HashMap<String,String> data = FileHandler.loadParametersFromJSON(config);
-        
+        HashMap<String,String> data = FileHandler.loadParametersFromJSON(config); 
         this.outputDirectory = data.get("OutputDirectory");
         inputFiles = data.get("InputFiles").replace("[", "").replace("]", "").split(", ").clone(); //Converts the JSON string back to a regular array
     }
@@ -45,10 +44,11 @@ public class Parameters {
 
     public static void main(String[] args) {
         System.out.println("Creating and saving Parameters!");
+
         Parameters p = new Parameters(new String[]{"data\\Kayla_all_gaze.csv","data\\Esther Jung_all_gaze.csv"},"data\\presets", new HashMap<>());
         p.saveToJSON("data\\presets","TestConfig.json");
-        System.out.println(p.toString());
 
+        System.out.println(p.toString());
         System.out.println("Loading parameters!");
 
         Parameters p2 = new Parameters(new File("data\\presets\\TestConfig.json"));
