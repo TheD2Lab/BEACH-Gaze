@@ -54,4 +54,11 @@ public class Parameters {
         Parameters p2 = new Parameters(new File("data\\presets\\TestConfig.json"));
         System.out.println(p2.toString());
     }
+
+    public String[] getInputFiles() {
+        return inputFiles.clone();
+    }
+    public String getOutputFile() {
+        return outputDirectory;
+    }    
 }
