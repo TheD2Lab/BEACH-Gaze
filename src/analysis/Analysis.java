@@ -22,7 +22,7 @@ public class Analysis {
         for (int i = 0; i < inputFiles.length; i++) {
             String fileName = inputFiles[i];
             File f = new File(fileName);
-            
+            ReadFile(f);   
         }
     }
 
@@ -30,11 +30,26 @@ public class Analysis {
         try {
             FileReader fileReader = new FileReader(gaze);
             CSVReader csvReader = new CSVReader(fileReader);
+            DataEntry data = new DataEntry(csvReader.readNext());
+            String[] line;
 
-            List<String> header = Arrays.asList(csvReader.readNext());
+            while ((line = csvReader.readNext()) != null) {
+                data.setLine(line);
+                updateCalculations(data);
+            }
+            
+            processCalculations();
             
         } catch (Exception e) {
 
         }
+    }
+
+    public void updateCalculations(DataEntry data) {
+        
+    }
+
+    public void processCalculations() {
+
     }
 }
