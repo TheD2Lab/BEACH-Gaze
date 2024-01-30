@@ -165,7 +165,18 @@ public class BatchAnalytics {
 		HashMap<String, Integer>partName = new HashMap<>(); //participant's name and number of files attached to the name
 		for(File file: files)
 		{
-			String[]fName = file.getName().split("_",2); //splits the name and the suffix from the file name
+			//String[]fName = file.getName().split("_",2); //splits the name and the suffix from the file name
+			String fullFileName = file.getName();
+			int split = 0;
+			
+			if (fullFileName.contains(GZD_SUFFIX))
+				split = fullFileName.lastIndexOf("_all_gaze.csv");
+			else if (fullFileName.contains(FXD_SUFFIX))
+				split = fullFileName.lastIndexOf("_fixations.csv");
+			
+			String[] fName = {fullFileName.substring(0, split), fullFileName.substring(split + 1) };
+			System.out.println(fName[0]);
+			System.out.println(fName[1]);
 
 			//checks if the naming convention was incorrect
 			if(!fName[1].equals(GZD_SUFFIX) && !fName[1].equals(FXD_SUFFIX))
