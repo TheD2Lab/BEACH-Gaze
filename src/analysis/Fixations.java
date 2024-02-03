@@ -20,11 +20,12 @@ public class Fixations {
             int timestampIndex = list.indexOf("FPOGS");
      */
     public void update() {
-        double fixationDuration = Double.valueOf(data.getValue("FPOGD"));
+        double fixationDuration = Double.valueOf(data.getCurrentValue("FPOGD"));
         allDurations.add(fixationDuration);
     }
 
-    public void process() {
-        
+    public String[] process() {
+        //String.valueOf(descriptiveStats.getSumOfDoubles(allDurations));
+        return new String[]{};
     }
 }
