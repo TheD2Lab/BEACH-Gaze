@@ -33,4 +33,8 @@ public class DataEntry {
     public String getValue(String header, int row) {
         return fixationData.get(row).get(headerToIndex.get(header)); //Gets the value in the selected row under the desired header
     }
+
+    public String getValue(String header, int row, boolean shortened) {
+        return fixationData.get(row).get(headerToIndex.get(header)); //Gets the value in the selected row under the desired header
+    }
 }
