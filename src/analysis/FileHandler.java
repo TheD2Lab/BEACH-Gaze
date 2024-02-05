@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import org.json.simple.*;
 import org.json.simple.parser.*;
 
+import com.opencsv.CSVReader;
+
 
 /*
  * Read and write xml, csv, txt files
@@ -21,6 +23,25 @@ import org.json.simple.parser.*;
  */
 
 public class FileHandler {
+   static public DataEntry BuildDataEntry(File gaze) {
+        try {
+            FileReader fileReader = new FileReader(gaze);
+            CSVReader csvReader = new CSVReader(fileReader);
+            DataEntry data = new DataEntry(csvReader.readNext());
+            String[] line;
+
+            while ((line = csvReader.readNext()) != null) {
+                data.setLine(line);
+            }
+
+            return data;
+            
+        } catch (Exception e) {
+            System.out.println(e.toString());
+            return  null;
+        }
+    }
+
     static public boolean SaveParametersAsJSON(HashMap<String,String> data,String saveLocation) {
         try {
             System.out.println("Writing file!");
