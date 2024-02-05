@@ -29,7 +29,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 
-public class descriptiveStats {
+public class DescriptiveStats {
 
 	public static double getSumOfIntegers(ArrayList<Integer> allIntegers){
 
