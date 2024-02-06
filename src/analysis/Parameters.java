@@ -27,7 +27,11 @@ public class Parameters {
     public Parameters(File config) { 
         HashMap<String,String> data = FileHandler.loadParametersFromJSON(config); 
         this.outputDirectory = data.get("OutputDirectory");
-        inputFiles = data.get("InputFiles").replace("[", "").replace("]", "").split(", ").clone(); //Converts the JSON string back to a regular array
+        String[] pathStrings = data.get("InputFiles").replace("[", "").replace("]", "").split(", ").clone(); //Converts the JSON string back to a regular array
+        inputFiles = new File[pathStrings.length];
+        for (int i = 0; i < pathStrings.length; i++) {
+            inputFiles[i] = new File(pathStrings[i]);
+        }
     }
 
     public void saveToJSON(String saveLocation, String fileName) {
