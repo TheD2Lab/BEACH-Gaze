@@ -24,11 +24,12 @@ public class DataEntry {
             headerToIndex.put(header, i);
         }
 
-        currFixation = 1;
         allGazeData = new ArrayList<List<String>>();
         fixationData = new ArrayList<List<String>>();
         cleanedAllGazeData = new ArrayList<List<String>>();
         cleanedFixationData = new ArrayList<List<String>>();
+        
+        currFixation = 1;
     }
 
     public void process(String[] currLine) { //Sets the currently read line of the CSV.
