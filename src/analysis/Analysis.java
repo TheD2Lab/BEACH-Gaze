@@ -12,7 +12,6 @@ public class Analysis {
      */
 
     private Parameters params;
-    private DataEntry data;
     
     public Analysis(Parameters params) {
         this.params = params;
@@ -22,7 +21,7 @@ public class Analysis {
         File[] inputFiles = params.getInputFiles();
         for (int i = 0; i < inputFiles.length; i++) {
             File f = inputFiles[i];
-            data = FileHandler.buildDataEntry(f);   
+            DataEntry data = FileHandler.buildDataEntry(f);   
         }
     }
 
