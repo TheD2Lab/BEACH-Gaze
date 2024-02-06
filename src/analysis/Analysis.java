@@ -12,17 +12,17 @@ public class Analysis {
      */
 
     private Parameters params;
+    private DataEntry data;
     
     public Analysis(Parameters params) {
         this.params = params;
     }
 
-    public void Start() {
-        String[] inputFiles = params.getInputFiles();
+    public void run() {
+        File[] inputFiles = params.getInputFiles();
         for (int i = 0; i < inputFiles.length; i++) {
-            String fileName = inputFiles[i];
-            File f = new File(fileName);
-            DataEntry data = FileHandler.BuildDataEntry(f);   
+            File f = inputFiles[i];
+            data = FileHandler.buildDataEntry(f);   
         }
     }
 

@@ -319,5 +319,6 @@ public class UserInterface {
     private void runAnalysis() {
         Parameters params = new Parameters(inputFiles, outputDirectory, windowSettings);
         Analysis analysis = new Analysis(params);
+        analysis.run();
     }
 }

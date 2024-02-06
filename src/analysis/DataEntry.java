@@ -1,14 +1,21 @@
 package analysis;
 
+import java.util.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class DataEntry {
-    HashMap<String,Integer> headerToIndex; //Stores the index of all headers
-    ArrayList<ArrayList<String>> fixationData;
     
-    String[] line; //The current line being read
+    HashMap<String,Integer> headerToIndex; //Stores the index of all headers
+    ArrayList<List<String>> allGazeData;
+    ArrayList<List<String>> fixationData;
+    ArrayList<List<String>> cleanedAllGazeData;
+    ArrayList<List<String>> cleanedFixationData;
+    
+    List<String> lastValidFixation;
+    String[] currLine; //The current line being read
+    int currFixation;
 
     public DataEntry(String[] headers) { //The constructor takes the first line of the CSV file so it can store the headers
         headerToIndex = new HashMap<String,Integer>();
@@ -16,18 +23,32 @@ public class DataEntry {
             String header = headers[i];
             headerToIndex.put(header, i);
         }
+
+        currFixation = 1;
+        allGazeData = new ArrayList<List<String>>();
+        fixationData = new ArrayList<List<String>>();
+        cleanedAllGazeData = new ArrayList<List<String>>();
+        cleanedFixationData = new ArrayList<List<String>>();
     }
 
-    public void setLine(String[] line) { //Sets the currently read line of the CSV.
-        this.line = line;
-        fixationData.add(new ArrayList<String>()); //Create a new line in the fixationData list
-        for (int i = 0; i < line.length; i++) {
-            fixationData.get(fixationData.size() - 1).add(line[i]); //Add all rows to the new line in the fixationData list.
+    public void process(String[] currLine) { //Sets the currently read line of the CSV.
+        this.currLine = currLine;
+        List<String> line = Arrays.asList(currLine);
+        allGazeData.add(line);
+
+        int fixationID = Integer.parseInt(getCurrentValue("FPOGID"));
+        int fixationValidity = Integer.parseInt(getCurrentValue("FPOGV"));
+        
+        if (fixationID != currFixation) {
+            if (lastValidFixation != null) fixationData.add(lastValidFixation);
+            currFixation = fixationID;
+        } else if (fixationID == currFixation && fixationValidity == 1) {
+            lastValidFixation = line;
         }
     }
 
     public String getCurrentValue(String header) { //Returns the value on the current line with the given header.
-        return line[headerToIndex.get(header)];
+        return currLine[headerToIndex.get(header)];
     }
 
     public String getValue(String header, int row) {

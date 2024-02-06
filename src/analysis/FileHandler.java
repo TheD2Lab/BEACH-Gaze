@@ -16,14 +16,13 @@ import org.json.simple.parser.*;
 
 import com.opencsv.CSVReader;
 
-
 /*
  * Read and write xml, csv, txt files
  * Save into memory
  */
 
 public class FileHandler {
-   static public DataEntry BuildDataEntry(File gaze) {
+   static public DataEntry buildDataEntry(File gaze) {
         try {
             FileReader fileReader = new FileReader(gaze);
             CSVReader csvReader = new CSVReader(fileReader);
@@ -31,9 +30,10 @@ public class FileHandler {
             String[] line;
 
             while ((line = csvReader.readNext()) != null) {
-                data.setLine(line);
+                data.process(line);
             }
 
+            csvReader.close();
             return data;
             
         } catch (Exception e) {
