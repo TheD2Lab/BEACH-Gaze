@@ -270,6 +270,23 @@ public class UserInterface {
         runAnalysisButton.addActionListener(e -> {
             runAnalysis();
         });
+
+        continuousCheckBox.addActionListener(e -> {
+            windowSettings.continuous = true;
+        });
+
+        cumulativeCheckBox.addActionListener(e -> {
+            windowSettings.continuous = true;
+        });
+
+        overlappingCheckBox.addActionListener(e -> {
+            windowSettings.overlapping = true;
+        });
+
+        eventCheckBox.addActionListener(e -> {
+            windowSettings.event = true;
+        });
+        
     }
 
     private void selectInputFiles() {

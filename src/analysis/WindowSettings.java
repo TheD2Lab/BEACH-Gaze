@@ -20,4 +20,6 @@ public class WindowSettings {
         this.overlapping = overlapping;
         this.event = event;
     }
+
+    
 }
