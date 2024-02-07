@@ -21,8 +21,12 @@ public class UserInterface {
     private JTextField directoryField;
     private JButton runAnalysisButton;
     private JCheckBox continuousCheckBox;
+    private JTextField continuousWindowSizeField;
     private JCheckBox cumulativeCheckBox;
+    private JTextField cumulativeWindowSizeField;
     private JCheckBox overlappingCheckBox;
+    private JTextField overlappingWindowSizeField;
+    private JTextField overlappingOverlapSizeField;
     private JCheckBox eventCheckBox;
 
     public UserInterface() {
@@ -149,37 +153,83 @@ public class UserInterface {
         componentGBC.gridheight = 1;
 
         JLabel windowsLabel = new JLabel("Window Settings");
-        componentGBC.insets = new Insets(0, 0, 0, 200);
-        componentGBC.gridx = 0;
+        componentGBC.insets = new Insets(0, 0, 0, 150);
+        componentGBC.gridx = GridBagConstraints.REMAINDER;
         componentGBC.gridy = 0;
+        componentGBC.gridwidth = 10;
         windowsPanel.add(windowsLabel, componentGBC);
 
         continuousCheckBox = new JCheckBox("Continuous");
-        componentGBC.gridwidth = 1;
+        componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 0;
         componentGBC.gridy = 1;
-        componentGBC.gridwidth = 2;
+        componentGBC.gridwidth = 3;
         windowsPanel.add(continuousCheckBox, componentGBC);
 
-        cumulativeCheckBox = new JCheckBox("Cumulative");
-        componentGBC.gridwidth = 1;
+        JLabel windowSizeLabel1 = new JLabel("Window Size");
         componentGBC.gridx = 0;
         componentGBC.gridy = 2;
-        componentGBC.gridwidth = 2;
-        windowsPanel.add(cumulativeCheckBox, componentGBC);
-
-        overlappingCheckBox = new JCheckBox("Overlapping");
         componentGBC.gridwidth = 1;
+        windowsPanel.add(windowSizeLabel1, componentGBC);
+
+        continuousWindowSizeField = new JTextField("", 5);
+        componentGBC.gridx = 1;
+        componentGBC.gridy = 2;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(continuousWindowSizeField, componentGBC);
+        
+        cumulativeCheckBox = new JCheckBox("Cumulative");
         componentGBC.gridx = 0;
         componentGBC.gridy = 3;
-        componentGBC.gridwidth = 2;
-        windowsPanel.add(overlappingCheckBox, componentGBC);
+        componentGBC.gridwidth = 3;
+        windowsPanel.add(cumulativeCheckBox, componentGBC);
 
-        eventCheckBox = new JCheckBox("Event");
-        componentGBC.gridwidth = 1;
+        JLabel windowSizeLabel2 = new JLabel("Window Size");
         componentGBC.gridx = 0;
         componentGBC.gridy = 4;
-        componentGBC.gridwidth = 2;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(windowSizeLabel2, componentGBC);
+
+        cumulativeWindowSizeField = new JTextField("", 5);
+        componentGBC.gridx = 1;
+        componentGBC.gridy = 4;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(cumulativeWindowSizeField, componentGBC);
+
+        overlappingCheckBox = new JCheckBox("Overlapping");
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 5;
+        componentGBC.gridwidth = 3;
+        windowsPanel.add(overlappingCheckBox, componentGBC);
+
+        JLabel windowSizeLabel3 = new JLabel("Window Size");
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 6;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(windowSizeLabel3, componentGBC);
+        
+        overlappingWindowSizeField = new JTextField("", 5);
+        componentGBC.gridx = 1;
+        componentGBC.gridy = 6;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(overlappingWindowSizeField, componentGBC);
+
+        JLabel overlapSizeLabel = new JLabel("Overlap Size");
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 7;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(overlapSizeLabel, componentGBC);
+
+        overlappingOverlapSizeField = new JTextField("", 5);
+        componentGBC.gridx = 1;
+        componentGBC.gridy = 7;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(overlappingOverlapSizeField, componentGBC);
+
+        eventCheckBox = new JCheckBox("Event");
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 8;
+        componentGBC.gridwidth = 3;
         windowsPanel.add(eventCheckBox, componentGBC);
 
         frame.add(windowsPanel, panelGBC);
@@ -210,7 +260,7 @@ public class UserInterface {
         componentGBC.gridheight = 1;
 
         JLabel consoleLabel = new JLabel("Console Errors");
-        componentGBC.insets = new Insets(0, 0, 0, 400);
+        componentGBC.insets = new Insets(0, 0, 0, 350);
         componentGBC.gridx = 0;
         componentGBC.gridy = 0;
         componentGBC.gridwidth = 1;
@@ -272,19 +322,19 @@ public class UserInterface {
         });
 
         continuousCheckBox.addActionListener(e -> {
-            windowSettings.continuous = true;
+            windowSettings.setContinuousEnabled(cumulativeCheckBox.isSelected());
         });
 
         cumulativeCheckBox.addActionListener(e -> {
-            windowSettings.continuous = true;
+            windowSettings.setCumulativeEnabled(cumulativeCheckBox.isSelected());
         });
 
         overlappingCheckBox.addActionListener(e -> {
-            windowSettings.overlapping = true;
+            windowSettings.setOverlappingEnabled(overlappingCheckBox.isEnabled());
         });
 
         eventCheckBox.addActionListener(e -> {
-            windowSettings.event = true;
+            windowSettings.setEventEnabled(eventCheckBox.isEnabled());
         });
         
     }
