@@ -52,7 +52,7 @@ public class AOI {
 		new File(outputLocation).mkdirs();
 
 		// calculates DGMs
-		String aoiFdxResults = outputLocation + name + "_aoi_graphFDXResults.csv";
+		String aoiFdxResults = outputLocation + name + "_aoi_graphFXDResults.csv";
 		writeFDXResults(aoiFdxResults, aoiMap, SCREEN_WIDTH, SCREEN_HEIGHT, csvIndexes);
 
 		// calculate transition features
