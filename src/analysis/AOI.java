@@ -52,8 +52,8 @@ public class AOI {
 		new File(outputLocation).mkdirs();
 
 		// calculates DGMs
-		String aoiFdxResults = outputLocation + name + "_aoi_graphFXDResults.csv";
-		writeFDXResults(aoiFdxResults, aoiMap, SCREEN_WIDTH, SCREEN_HEIGHT, csvIndexes);
+		String aoiFxdResults = outputLocation + name + "_aoi_graphFXDResults.csv";
+		writeFXDResults(aoiFxdResults, aoiMap, SCREEN_WIDTH, SCREEN_HEIGHT, csvIndexes);
 
 		// calculate transition features
 		String transFeatures = outputLocation + name + "_aoi_transitionFeatures.csv";
@@ -73,7 +73,7 @@ public class AOI {
 	 * @param SCREEN_HEIGHT	the height of the monitor resolution used during the gaze recording in pixels 
 	 * @param indexes			the indexes of data
 	 */
-	private static void writeFDXResults(String outputFile, Map<String, AOI> aoiMap, int SCREEN_WIDTH, int SCREEN_HEIGHT,
+	private static void writeFXDResults(String outputFile, Map<String, AOI> aoiMap, int SCREEN_WIDTH, int SCREEN_HEIGHT,
 			Indexes indexes) {
 		
 		try (
