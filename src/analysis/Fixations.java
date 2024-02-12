@@ -19,6 +19,18 @@ public class Fixations {
             int aoiIndex = list.indexOf("AOI");
             int timestampIndex = list.indexOf("FPOGS");
      */
+    public void analyze(DataEntry data) {
+        for (int i = 0; i < data.getLength("Fixation"); i++) {
+            String v = data.getValue("GPOSX", i, "Fixation");
+        }
+    }
+
+
+
+
+
+
+
     public void update() {
         double fixationDuration = Double.valueOf(data.getCurrentValue("FPOGD"));
         allDurations.add(fixationDuration);

@@ -3,11 +3,14 @@ package analysis;
 import java.io.File;
 import java.io.FileNotFoundException; 
 import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.io.FileReader;
-import java.util.LinkedHashMap; 
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.HashMap; 
 import java.util.Set;
-
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 //import javax.swing.text.html.HTMLDocument.Iterator;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -40,6 +43,57 @@ public class FileHandler {
             System.out.println(e.toString());
             return  null;
         }
+    }
+
+    static public String convertToCSV(ArrayList<String> data) {
+        String converted = "";
+        for (int i = 0; i < data.size(); i++) {
+            converted = converted + data.get(i);
+            if (i < data.size() - 1) {
+                converted = converted + ",";
+            }
+        }
+
+        return converted + " \n ";
+    }
+
+    static public void writeAnalytics(ArrayList<ArrayList<String>> results, String outputPath) {
+        File csvOutputFile = new File(outputPath);
+        try {
+            PrintWriter pw = new PrintWriter(csvOutputFile);
+            String csvData = "";
+            for (int i = 0; i < results.size(); i++) {
+                csvData = csvData + convertToCSV(results.get(i));
+            }
+            pw.println(csvData);
+            pw.close();
+        } catch (Exception e) {
+            System.err.println(e.toString());
+        }   
+    }
+
+    public static void main(String[] args) {
+        ArrayList<ArrayList<String>> data = new ArrayList<ArrayList<String>>();
+        data.add(new ArrayList<String>());
+        data.add(new ArrayList<String>());
+        data.add(new ArrayList<String>());
+
+        data.get(0).add("Header 1");
+        data.get(0).add("Header 2");
+        data.get(0).add("Header 3");
+        data.get(0).add("Header 4");
+
+        data.get(1).add("Value 1a");
+        data.get(1).add("Value 2a");
+        data.get(1).add("Value 3a");
+        data.get(1).add("Value 4a");
+
+        data.get(2).add("Value 1b");
+        data.get(2).add("Value 2b");
+        data.get(2).add("Value 3b");
+        data.get(2).add("Value 4b");
+        System.out.println("Writing!");
+        writeAnalytics(data, "C:/Users/Productivity/Documents/Testing/Doc1.csv");
     }
 
     static public boolean SaveParametersAsJSON(HashMap<String,String> data,String saveLocation) {
