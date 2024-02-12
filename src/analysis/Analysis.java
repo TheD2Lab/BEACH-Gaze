@@ -23,6 +23,8 @@ public class Analysis {
             File f = inputFiles[i];
             DataEntry data = FileHandler.buildDataEntry(f);   
         }
+
+        System.out.println("Analysis Complete.");
     }
 
     public void updateCalculations(DataEntry data) {

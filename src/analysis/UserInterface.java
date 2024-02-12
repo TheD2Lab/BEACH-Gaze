@@ -11,7 +11,7 @@ public class UserInterface {
 
     File[] inputFiles;
     String outputDirectory;
-    WindowSettings windowSettings;
+    WindowAnalysis windowAnalysis;
 
     private JFrame frame;
     private JTabbedPane tabs;
@@ -41,7 +41,7 @@ public class UserInterface {
         // Default values
         inputFiles = new File[0];
         outputDirectory = "C:\\";
-        windowSettings = new WindowSettings();
+        windowAnalysis = new WindowAnalysis();
 
         buildFrame();
         buildTabPanels();
@@ -84,15 +84,16 @@ public class UserInterface {
 
         JLabel gazeLabel = new JLabel("Participant Settings");
         gazeLabel.setFont(gazeLabel.getFont().deriveFont(Font.BOLD, 12f));
+        componentGBC.insets = new Insets(0, 0, 0, 120);
         componentGBC.gridx = GridBagConstraints.REMAINDER;
         componentGBC.gridy = 0;
-        componentGBC.gridwidth = 4;
+        componentGBC.gridwidth = 8;
         gazePanel.add(gazeLabel, componentGBC);
 
         batchAnalysisCheckBox = new JCheckBox("Batch Analysis (Select to analyze multiple participants)");
         componentGBC.gridx = 0;
         componentGBC.gridy = 1;
-        componentGBC.gridwidth = 5;
+        componentGBC.gridwidth = 6;
         gazePanel.add(batchAnalysisCheckBox, componentGBC);
 
         selectFilesButton = new JButton("Select File(s)");
@@ -116,14 +117,14 @@ public class UserInterface {
 
         browseDirectoryButton = new JButton("Browse");
         componentGBC.insets = new Insets(0, 0, 0, 0);
-        componentGBC.gridx = 0;
+        componentGBC.gridx = 2;
         componentGBC.gridy = 5;
         componentGBC.gridwidth = 2;
         gazePanel.add(browseDirectoryButton, componentGBC);
 
         directoryField = new JTextField(outputDirectory, 20);
         directoryField.setEditable(false);
-        componentGBC.gridx = 2;
+        componentGBC.gridx = 0;
         componentGBC.gridy = 5;
         componentGBC.gridwidth = 2;
         gazePanel.add(directoryField, componentGBC);
@@ -154,14 +155,19 @@ public class UserInterface {
         componentGBC.gridheight = 1;
 
         JLabel windowsLabel = new JLabel("Window Settings");
-        windowsLabel.setFont(windowsLabel.getFont().deriveFont(Font.BOLD, 14f));
-        componentGBC.insets = new Insets(0, 0, 0, 150);
+        windowsLabel.setFont(windowsLabel.getFont().deriveFont(Font.BOLD, 12f));
+        componentGBC.insets = new Insets(0, 0, 0, 200);
         componentGBC.gridx = GridBagConstraints.REMAINDER;
         componentGBC.gridy = 0;
         componentGBC.gridwidth = 10;
         windowsPanel.add(windowsLabel, componentGBC);
-
+        
         tumblingCheckBox = new JCheckBox("Tumbling");
+        String tumblingToolTip = "This approach to predictive gaze analytics takes a " +
+        "digest view on the users’ gaze data and focuses on " +
+        "providing scheduled non-overlapping updates in the " +
+        "process of generating predictions.";
+        tumblingCheckBox.setToolTipText("<html><p width=\"500\">" + tumblingToolTip +"</p></html>");
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 0;
         componentGBC.gridy = 1;
@@ -181,6 +187,9 @@ public class UserInterface {
         windowsPanel.add(tumblingWindowSizeField, componentGBC);
         
         expandingCheckBox = new JCheckBox("Expanding");
+        String expandingToolTip = "The goal of this approach is to emphasize on all gaze that is " +
+        "known to the system when generating predictions on user success and failure.";
+        expandingCheckBox.setToolTipText("<html><p width=\"500\">" + expandingToolTip + "</p></html>");
         componentGBC.gridx = 0;
         componentGBC.gridy = 3;
         componentGBC.gridwidth = 3;
@@ -199,6 +208,9 @@ public class UserInterface {
         windowsPanel.add(expandingWindowSizeField, componentGBC);
 
         hoppingCheckBox = new JCheckBox("Hopping");
+        String hoppingToolTip = "The goal of this approach is to capture a series of continuous " + 
+                "snapshots that reflect the most recent gaze state of the user.";
+        hoppingCheckBox.setToolTipText("<html><p width=\"500\">" + hoppingToolTip + "</p></html>");
         componentGBC.gridx = 0;
         componentGBC.gridy = 5;
         componentGBC.gridwidth = 3;
@@ -229,6 +241,13 @@ public class UserInterface {
         windowsPanel.add(hoppingOverlapSizeField, componentGBC);
 
         eventCheckBox = new JCheckBox("Event");
+        String eventToolTip = "The goal of this " + 
+                "approach to gaze analytics is to emphasize on potentially " +
+                "more informative chunks of gaze data in the " + 
+                "predictions of user success and failure, where the " + 
+                "weight is placed on notable events rather than taking " +
+                "a scheduled view on gaze data stream";
+        eventCheckBox.setToolTipText("<html><p width=\"500\">" + eventToolTip + "</p></html>");
         componentGBC.gridx = 0;
         componentGBC.gridy = 8;
         componentGBC.gridwidth = 3;
@@ -238,11 +257,11 @@ public class UserInterface {
     }
 
     private void buildConsolePanel() {
-        JPanel windowsPanel = new JPanel();
-        Border border = new CompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
-                                           BorderFactory.createEmptyBorder(10,10,10,10));
-        windowsPanel.setBorder(border);
-        windowsPanel.setLayout(new GridBagLayout());
+        JPanel consolePanel = new JPanel();
+        consolePanel.setLayout(new GridBagLayout());
+        // Border border = new CompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
+        //                                    BorderFactory.createEmptyBorder(10,10,10,10));
+        // consolePanel.setBorder(border);
 
         // Constraints dictate location of UI components
         GridBagConstraints panelGBC = new GridBagConstraints();
@@ -261,53 +280,24 @@ public class UserInterface {
         componentGBC.gridwidth = 1;
         componentGBC.gridheight = 1;
 
-        JLabel consoleLabel = new JLabel("Console Errors");
-        componentGBC.insets = new Insets(0, 0, 0, 350);
-        componentGBC.gridx = 0;
-        componentGBC.gridy = 0;
-        componentGBC.gridwidth = 1;
-        componentGBC.gridheight = 1;
-        windowsPanel.add(consoleLabel, componentGBC);
+        // JLabel consoleLabel = new JLabel("Console Errors");
+        // componentGBC.insets = new Insets(0, 0, 0, 350);
+        // componentGBC.gridx = 0;
+        // componentGBC.gridy = 0;
+        // componentGBC.gridwidth = 1;
+        // componentGBC.gridheight = 1;
+        // consolePanel.add(consoleLabel, componentGBC);
         
         runAnalysisButton = new JButton("Run Analysis");
-        componentGBC.insets = new Insets(180, 0, 0, 0);
+        runAnalysisButton.setFont(runAnalysisButton.getFont().deriveFont(20f));
+        componentGBC.insets = new Insets(190, 10, 20, 10);
         componentGBC.gridx = 0;
         componentGBC.gridy = 1;
         componentGBC.gridwidth = 1;
         componentGBC.gridheight = 1;
-        windowsPanel.add(runAnalysisButton, componentGBC);
+        consolePanel.add(runAnalysisButton, componentGBC);
 
-        analysisPanel.add(windowsPanel, panelGBC);
-    }
-
-    private void buildContactPanel() {
-        JPanel contactPanel = new JPanel();
-        contactPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-        contactPanel.setLayout(new GridBagLayout());
-
-        // Constraints dictate location of UI components
-        GridBagConstraints panelGBC = new GridBagConstraints();
-        panelGBC.anchor = GridBagConstraints.LAST_LINE_START;
-        panelGBC.gridx = 1;
-        panelGBC.gridy = 1;
-        panelGBC.gridwidth = 1;
-        panelGBC.gridheight = 1;
-        panelGBC.weightx = 1;
-        panelGBC.weighty = 1;
-
-        GridBagConstraints componentGBC = new GridBagConstraints();
-        componentGBC.anchor = GridBagConstraints.FIRST_LINE_START;
-        componentGBC.ipadx = 10;
-        componentGBC.ipady = 10;
-        componentGBC.gridwidth = 1;
-        componentGBC.gridheight = 1;
-
-        JLabel contactLabel = new JLabel("Contact Info");
-        componentGBC.gridx = 0;
-        componentGBC.gridy = 0;
-        contactPanel.add(contactLabel, componentGBC);
-
-        analysisPanel.add(contactPanel, panelGBC);
+        analysisPanel.add(consolePanel, panelGBC);
     }
 
     private void setEventHandlers() {
@@ -324,19 +314,19 @@ public class UserInterface {
         });
 
         tumblingCheckBox.addActionListener(e -> {
-            windowSettings.setTumblingEnabled(expandingCheckBox.isSelected());
+            windowAnalysis.setTumblingEnabled(expandingCheckBox.isSelected());
         });
 
         expandingCheckBox.addActionListener(e -> {
-            windowSettings.setExpandingEnabled(expandingCheckBox.isSelected());
+            windowAnalysis.setExpandingEnabled(expandingCheckBox.isSelected());
         });
 
         hoppingCheckBox.addActionListener(e -> {
-            windowSettings.setHoppingEnabled(hoppingCheckBox.isEnabled());
+            windowAnalysis.setHoppingEnabled(hoppingCheckBox.isEnabled());
         });
 
         eventCheckBox.addActionListener(e -> {
-            windowSettings.setEventEnabled(eventCheckBox.isEnabled());
+            windowAnalysis.setEventEnabled(eventCheckBox.isEnabled());
         });
         
     }
@@ -369,7 +359,7 @@ public class UserInterface {
     }
 
     private void runAnalysis() {
-        Parameters params = new Parameters(inputFiles, outputDirectory, windowSettings);
+        Parameters params = new Parameters(inputFiles, outputDirectory, windowAnalysis);
         Analysis analysis = new Analysis(params);
         analysis.run();
     }
@@ -381,7 +371,6 @@ public class UserInterface {
         buildGazePanel();
         buildWindowsPanel();
         buildConsolePanel();
-        buildContactPanel();
 
         JPanel helpPanel = new JPanel(new GridBagLayout());
 

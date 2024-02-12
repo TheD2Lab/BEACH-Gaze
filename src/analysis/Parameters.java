@@ -16,7 +16,7 @@ public class Parameters {
     /*
      * Constructor with variables as the parameters
      */
-    public Parameters(File[] inputFiles, String outputDirectory, WindowSettings windowSettings) {
+    public Parameters(File[] inputFiles, String outputDirectory, WindowAnalysis windowAnalysis) {
         this.inputFiles = inputFiles.clone();
         this.outputDirectory = outputDirectory;
     }

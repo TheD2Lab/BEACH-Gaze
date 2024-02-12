@@ -1,6 +1,6 @@
 package analysis;
 
-public class WindowSettings {
+public class WindowAnalysis {
 
     private boolean tumblingEnabled;
     private boolean tumblingWindowSize;
@@ -14,14 +14,14 @@ public class WindowSettings {
     
     private boolean eventEnabled;
 
-    public WindowSettings() {
+    public WindowAnalysis() {
         this.tumblingEnabled = false;
         this.expandingEnabled = false;
         this.hoppingEnabled = false;
         this.eventEnabled = false;
     }
     
-    public WindowSettings(boolean tumbling, boolean expanding, boolean hopping, boolean event) {
+    public WindowAnalysis(boolean tumbling, boolean expanding, boolean hopping, boolean event) {
         this.tumblingEnabled = tumbling;
         this.expandingEnabled = expanding;
         this.hoppingEnabled = hopping;
