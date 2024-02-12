@@ -22,9 +22,9 @@ import com.opencsv.CSVReader;
  */
 
 public class FileHandler {
-   static public DataEntry buildDataEntry(File gaze) {
+   static public DataEntry buildDataEntry(File gazeFile) {
         try {
-            FileReader fileReader = new FileReader(gaze);
+            FileReader fileReader = new FileReader(gazeFile);
             CSVReader csvReader = new CSVReader(fileReader);
             DataEntry data = new DataEntry(csvReader.readNext());
             String[] line;

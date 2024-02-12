@@ -2,58 +2,58 @@ package analysis;
 
 public class WindowSettings {
 
-    private boolean continuousEnabled;
-    private boolean continuousWindowSize;
+    private boolean tumblingEnabled;
+    private boolean tumblingWindowSize;
 
-    private boolean cumulativeEnabled;
-    private boolean cumulativeWindowSize;
+    private boolean expandingEnabled;
+    private boolean expandingWindowSize;
 
-    private boolean overlappingEnabled;
-    private boolean overlappingWindowSize;
-    private boolean overlappingOverlapSize;
+    private boolean hoppingEnabled;
+    private boolean hoppingWindowSize;
+    private boolean hoppingOverlapSize;
     
     private boolean eventEnabled;
 
     public WindowSettings() {
-        this.continuousEnabled = false;
-        this.cumulativeEnabled = false;
-        this.overlappingEnabled = false;
+        this.tumblingEnabled = false;
+        this.expandingEnabled = false;
+        this.hoppingEnabled = false;
         this.eventEnabled = false;
     }
     
-    public WindowSettings(boolean continuous, boolean cumulative, boolean overlapping, boolean event) {
-        this.continuousEnabled = continuous;
-        this.cumulativeEnabled = cumulative;
-        this.overlappingEnabled = overlapping;
+    public WindowSettings(boolean tumbling, boolean expanding, boolean hopping, boolean event) {
+        this.tumblingEnabled = tumbling;
+        this.expandingEnabled = expanding;
+        this.hoppingEnabled = hopping;
         this.eventEnabled = event;
     }
 
-    public boolean getContinuousEnabled() {
-        return this.continuousEnabled;
+    public boolean isTumblingEnabled() {
+        return this.tumblingEnabled;
     }
 
-    public boolean getCumulativeEnabled() {
-        return this.cumulativeEnabled;
+    public boolean isExpandingEnabled() {
+        return this.expandingEnabled;
     }
 
-    public boolean getOverlappingEnabled() {
-        return this.overlappingEnabled;
+    public boolean isHoppingEnabled() {
+        return this.hoppingEnabled;
     }
 
-    public boolean getEventEnabled() {
+    public boolean isEventEnabled() {
         return this.eventEnabled;
     }
 
-    public void setContinuousEnabled(boolean continuous) {
-        this.continuousEnabled = continuous;
+    public void setTumblingEnabled(boolean tumbling) {
+        this.tumblingEnabled = tumbling;
     }
 
-    public void setCumulativeEnabled(boolean cumulative) {
-        this.cumulativeEnabled = cumulative;
+    public void setExpandingEnabled(boolean expanding) {
+        this.expandingEnabled = expanding;
     }
 
-    public void setOverlappingEnabled(boolean overlapping) {
-        this.overlappingEnabled = overlapping;
+    public void setHoppingEnabled(boolean hopping) {
+        this.hoppingEnabled = hopping;
     }
     public void setEventEnabled(boolean event) {
         this.eventEnabled = event;
@@ -61,9 +61,9 @@ public class WindowSettings {
 
     @Override
     public String toString() {
-        return "Continuous: " + continuousEnabled + "\n" +
-                "Cumulative: " + cumulativeEnabled + "\n" +
-                "Overlapping: " + overlappingEnabled + "\n" +
+        return "Tumbling: " + tumblingEnabled + "\n" +
+                "Expanding: " + expandingEnabled + "\n" +
+                "Hopping: " + hoppingEnabled + "\n" +
                 "Event: " + eventEnabled;
     }
 }

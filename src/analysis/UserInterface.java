@@ -14,19 +14,21 @@ public class UserInterface {
     WindowSettings windowSettings;
 
     private JFrame frame;
+    private JTabbedPane tabs;
+    private JPanel analysisPanel;
     private JCheckBox batchAnalysisCheckBox;
     private JButton selectFilesButton;
     private JLabel fileCountLabel;
     private JButton browseDirectoryButton;
     private JTextField directoryField;
     private JButton runAnalysisButton;
-    private JCheckBox continuousCheckBox;
-    private JTextField continuousWindowSizeField;
-    private JCheckBox cumulativeCheckBox;
-    private JTextField cumulativeWindowSizeField;
-    private JCheckBox overlappingCheckBox;
-    private JTextField overlappingWindowSizeField;
-    private JTextField overlappingOverlapSizeField;
+    private JCheckBox tumblingCheckBox;
+    private JTextField tumblingWindowSizeField;
+    private JCheckBox expandingCheckBox;
+    private JTextField expandingWindowSizeField;
+    private JCheckBox hoppingCheckBox;
+    private JTextField hoppingWindowSizeField;
+    private JTextField hoppingOverlapSizeField;
     private JCheckBox eventCheckBox;
 
     public UserInterface() {
@@ -42,12 +44,10 @@ public class UserInterface {
         windowSettings = new WindowSettings();
 
         buildFrame();
-        initGazePanel();
-        initWindowsPanel();
-        initConsolePanel();
-        initContactPanel();
+        buildTabPanels();
         setEventHandlers();
 
+        frame.add(tabs);
         frame.setVisible(true);
     }
 
@@ -59,7 +59,7 @@ public class UserInterface {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private void initGazePanel() {
+    private void buildGazePanel() {
         // Panel contains all components pertaining to gaze settings
         JPanel gazePanel = new JPanel();
         gazePanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
@@ -82,10 +82,11 @@ public class UserInterface {
         componentGBC.gridwidth = 1;
         componentGBC.gridheight = 1;
 
-        JLabel gazeLabel = new JLabel("Gaze Analysis Settings");
+        JLabel gazeLabel = new JLabel("Participant Settings");
+        gazeLabel.setFont(gazeLabel.getFont().deriveFont(Font.BOLD, 12f));
         componentGBC.gridx = GridBagConstraints.REMAINDER;
         componentGBC.gridy = 0;
-        componentGBC.gridwidth = 3;
+        componentGBC.gridwidth = 4;
         gazePanel.add(gazeLabel, componentGBC);
 
         batchAnalysisCheckBox = new JCheckBox("Batch Analysis (Select to analyze multiple participants)");
@@ -127,10 +128,10 @@ public class UserInterface {
         componentGBC.gridwidth = 2;
         gazePanel.add(directoryField, componentGBC);
 
-        frame.add(gazePanel, panelGBC);
+        analysisPanel.add(gazePanel, panelGBC);
     }
 
-    private void initWindowsPanel() {
+    private void buildWindowsPanel() {
         JPanel windowsPanel = new JPanel();
         windowsPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         windowsPanel.setLayout(new GridBagLayout());
@@ -153,18 +154,19 @@ public class UserInterface {
         componentGBC.gridheight = 1;
 
         JLabel windowsLabel = new JLabel("Window Settings");
+        windowsLabel.setFont(windowsLabel.getFont().deriveFont(Font.BOLD, 14f));
         componentGBC.insets = new Insets(0, 0, 0, 150);
         componentGBC.gridx = GridBagConstraints.REMAINDER;
         componentGBC.gridy = 0;
         componentGBC.gridwidth = 10;
         windowsPanel.add(windowsLabel, componentGBC);
 
-        continuousCheckBox = new JCheckBox("Continuous");
+        tumblingCheckBox = new JCheckBox("Tumbling");
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 0;
         componentGBC.gridy = 1;
         componentGBC.gridwidth = 3;
-        windowsPanel.add(continuousCheckBox, componentGBC);
+        windowsPanel.add(tumblingCheckBox, componentGBC);
 
         JLabel windowSizeLabel1 = new JLabel("Window Size");
         componentGBC.gridx = 0;
@@ -172,17 +174,17 @@ public class UserInterface {
         componentGBC.gridwidth = 1;
         windowsPanel.add(windowSizeLabel1, componentGBC);
 
-        continuousWindowSizeField = new JTextField("", 5);
+        tumblingWindowSizeField = new JTextField("", 5);
         componentGBC.gridx = 1;
         componentGBC.gridy = 2;
         componentGBC.gridwidth = 1;
-        windowsPanel.add(continuousWindowSizeField, componentGBC);
+        windowsPanel.add(tumblingWindowSizeField, componentGBC);
         
-        cumulativeCheckBox = new JCheckBox("Cumulative");
+        expandingCheckBox = new JCheckBox("Expanding");
         componentGBC.gridx = 0;
         componentGBC.gridy = 3;
         componentGBC.gridwidth = 3;
-        windowsPanel.add(cumulativeCheckBox, componentGBC);
+        windowsPanel.add(expandingCheckBox, componentGBC);
 
         JLabel windowSizeLabel2 = new JLabel("Window Size");
         componentGBC.gridx = 0;
@@ -190,17 +192,17 @@ public class UserInterface {
         componentGBC.gridwidth = 1;
         windowsPanel.add(windowSizeLabel2, componentGBC);
 
-        cumulativeWindowSizeField = new JTextField("", 5);
+        expandingWindowSizeField = new JTextField("", 5);
         componentGBC.gridx = 1;
         componentGBC.gridy = 4;
         componentGBC.gridwidth = 1;
-        windowsPanel.add(cumulativeWindowSizeField, componentGBC);
+        windowsPanel.add(expandingWindowSizeField, componentGBC);
 
-        overlappingCheckBox = new JCheckBox("Overlapping");
+        hoppingCheckBox = new JCheckBox("Hopping");
         componentGBC.gridx = 0;
         componentGBC.gridy = 5;
         componentGBC.gridwidth = 3;
-        windowsPanel.add(overlappingCheckBox, componentGBC);
+        windowsPanel.add(hoppingCheckBox, componentGBC);
 
         JLabel windowSizeLabel3 = new JLabel("Window Size");
         componentGBC.gridx = 0;
@@ -208,11 +210,11 @@ public class UserInterface {
         componentGBC.gridwidth = 1;
         windowsPanel.add(windowSizeLabel3, componentGBC);
         
-        overlappingWindowSizeField = new JTextField("", 5);
+        hoppingWindowSizeField = new JTextField("", 5);
         componentGBC.gridx = 1;
         componentGBC.gridy = 6;
         componentGBC.gridwidth = 1;
-        windowsPanel.add(overlappingWindowSizeField, componentGBC);
+        windowsPanel.add(hoppingWindowSizeField, componentGBC);
 
         JLabel overlapSizeLabel = new JLabel("Overlap Size");
         componentGBC.gridx = 0;
@@ -220,11 +222,11 @@ public class UserInterface {
         componentGBC.gridwidth = 1;
         windowsPanel.add(overlapSizeLabel, componentGBC);
 
-        overlappingOverlapSizeField = new JTextField("", 5);
+        hoppingOverlapSizeField = new JTextField("", 5);
         componentGBC.gridx = 1;
         componentGBC.gridy = 7;
         componentGBC.gridwidth = 1;
-        windowsPanel.add(overlappingOverlapSizeField, componentGBC);
+        windowsPanel.add(hoppingOverlapSizeField, componentGBC);
 
         eventCheckBox = new JCheckBox("Event");
         componentGBC.gridx = 0;
@@ -232,10 +234,10 @@ public class UserInterface {
         componentGBC.gridwidth = 3;
         windowsPanel.add(eventCheckBox, componentGBC);
 
-        frame.add(windowsPanel, panelGBC);
+        analysisPanel.add(windowsPanel, panelGBC);
     }
 
-    private void initConsolePanel() {
+    private void buildConsolePanel() {
         JPanel windowsPanel = new JPanel();
         Border border = new CompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
                                            BorderFactory.createEmptyBorder(10,10,10,10));
@@ -268,17 +270,17 @@ public class UserInterface {
         windowsPanel.add(consoleLabel, componentGBC);
         
         runAnalysisButton = new JButton("Run Analysis");
-        componentGBC.insets = new Insets(200, 0, 0, 0);
+        componentGBC.insets = new Insets(180, 0, 0, 0);
         componentGBC.gridx = 0;
         componentGBC.gridy = 1;
         componentGBC.gridwidth = 1;
         componentGBC.gridheight = 1;
         windowsPanel.add(runAnalysisButton, componentGBC);
 
-        frame.add(windowsPanel, panelGBC);
+        analysisPanel.add(windowsPanel, panelGBC);
     }
 
-    private void initContactPanel() {
+    private void buildContactPanel() {
         JPanel contactPanel = new JPanel();
         contactPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         contactPanel.setLayout(new GridBagLayout());
@@ -305,7 +307,7 @@ public class UserInterface {
         componentGBC.gridy = 0;
         contactPanel.add(contactLabel, componentGBC);
 
-        frame.add(contactPanel, panelGBC);
+        analysisPanel.add(contactPanel, panelGBC);
     }
 
     private void setEventHandlers() {
@@ -321,16 +323,16 @@ public class UserInterface {
             runAnalysis();
         });
 
-        continuousCheckBox.addActionListener(e -> {
-            windowSettings.setContinuousEnabled(cumulativeCheckBox.isSelected());
+        tumblingCheckBox.addActionListener(e -> {
+            windowSettings.setTumblingEnabled(expandingCheckBox.isSelected());
         });
 
-        cumulativeCheckBox.addActionListener(e -> {
-            windowSettings.setCumulativeEnabled(cumulativeCheckBox.isSelected());
+        expandingCheckBox.addActionListener(e -> {
+            windowSettings.setExpandingEnabled(expandingCheckBox.isSelected());
         });
 
-        overlappingCheckBox.addActionListener(e -> {
-            windowSettings.setOverlappingEnabled(overlappingCheckBox.isEnabled());
+        hoppingCheckBox.addActionListener(e -> {
+            windowSettings.setHoppingEnabled(hoppingCheckBox.isEnabled());
         });
 
         eventCheckBox.addActionListener(e -> {
@@ -370,5 +372,20 @@ public class UserInterface {
         Parameters params = new Parameters(inputFiles, outputDirectory, windowSettings);
         Analysis analysis = new Analysis(params);
         analysis.run();
+    }
+
+    private void buildTabPanels() {
+        tabs = new JTabbedPane();
+
+        analysisPanel = new JPanel(new GridBagLayout());
+        buildGazePanel();
+        buildWindowsPanel();
+        buildConsolePanel();
+        buildContactPanel();
+
+        JPanel helpPanel = new JPanel(new GridBagLayout());
+
+        tabs.addTab("Analysis", analysisPanel);
+        tabs.addTab("Help", helpPanel);
     }
 }

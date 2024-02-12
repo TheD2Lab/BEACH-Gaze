@@ -32,14 +32,15 @@ public class DataEntry {
         currFixation = 1;
     }
 
-    public void process(String[] currLine) { //Sets the currently read line of the CSV.
+    public void process(String[] currLine) { 
+        // Add this line to the list of total lines
         this.currLine = currLine;
         List<String> line = Arrays.asList(currLine);
         allGazeData.add(line);
 
+        // Determine if this line is representative of a fixation
         int fixationID = Integer.parseInt(getCurrentValue("FPOGID"));
         int fixationValidity = Integer.parseInt(getCurrentValue("FPOGV"));
-        
         if (fixationID != currFixation) {
             if (lastValidFixation != null) fixationData.add(lastValidFixation);
             currFixation = fixationID;
