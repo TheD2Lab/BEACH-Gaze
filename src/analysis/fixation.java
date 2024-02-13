@@ -160,19 +160,19 @@ public class fixation {
 			headers.add("sum of all fixation duration");
 			data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allFixationDurations)));
 
-			headers.add("mean fixation duration (ms)");
+			headers.add("mean fixation duration (s)");
 			data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allFixationDurations)));
 
-			headers.add("median fixation duration (ms)");
+			headers.add("median fixation duration (s)");
 			data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allFixationDurations)));
 
-			headers.add(" StDev of fixation durations (ms)");
+			headers.add("StDev of fixation durations (s)");
 			data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allFixationDurations)));
 
-			headers.add("Min. fixation duration (ms)");
+			headers.add("Min. fixation duration (s)");
 			data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allFixationDurations)));
 
-			headers.add("Max. fixation duration (ms)");
+			headers.add("Max. fixation duration (s)");
 			data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allFixationDurations)));
 
 			Double[] allSaccadeLengths = saccade.getAllSaccadeLength(allCoordinates);

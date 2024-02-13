@@ -90,7 +90,7 @@ public class AOI {
 			headers.add("sum of all fixation duration");
 			headers.add("mean fixation duration (s)");
 			headers.add("median fixation duration (s)");
-			headers.add(" StDev of fixation durations (s)");
+			headers.add("StDev of fixation durations (s)");
 			headers.add("Min. fixation duration (s)");
 			headers.add("Max. fixation duration (s)");
 
