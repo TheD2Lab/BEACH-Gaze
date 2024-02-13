@@ -71,7 +71,7 @@ public class FileHandler {
             System.err.println(e.toString());
         }   
     }
-
+    /*
     public static void main(String[] args) {
         ArrayList<ArrayList<String>> data = new ArrayList<ArrayList<String>>();
         data.add(new ArrayList<String>());
@@ -95,7 +95,7 @@ public class FileHandler {
         System.out.println("Writing!");
         writeAnalytics(data, "C:/Users/Productivity/Documents/Testing/Doc1.csv");
     }
-
+    */
     static public boolean SaveParametersAsJSON(HashMap<String,String> data,String saveLocation) {
         try {
             System.out.println("Writing file!");

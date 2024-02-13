@@ -16,7 +16,7 @@ public class Parameters {
     /*
      * Constructor with variables as the parameters
      */
-    public Parameters(String[] inputFiles, String outputDirectory, HashMap<String, Integer> windowSettings) {
+    public Parameters(String[] inputFiles, String outputDirectory, WindowSettings windowSettings) {
         this.inputFiles = inputFiles.clone();
         this.outputDirectory = outputDirectory;
     }
@@ -42,7 +42,7 @@ public class Parameters {
         return "--Parameters-- \n InputFiles: ["+inputFiles.length+"] "+Arrays.toString(inputFiles)+" \n OutputDirectory: "+outputDirectory +"\n --End of Parameters--";
     }
 
-    public static void main(String[] args) {
+    /* public static void main(String[] args) {
         System.out.println("Creating and saving Parameters!");
 
         Parameters p = new Parameters(new String[]{"data\\Kayla_all_gaze.csv","data\\Esthe  r Jung_all_gaze.csv"},"data\\presets", new HashMap<>());
@@ -53,7 +53,7 @@ public class Parameters {
 
         Parameters p2 = new Parameters(new File("data\\presets\\TestConfig.json"));
         System.out.println(p2.toString());
-    }
+    } */
 
     public String[] getInputFiles() {
         return inputFiles.clone();

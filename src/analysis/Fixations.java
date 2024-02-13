@@ -1,17 +1,11 @@
 package analysis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class Fixations {
-    private ArrayList<Double> allDurations;
-    private DataEntry data;
-
-    public Fixations(DataEntry data) {
-        this.data = data;
-        this.allDurations = new ArrayList<Double>();
-    }
-
-    /*
+    /* Taken from old fixations file to use as reference
      *      int fixationDurationIndex = list.indexOf("FPOGD");
             int fixationIDIndex = list.indexOf("FPOGID");
             int fixationXIndex = list.indexOf("FPOGX");
@@ -19,25 +13,79 @@ public class Fixations {
             int aoiIndex = list.indexOf("AOI");
             int timestampIndex = list.indexOf("FPOGS");
      */
-    public void analyze(DataEntry data) {
-        for (int i = 0; i < data.getLength("Fixation"); i++) {
-            String v = data.getValue("GPOSX", i, "Fixation");
+
+    static public LinkedHashMap<String,String> analyze(DataEntry data) {
+        LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
+        
+        ArrayList<Double> allFixationDurations = new ArrayList<>();
+        int fixationCount = data.rowCount();
+
+        System.out.println("FixationCount: "+Integer.toString(fixationCount));
+
+        for (int row = 0; row < data.rowCount(); row++) {
+            Double fixationDurationSeconds = Double.valueOf(data.getValue("FPOGD", row));
+            allFixationDurations.add(fixationDurationSeconds);
         }
-    }
+        System.out.println("Fixations done");
+        System.out.println(allFixationDurations.size());
+        results.put(
+            "Total Number of Fixations", //Output Header
+            String.valueOf(fixationCount) //Output Value
+            );
 
+        results.put(
+            "sum of all fixation duration",
+            String.valueOf(DescriptiveStats.getSumOfDoubles(allFixationDurations))
+            );
 
+        results.put(
+            "mean fixation duration (ms)",
+            String.valueOf(DescriptiveStats.getMeanOfDoubles(allFixationDurations))
+            );
 
+        results.put(
+            "median fixation duration (ms)",
+            String.valueOf(DescriptiveStats.getMedianOfDoubles(allFixationDurations))
+            );
 
+        results.put(
+            "StDev of fixation durations (ms)",
+            String.valueOf(DescriptiveStats.getStDevOfDoubles(allFixationDurations))
+            );
 
+        results.put(
+            "Min. fixation duration (ms)",
+            String.valueOf(DescriptiveStats.getMinOfDoubles(allFixationDurations))
+            );
 
+        results.put(
+            "Max. fixation duration (ms)",
+            String.valueOf(DescriptiveStats.getMaxOfDoubles(allFixationDurations))
+            );
 
-    public void update() {
-        double fixationDuration = Double.valueOf(data.getCurrentValue("FPOGD"));
-        allDurations.add(fixationDuration);
-    }
-
-    public String[] process() {
-        //String.valueOf(descriptiveStats.getSumOfDoubles(allDurations));
-        return new String[]{};
+        return results;
     }
 }
+
+/*
+ *      x    headers.add("total number of fixations");
+            data.add(String.valueOf(fixationCount));
+
+			headers.add("sum of all fixation duration");
+			data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allFixationDurations)));
+
+			headers.add("mean fixation duration (ms)");
+			data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allFixationDurations)));
+
+			headers.add("median fixation duration (ms)");
+			data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allFixationDurations)));
+
+			headers.add(" StDev of fixation durations (ms)");
+			data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allFixationDurations)));
+
+			headers.add("Min. fixation duration (ms)");
+			data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allFixationDurations)));
+
+			headers.add("Max. fixation duration (ms)");
+			data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allFixationDurations)));
+ */

@@ -1,10 +1,12 @@
 package analysis;
 import java.io.File;
 import java.io.FileReader;
-
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import com.opencsv.CSVReader;
+import java.io.File;
 
 public class Analysis {
     /*
@@ -22,14 +24,19 @@ public class Analysis {
         for (int i = 0; i < inputFiles.length; i++) {
             File f = inputFiles[i];
             DataEntry data = FileHandler.buildDataEntry(f);   
+            calculateResults(data);
         }
     }
 
-    public void updateCalculations(DataEntry data) {
-        
-    }
+    public void calculateResults(DataEntry data) {
+        ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
+        results.add(new ArrayList<String>()); //Headers
+        results.add(new ArrayList<String>()); //Values
 
-    public void processCalculations() {
+        LinkedHashMap<String,String> fixation = Fixations.analyze(data);
+        results.get(0).addAll(fixation.keySet());
+        results.get(1).addAll(fixation.values());
 
+        FileHandler.writeAnalytics(results, params.getOutputFile());
     }
 }
