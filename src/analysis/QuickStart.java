@@ -5,8 +5,8 @@ public class QuickStart {
     static final String configDirectory = "";
 
     public static void main(String[] args) {
-         Parameters params = new Parameters(new String[]{"data//Esther Jung_all_gaze.csv"}, "C://Users//Productivity//Documents//Testing//OutputTest.csv",new WindowSettings());
-         Analysis analysis = new Analysis(params);
-        analysis.run();
+        // Parameters params = new Parameters(new String[]{"data//Esther Jung_all_gaze.csv"}, "C://Users//Productivity//Documents//Testing//OutputTest.csv",new WindowAnalysis());
+        // Analysis analysis = new Analysis(params);
+        // analysis.run();
     }
 }

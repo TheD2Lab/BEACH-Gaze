@@ -59,6 +59,24 @@ public class WindowAnalysis {
         this.eventEnabled = event;
     }
 
+    public void runAnalysis(DataEntry data) {
+        if (tumblingEnabled) {
+
+        }
+
+        if (expandingEnabled) {
+
+        }
+
+        if (hoppingEnabled) {
+
+        }
+
+        if (eventEnabled) {
+            
+        }
+    }
+
     @Override
     public String toString() {
         return "Tumbling: " + tumblingEnabled + "\n" +
