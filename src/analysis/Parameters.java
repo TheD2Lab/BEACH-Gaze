@@ -46,8 +46,8 @@ public class Parameters {
         return "--Parameters-- \n InputFiles: ["+inputFiles.length+"] "+Arrays.toString(inputFiles)+" \n OutputDirectory: "+outputDirectory +"\n --End of Parameters--";
     }
 
-    // public static void main(String[] args) {
-    //     System.out.println("Creating and saving Parameters!");
+    /* public static void main(String[] args) {
+        System.out.println("Creating and saving Parameters!");
 
     //     Parameters p = new Parameters(new String[]{"data\\Kayla_all_gaze.csv","data\\Esther Jung_all_gaze.csv"},"data\\presets", new HashMap<>());
     //     p.saveToJSON("data\\presets","TestConfig.json");
@@ -55,9 +55,9 @@ public class Parameters {
     //     System.out.println(p.toString());
     //     System.out.println("Loading parameters!");
 
-    //     Parameters p2 = new Parameters(new File("data\\presets\\TestConfig.json"));
-    //     System.out.println(p2.toString());
-    // }
+        Parameters p2 = new Parameters(new File("data\\presets\\TestConfig.json"));
+        System.out.println(p2.toString());
+    } */
 
     public File[] getInputFiles() {
         return inputFiles.clone();

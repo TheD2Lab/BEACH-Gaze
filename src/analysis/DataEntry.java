@@ -60,4 +60,15 @@ public class DataEntry {
     public String getValue(String header, int row, boolean shortened) {
         return fixationData.get(row).get(headerToIndex.get(header)); //Gets the value in the selected row under the desired header
     }
+
+    public int rowCount() {
+        return fixationData.size();
+    }
+
+    public int columnCount() {
+        if (fixationData.get(0) != null) {
+            return fixationData.get(0).size();
+        }
+        return 0;
+    }
 }
