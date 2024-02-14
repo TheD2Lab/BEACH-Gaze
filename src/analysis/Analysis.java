@@ -39,6 +39,6 @@ public class Analysis {
         results.get(0).addAll(fixation.keySet());
         results.get(1).addAll(fixation.values());
 
-        FileHandler.writeAnalytics(results, params.getOutputFile());
+        FileHandler.writeAnalytics(results, params.getOutputDirectory());
     }
 }

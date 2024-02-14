@@ -12,13 +12,15 @@ public class Parameters {
      */
     private File[] inputFiles;
     private String outputDirectory;
+    private WindowSettings windowSettings;
 
     /*
      * Constructor with variables as the parameters
      */
-    public Parameters(File[] inputFiles, String outputDirectory, WindowAnalysis windowAnalysis) {
+    public Parameters(File[] inputFiles, String outputDirectory, WindowSettings windowSettings) {
         this.inputFiles = inputFiles.clone();
         this.outputDirectory = outputDirectory;
+        this.windowSettings = windowSettings;
     }
 
     /*
@@ -62,7 +64,7 @@ public class Parameters {
     public File[] getInputFiles() {
         return inputFiles.clone();
     }
-    public String getOutputFile() {
+    public String getOutputDirectory() {
         return outputDirectory;
     }    
 }

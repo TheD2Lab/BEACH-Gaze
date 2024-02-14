@@ -2,8 +2,6 @@ package analysis;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 import java.io.File;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -11,7 +9,7 @@ public class UserInterface {
 
     File[] inputFiles;
     String outputDirectory;
-    WindowAnalysis windowAnalysis;
+    WindowSettings windowSettings;
 
     private JFrame frame;
     private JTabbedPane tabs;
@@ -41,7 +39,7 @@ public class UserInterface {
         // Default values
         inputFiles = new File[0];
         outputDirectory = "C:\\";
-        windowAnalysis = new WindowAnalysis();
+        windowSettings = new WindowSettings();
 
         buildFrame();
         buildTabPanels();
@@ -174,13 +172,15 @@ public class UserInterface {
         componentGBC.gridwidth = 3;
         windowsPanel.add(tumblingCheckBox, componentGBC);
 
-        JLabel windowSizeLabel1 = new JLabel("Window Size");
+        JLabel windowSizeLabel1 = new JLabel("Window Size (s)");
+        componentGBC.insets = new Insets(0, 20, 0, 0);
         componentGBC.gridx = 0;
         componentGBC.gridy = 2;
         componentGBC.gridwidth = 1;
         windowsPanel.add(windowSizeLabel1, componentGBC);
 
-        tumblingWindowSizeField = new JTextField("", 5);
+        tumblingWindowSizeField = new JTextField("", 10);
+        componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 1;
         componentGBC.gridy = 2;
         componentGBC.gridwidth = 1;
@@ -195,13 +195,15 @@ public class UserInterface {
         componentGBC.gridwidth = 3;
         windowsPanel.add(expandingCheckBox, componentGBC);
 
-        JLabel windowSizeLabel2 = new JLabel("Window Size");
+        JLabel windowSizeLabel2 = new JLabel("Window Size (s)");
+        componentGBC.insets = new Insets(0, 20, 0, 0);
         componentGBC.gridx = 0;
         componentGBC.gridy = 4;
         componentGBC.gridwidth = 1;
         windowsPanel.add(windowSizeLabel2, componentGBC);
 
-        expandingWindowSizeField = new JTextField("", 5);
+        expandingWindowSizeField = new JTextField("", 10);
+        componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 1;
         componentGBC.gridy = 4;
         componentGBC.gridwidth = 1;
@@ -216,25 +218,29 @@ public class UserInterface {
         componentGBC.gridwidth = 3;
         windowsPanel.add(hoppingCheckBox, componentGBC);
 
-        JLabel windowSizeLabel3 = new JLabel("Window Size");
+        JLabel windowSizeLabel3 = new JLabel("Window Size (s)");
+        componentGBC.insets = new Insets(0, 20, 0, 0);
         componentGBC.gridx = 0;
         componentGBC.gridy = 6;
         componentGBC.gridwidth = 1;
         windowsPanel.add(windowSizeLabel3, componentGBC);
         
-        hoppingWindowSizeField = new JTextField("", 5);
+        hoppingWindowSizeField = new JTextField("", 10);
+        componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 1;
         componentGBC.gridy = 6;
         componentGBC.gridwidth = 1;
         windowsPanel.add(hoppingWindowSizeField, componentGBC);
 
-        JLabel overlapSizeLabel = new JLabel("Overlap Size");
+        JLabel overlapSizeLabel = new JLabel("Overlap Size (s)");
+        componentGBC.insets = new Insets(0, 20, 0, 0);
         componentGBC.gridx = 0;
         componentGBC.gridy = 7;
         componentGBC.gridwidth = 1;
         windowsPanel.add(overlapSizeLabel, componentGBC);
 
-        hoppingOverlapSizeField = new JTextField("", 5);
+        hoppingOverlapSizeField = new JTextField("", 10);
+        componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 1;
         componentGBC.gridy = 7;
         componentGBC.gridwidth = 1;
@@ -314,21 +320,36 @@ public class UserInterface {
         });
 
         tumblingCheckBox.addActionListener(e -> {
-            windowAnalysis.setTumblingEnabled(expandingCheckBox.isSelected());
+            windowSettings.expandingEnabled = expandingCheckBox.isSelected();
         });
 
         expandingCheckBox.addActionListener(e -> {
-            windowAnalysis.setExpandingEnabled(expandingCheckBox.isSelected());
+            windowSettings.expandingEnabled = expandingCheckBox.isSelected();
         });
 
         hoppingCheckBox.addActionListener(e -> {
-            windowAnalysis.setHoppingEnabled(hoppingCheckBox.isEnabled());
+            windowSettings.hoppingEnabled = hoppingCheckBox.isEnabled();
         });
 
         eventCheckBox.addActionListener(e -> {
-            windowAnalysis.setEventEnabled(eventCheckBox.isEnabled());
+            windowSettings.eventEnabled = eventCheckBox.isEnabled();
         });
-        
+
+        tumblingWindowSizeField.addActionListener(e -> {
+            windowSettings.tumblingWindowSize = Integer.parseInt(tumblingWindowSizeField.getText());
+        });
+
+        expandingWindowSizeField.addActionListener(e -> {
+            windowSettings.expandingWindowSize = Integer.parseInt(expandingWindowSizeField.getText());
+        });
+
+        hoppingWindowSizeField.addActionListener(e -> {
+            windowSettings.hoppingWindowSize = Integer.parseInt(hoppingWindowSizeField.getText());
+        });
+
+        hoppingOverlapSizeField.addActionListener(e -> {
+            windowSettings.hoppingOverlapSize = Integer.parseInt(hoppingOverlapSizeField.getText());
+        });
     }
 
     private void selectInputFiles() {
@@ -359,7 +380,7 @@ public class UserInterface {
     }
 
     private void runAnalysis() {
-        Parameters params = new Parameters(inputFiles, outputDirectory, windowAnalysis);
+        Parameters params = new Parameters(inputFiles, outputDirectory, windowSettings);
         Analysis analysis = new Analysis(params);
         analysis.run();
     }
@@ -376,5 +397,9 @@ public class UserInterface {
 
         tabs.addTab("Analysis", analysisPanel);
         tabs.addTab("Help", helpPanel);
+    }
+
+    private boolean validateFields() {
+        return false;
     }
 }
