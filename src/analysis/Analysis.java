@@ -36,33 +36,35 @@ public class Analysis {
         results.add(new ArrayList<String>()); //Headers
         results.add(new ArrayList<String>()); //Values
 
-        LinkedHashMap<String,String> fixation = Fixations.analyze(data);
+        ArrayList<List<String>> fixationData = data.getData(false, false);
+        fixationData.add(0, data.getHeaders()); // Add headers to data list
+        LinkedHashMap<String,String> fixation = Fixations.analyze(fixationData);
         results.get(0).addAll(fixation.keySet());
         results.get(1).addAll(fixation.values());
 
-        FileHandler.writeToCSV(results, outputDirectory + "\\output.csv");
+        FileHandler.writeToCSV(results, outputDirectory + "\\analytics.csv");
     }
 
     public void generateWindows(DataEntry data) {
         WindowSettings settings = params.getWindowSettings();
-        String[] headers = data.getHeader();
         ArrayList<List<String>> rawGazeData = data.getData(true, true);
-        int dataCount = rawGazeData.size();
+
 
         if (settings.tumblingEnabled) {
             int windowSize = settings.tumblingWindowSize;
-            DataEntry windowData = new DataEntry(headers); 
+            int start = 0;
+            int end = windowSize;
 
-            for (int i = 0; i < dataCount; i++) {
+            for (int i = 0; i < rawGazeData.size(); i++) {
                 List<String> row = rawGazeData.get(i);
+                
             }
         }
 
         if (settings.expandingEnabled) {
             int windowSize = settings.expandingWindowSize;
-            DataEntry windowData = new DataEntry(headers);
 
-            for (int i = 0; i < dataCount; i++) {
+            for (int i = 0; i < rawGazeData.size(); i++) {
                 
             }
         }
@@ -70,9 +72,8 @@ public class Analysis {
         if (settings.hoppingEnabled) {
             int windowSize = settings.hoppingWindowSize;
             int overlapSize = settings.hoppingOverlapSize;
-            DataEntry windowData = new DataEntry(headers);
 
-            for (int i = 0; i < dataCount; i++) {
+            for (int i = 0; i < rawGazeData.size(); i++) {
                 
             }
         }

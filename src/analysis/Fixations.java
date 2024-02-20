@@ -3,6 +3,7 @@ package analysis;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 public class Fixations {
     /* Taken from old fixations file to use as reference
@@ -14,16 +15,19 @@ public class Fixations {
             int timestampIndex = list.indexOf("FPOGS");
      */
 
-    static public LinkedHashMap<String,String> analyze(DataEntry data) {
+    static public LinkedHashMap<String,String> analyze(ArrayList<List<String>> data) {
         LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
+        List<String> headers = data.get(0);
+        
+        int durationIndex = headers.indexOf("FPOGD");
         
         ArrayList<Double> allFixationDurations = new ArrayList<>();
-        int fixationCount = data.rowCount();
+        int fixationCount = data.size() - 1;
 
         System.out.println("FixationCount: "+Integer.toString(fixationCount));
-
-        for (int row = 0; row < data.rowCount(); row++) {
-            Double fixationDurationSeconds = Double.valueOf(data.getValue("FPOGD", row));
+        
+        for (int row = 0; row < data.size(); row++) {
+            Double fixationDurationSeconds = Double.valueOf(data.get(row).get(durationIndex));
             allFixationDurations.add(fixationDurationSeconds);
         }
         System.out.println("Fixations done");

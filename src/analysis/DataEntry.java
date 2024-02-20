@@ -7,7 +7,7 @@ import java.util.List;
 
 public class DataEntry {
     
-    String[] headers;
+    List<String> headers;
     HashMap<String,Integer> headerToIndex; //Stores the index of all headers
     ArrayList<List<String>> gazeData;
     ArrayList<List<String>> fixationData;
@@ -19,10 +19,9 @@ public class DataEntry {
     int currFixation;
 
     public DataEntry(String[] headers) { //The constructor takes the first line of the CSV file so it can store the headers
-        this.headers = headers;
         headerToIndex = new HashMap<String,Integer>();
         for (int i = 0; i < headers.length; i++) {
-            String header = headers[i];
+            String header = headers[i].contains("TIME(") ? "TIME" : headers[i];
             headerToIndex.put(header, i);
         }
 
@@ -77,23 +76,13 @@ public class DataEntry {
         return 0;
     }
 
-    public String[] getHeader() {
+    public List<String> getHeaders() {
         return this.headers;
     }
 
-    // public int getDataSize(boolean raw, boolean allGaze) {
-    //     if (raw) {
-    //         if (allGaze) 
-    //             return rawGazeData.size();
-    //         else 
-    //             return rawFixationData.size();
-    //     } else {
-    //         if (allGaze) 
-    //             return gazeData.size();
-    //         else 
-    //             return fixationData.size();
-    //     }
-    // }
+    public int getHeaderIndex(String header) {
+        return headerToIndex.get(header);
+    }
 
     public ArrayList<List<String>> getData(boolean raw, boolean allGaze) {
         if (raw) {
