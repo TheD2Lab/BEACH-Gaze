@@ -7,7 +7,7 @@ import java.util.List;
 
 public class DataEntry {
     
-    List<String> headers;
+    ArrayList<String> headers;
     HashMap<String,Integer> headerToIndex; //Stores the index of all headers
     ArrayList<List<String>> gazeData;
     ArrayList<List<String>> fixationData;
@@ -24,6 +24,9 @@ public class DataEntry {
             String header = headers[i].contains("TIME(") ? "TIME" : headers[i];
             headerToIndex.put(header, i);
         }
+
+        this.headers = new ArrayList<String>();
+        this.headers.addAll(Arrays.asList(headers));
 
         this.gazeData = new ArrayList<List<String>>();
         this.fixationData = new ArrayList<List<String>>();

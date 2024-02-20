@@ -20,13 +20,14 @@ public class Fixations {
         List<String> headers = data.get(0);
         
         int durationIndex = headers.indexOf("FPOGD");
-        
+        System.out.println("Duration Index: "+durationIndex);
+
         ArrayList<Double> allFixationDurations = new ArrayList<>();
         int fixationCount = data.size() - 1;
 
         System.out.println("FixationCount: "+Integer.toString(fixationCount));
         
-        for (int row = 0; row < data.size(); row++) {
+        for (int row = 1; row < data.size(); row++) {
             Double fixationDurationSeconds = Double.valueOf(data.get(row).get(durationIndex));
             allFixationDurations.add(fixationDurationSeconds);
         }

@@ -38,9 +38,15 @@ public class Analysis {
 
         ArrayList<List<String>> fixationData = data.getData(false, false);
         fixationData.add(0, data.getHeaders()); // Add headers to data list
+        System.out.println(fixationData.get(0).toString());
+
         LinkedHashMap<String,String> fixation = Fixations.analyze(fixationData);
         results.get(0).addAll(fixation.keySet());
         results.get(1).addAll(fixation.values());
+
+        LinkedHashMap<String,String> entropy = GazeEntropy.analyze(fixationData);
+        results.get(0).addAll(entropy.keySet());
+        results.get(1).addAll(entropy.values());
 
         FileHandler.writeToCSV(results, outputDirectory + "\\analytics.csv");
     }
