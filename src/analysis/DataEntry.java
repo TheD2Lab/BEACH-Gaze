@@ -36,6 +36,10 @@ public class DataEntry {
         this.currFixation = 1;
     }
 
+    public DataEntry(ArrayList<String> headers) { //Allows constructing from an arrayList instead of just an array
+        this((String[])headers.toArray());
+    }
+
     public void process(String[] currLine) { 
         // Add this line to the list of total lines
         this.currLine = currLine;
@@ -54,6 +58,10 @@ public class DataEntry {
         
         // Temporary line for now until cleansing process is finished
         this.fixationData = this.rawFixationData;
+    }
+
+    public void process(ArrayList<String> currLine) { //Allows inputting an arrayList instead of an array
+        process((String[])currLine.toArray());
     }
 
     public String getCurrentValue(String header) { //Returns the value on the current line with the given header.

@@ -69,7 +69,7 @@ public class Analysis {
 
         if (settings.expandingEnabled) {
             int windowSize = settings.expandingWindowSize;
-
+            DataEntry window1 = new DataEntry((String[])data.getHeaders().toArray());
             for (int i = 0; i < rawGazeData.size(); i++) {
                 
             }
