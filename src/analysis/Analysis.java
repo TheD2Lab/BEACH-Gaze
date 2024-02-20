@@ -24,14 +24,15 @@ public class Analysis {
         for (int i = 0; i < inputFiles.length; i++) {
             File f = inputFiles[i];
             DataEntry data = FileHandler.buildDataEntry(f);   
-            calculateResults(data);
+            calculateResults(data, params.getOutputDirectory());
+            generateWindows(data);
         }
 
         System.out.println("Analysis Complete.");
     }
 
-    public void calculateResults(DataEntry data) {
-        ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
+    public void calculateResults(DataEntry data, String outputDirectory) {
+        ArrayList<List<String>> results = new ArrayList<List<String>>();
         results.add(new ArrayList<String>()); //Headers
         results.add(new ArrayList<String>()); //Values
 
@@ -39,6 +40,46 @@ public class Analysis {
         results.get(0).addAll(fixation.keySet());
         results.get(1).addAll(fixation.values());
 
-        FileHandler.writeAnalytics(results, params.getOutputDirectory());
+        FileHandler.writeToCSV(results, outputDirectory + "\\output.csv");
+    }
+
+    public void generateWindows(DataEntry data) {
+        WindowSettings settings = params.getWindowSettings();
+        String[] headers = data.getHeader();
+        ArrayList<List<String>> rawGazeData = data.getData(true, true);
+        int dataCount = rawGazeData.size();
+
+        if (settings.tumblingEnabled) {
+            int windowSize = settings.tumblingWindowSize;
+            DataEntry windowData = new DataEntry(headers); 
+
+            for (int i = 0; i < dataCount; i++) {
+                List<String> row = rawGazeData.get(i);
+            }
+        }
+
+        if (settings.expandingEnabled) {
+            int windowSize = settings.expandingWindowSize;
+            DataEntry windowData = new DataEntry(headers);
+
+            for (int i = 0; i < dataCount; i++) {
+                
+            }
+        }
+
+        if (settings.hoppingEnabled) {
+            int windowSize = settings.hoppingWindowSize;
+            int overlapSize = settings.hoppingOverlapSize;
+            DataEntry windowData = new DataEntry(headers);
+
+            for (int i = 0; i < dataCount; i++) {
+                
+            }
+        }
+
+        if (settings.eventEnabled) {
+
+        }
+
     }
 }

@@ -18,6 +18,7 @@ import org.json.simple.*;
 import org.json.simple.parser.*;
 
 import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 
 /*
  * Read and write xml, csv, txt files
@@ -57,20 +58,40 @@ public class FileHandler {
         return converted + " \n ";
     }
 
-    static public void writeAnalytics(ArrayList<ArrayList<String>> results, String outputPath) {
-        File csvOutputFile = new File(outputPath);
+    // static public void writeAnalytics(ArrayList<ArrayList<String>> results, String outputPath) {
+    //     File csvOutputFile = new File(outputPath);
+    //     try {
+    //         PrintWriter pw = new PrintWriter(csvOutputFile);
+    //         String csvData = "";
+    //         for (int i = 0; i < results.size(); i++) {
+    //             csvData = csvData + convertToCSV(results.get(i));
+    //         }
+    //         pw.println(csvData);
+    //         pw.close();
+    //     } catch (Exception e) {
+    //         System.err.println(e.toString());
+    //     }   
+    // }
+
+    static public void writeToCSV(ArrayList<List<String>> data, String filePath) {
         try {
-            PrintWriter pw = new PrintWriter(csvOutputFile);
-            String csvData = "";
-            for (int i = 0; i < results.size(); i++) {
-                csvData = csvData + convertToCSV(results.get(i));
+            File file = new File(filePath);
+            FileWriter fileWriter = new FileWriter(file);
+            CSVWriter csvWriter = new CSVWriter(fileWriter);
+
+            for (int i = 0; i < data.size(); i++) {
+                List<String> row = data.get(i);
+                int rowLength = row.size();
+                String[] csvData = row.toArray(new String[rowLength]);
+                csvWriter.writeNext(csvData);
             }
-            pw.println(csvData);
-            pw.close();
+
+            csvWriter.close();
         } catch (Exception e) {
-            System.err.println(e.toString());
-        }   
+            System.err.println(e);
+        }
     }
+
     /*
     public static void main(String[] args) {
         ArrayList<ArrayList<String>> data = new ArrayList<ArrayList<String>>();

@@ -64,7 +64,12 @@ public class Parameters {
     public File[] getInputFiles() {
         return inputFiles.clone();
     }
+
     public String getOutputDirectory() {
         return outputDirectory;
     }    
+
+    public WindowSettings getWindowSettings() {
+        return windowSettings;
+    }
 }
