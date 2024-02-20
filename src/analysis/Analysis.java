@@ -69,11 +69,21 @@ public class Analysis {
 
         if (settings.expandingEnabled) {
             int windowSize = settings.expandingWindowSize;
-            DataEntry window1 = new DataEntry((String[])data.getHeaders().toArray());
+            //ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
+
             for (int i = 0; i < rawGazeData.size(); i++) {
-                
+                //ArrayList<String> line = data.getLine(i);
+
+                //DataEntry d = new DataEntry(data.getHeaders());
+                //d.process(rawGazeData.get(i));
+                //windows.add(d);
             }
+            
+            //for (int i = 0; i < windows.size(); i++) {
+            //    calculateResults(windows.get(i), "some output path for this window");
+            //}
         }
+
 
         if (settings.hoppingEnabled) {
             int windowSize = settings.hoppingWindowSize;

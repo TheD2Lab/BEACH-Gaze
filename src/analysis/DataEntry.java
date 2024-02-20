@@ -36,7 +36,7 @@ public class DataEntry {
         this.currFixation = 1;
     }
 
-    public DataEntry(ArrayList<String> headers) { //Allows constructing from an arrayList instead of just an array
+    public DataEntry(List<String> headers) { //Allows constructing from an arrayList instead of just an array
         this((String[])headers.toArray());
     }
 
@@ -60,7 +60,7 @@ public class DataEntry {
         this.fixationData = this.rawFixationData;
     }
 
-    public void process(ArrayList<String> currLine) { //Allows inputting an arrayList instead of an array
+    public void process(List<String> currLine) { //Allows inputting an arrayList instead of an array
         process((String[])currLine.toArray());
     }
 
