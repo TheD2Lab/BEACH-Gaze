@@ -44,6 +44,10 @@ public class Analysis {
         results.get(0).addAll(fixation.keySet());
         results.get(1).addAll(fixation.values());
 
+        LinkedHashMap<String,String> saccades = Saccades.analyze(fixationData);
+        results.get(0).addAll(saccades.keySet());
+        results.get(1).addAll(saccades.values());
+
         LinkedHashMap<String,String> entropy = GazeEntropy.analyze(fixationData);
         results.get(0).addAll(entropy.keySet());
         results.get(1).addAll(entropy.values());

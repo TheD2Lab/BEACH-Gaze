@@ -33,6 +33,7 @@ public class Fixations {
         }
         System.out.println("Fixations done");
         System.out.println(allFixationDurations.size());
+        
         results.put(
             "Total Number of Fixations", //Output Header
             String.valueOf(fixationCount) //Output Value
