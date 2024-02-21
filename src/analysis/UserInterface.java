@@ -1,6 +1,8 @@
 package analysis;
 
 import java.awt.*;
+import java.awt.event.ItemEvent;
+
 import javax.swing.*;
 import java.io.File;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -161,10 +163,7 @@ public class UserInterface {
         windowsPanel.add(windowsLabel, componentGBC);
         
         tumblingCheckBox = new JCheckBox("Tumbling");
-        String tumblingToolTip = "This approach to predictive gaze analytics takes a " +
-        "digest view on the users’ gaze data and focuses on " +
-        "providing scheduled non-overlapping updates in the " +
-        "process of generating predictions.";
+        String tumblingToolTip = "A scheduled digest view of the gaze data using a tumbling window that is non-overlapping and fixed in size";
         tumblingCheckBox.setToolTipText("<html><p width=\"500\">" + tumblingToolTip +"</p></html>");
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 0;
@@ -187,8 +186,7 @@ public class UserInterface {
         windowsPanel.add(tumblingWindowSizeField, componentGBC);
         
         expandingCheckBox = new JCheckBox("Expanding");
-        String expandingToolTip = "The goal of this approach is to emphasize on all gaze that is " +
-        "known to the system when generating predictions on user success and failure.";
+        String expandingToolTip = "A cumulative view of the gaze data using an expanding window that is overlapping and non-fixed in size.";
         expandingCheckBox.setToolTipText("<html><p width=\"500\">" + expandingToolTip + "</p></html>");
         componentGBC.gridx = 0;
         componentGBC.gridy = 3;
@@ -210,8 +208,7 @@ public class UserInterface {
         windowsPanel.add(expandingWindowSizeField, componentGBC);
 
         hoppingCheckBox = new JCheckBox("Hopping");
-        String hoppingToolTip = "The goal of this approach is to capture a series of continuous " + 
-                "snapshots that reflect the most recent gaze state of the user.";
+        String hoppingToolTip = "The most recent snapshot view of the gaze data using a hopping window that is overlapping and fixed in size";
         hoppingCheckBox.setToolTipText("<html><p width=\"500\">" + hoppingToolTip + "</p></html>");
         componentGBC.gridx = 0;
         componentGBC.gridy = 5;
@@ -246,13 +243,8 @@ public class UserInterface {
         componentGBC.gridwidth = 1;
         windowsPanel.add(hoppingOverlapSizeField, componentGBC);
 
-        eventCheckBox = new JCheckBox("Event");
-        String eventToolTip = "The goal of this " + 
-                "approach to gaze analytics is to emphasize on potentially " +
-                "more informative chunks of gaze data in the " + 
-                "predictions of user success and failure, where the " + 
-                "weight is placed on notable events rather than taking " +
-                "a scheduled view on gaze data stream";
+        eventCheckBox = new JCheckBox("Event-Based");
+        String eventToolTip = "An event-based view of the gaze data using a session window that is non-overlapping and non-fixed in size";
         eventCheckBox.setToolTipText("<html><p width=\"500\">" + eventToolTip + "</p></html>");
         componentGBC.gridx = 0;
         componentGBC.gridy = 8;
@@ -319,20 +311,32 @@ public class UserInterface {
             runAnalysis();
         });
 
-        tumblingCheckBox.addActionListener(e -> {
-            windowSettings.expandingEnabled = expandingCheckBox.isSelected();
+        tumblingCheckBox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) 
+                windowSettings.tumblingEnabled = true;
+            else 
+                windowSettings.tumblingEnabled = false;
         });
 
-        expandingCheckBox.addActionListener(e -> {
-            windowSettings.expandingEnabled = expandingCheckBox.isSelected();
+        expandingCheckBox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) 
+                windowSettings.expandingEnabled = true;
+            else 
+                windowSettings.expandingEnabled = false;
         });
 
-        hoppingCheckBox.addActionListener(e -> {
-            windowSettings.hoppingEnabled = hoppingCheckBox.isEnabled();
+        hoppingCheckBox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) 
+                windowSettings.hoppingEnabled = true;
+            else 
+                windowSettings.hoppingEnabled = false;
         });
 
-        eventCheckBox.addActionListener(e -> {
-            windowSettings.eventEnabled = eventCheckBox.isEnabled();
+        eventCheckBox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) 
+                windowSettings.eventEnabled = true;
+            else 
+                windowSettings.eventEnabled = false;
         });
 
         tumblingWindowSizeField.addActionListener(e -> {
@@ -380,9 +384,24 @@ public class UserInterface {
     }
 
     private void runAnalysis() {
+        // Create a subfolder within the given output directory called "analysis"
+        File f = new File(outputDirectory + "\\results");
+        if (!f.exists()) {
+            f.mkdirs();
+            outputDirectory += "\\results";
+        } else {
+            int fileCount = 1;
+            outputDirectory += "\\results (" + fileCount + ")";
+            f = new File(outputDirectory);
+            while (f.exists()) {
+                fileCount++;
+                outputDirectory.replace(String.valueOf(fileCount - 1), String.valueOf(fileCount));
+            }
+        }
+
         Parameters params = new Parameters(inputFiles, outputDirectory, windowSettings);
         Analysis analysis = new Analysis(params);
-        analysis.run();
+        boolean isSuccessful = analysis.run();
     }
 
     private void buildTabPanels() {

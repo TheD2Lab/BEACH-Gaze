@@ -73,9 +73,16 @@ public class FileHandler {
     //     }   
     // }
 
-    static public void writeToCSV(ArrayList<List<String>> data, String filePath) {
+    static public void writeToCSV(ArrayList<List<String>> data, String outputDirectory, String fileName) {
         try {
-            File file = new File(filePath);
+            // Check to see if the output directory exists. If not, create it
+            File dir = new File(outputDirectory);
+            if (!dir.exists()) dir.mkdirs();
+
+            // Append a .csv to the file name if it's missing
+            String fString = fileName.contains(".csv") ? fileName : fileName + ".csv";
+            
+            File file = new File(outputDirectory + "\\" + fString);
             FileWriter fileWriter = new FileWriter(file);
             CSVWriter csvWriter = new CSVWriter(fileWriter);
 
