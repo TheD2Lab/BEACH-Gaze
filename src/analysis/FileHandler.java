@@ -58,22 +58,8 @@ public class FileHandler {
         return converted + " \n ";
     }
 
-    // static public void writeAnalytics(ArrayList<ArrayList<String>> results, String outputPath) {
-    //     File csvOutputFile = new File(outputPath);
-    //     try {
-    //         PrintWriter pw = new PrintWriter(csvOutputFile);
-    //         String csvData = "";
-    //         for (int i = 0; i < results.size(); i++) {
-    //             csvData = csvData + convertToCSV(results.get(i));
-    //         }
-    //         pw.println(csvData);
-    //         pw.close();
-    //     } catch (Exception e) {
-    //         System.err.println(e.toString());
-    //     }   
-    // }
-
     static public void writeToCSV(ArrayList<List<String>> data, String outputDirectory, String fileName) {
+        System.out.println("Writing to CSV");
         try {
             // Check to see if the output directory exists. If not, create it
             File dir = new File(outputDirectory);
@@ -94,6 +80,7 @@ public class FileHandler {
             }
 
             csvWriter.close();
+            System.out.println("Written Succesfully to "+outputDirectory+"//"+fileName);
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -124,7 +111,7 @@ public class FileHandler {
         writeAnalytics(data, "C:/Users/Productivity/Documents/Testing/Doc1.csv");
     }
     */
-    static public boolean SaveParametersAsJSON(HashMap<String,String> data,String saveLocation) {
+    static public boolean saveParametersAsJSON(HashMap<String,String> data,String saveLocation) {
         try {
             System.out.println("Writing file!");
             FileWriter pw = new FileWriter(saveLocation);

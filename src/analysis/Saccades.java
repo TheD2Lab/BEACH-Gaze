@@ -6,95 +6,35 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public class Saccades {
-    // static public HashMap<String,String> analyze(DataEntry data) {
-    //     for i in 
-    // }
-
-    /*
-     * 		Double[] allSaccadeLengths = saccade.getAllSaccadeLength(allCoordinates);
-
-			headers.add("total number of saccades");
-			data.add(String.valueOf(allSaccadeLengths.length));
-
-			headers.add("sum of all saccade length");
-			data.add(String.valueOf(DescriptiveStats.getSum(allSaccadeLengths)));
-
-			headers.add("mean saccade length");
-			data.add(String.valueOf(DescriptiveStats.getMean(allSaccadeLengths)));
-
-
-			headers.add("median saccade length");
-			data.add(String.valueOf(DescriptiveStats.getMedian(allSaccadeLengths)));
-
-			headers.add("StDev of saccade lengths");
-			data.add(String.valueOf(DescriptiveStats.getStDev(allSaccadeLengths)));
-
-			headers.add("min saccade length");
-			data.add(String.valueOf(DescriptiveStats.getMin(allSaccadeLengths)));
-
-
-			headers.add("max saccade length");
-			data.add(String.valueOf(DescriptiveStats.getMax(allSaccadeLengths)));
-
-			ArrayList<Double> allSaccadeDurations = saccade.getAllSaccadeDurations(saccadeDetails);
-
-			headers.add("sum of all saccade durations");
-			data.add(String.valueOf(DescriptiveStats.getSumOfDoubles(allSaccadeDurations)));
-
-			headers.add("mean saccade duration");
-			data.add(String.valueOf(DescriptiveStats.getMeanOfDoubles(allSaccadeDurations)));
-
-			headers.add("median saccade duration");
-			data.add(String.valueOf(DescriptiveStats.getMedianOfDoubles(allSaccadeDurations)));
-
-
-			headers.add("StDev of saccade durations");
-			data.add(String.valueOf(DescriptiveStats.getStDevOfDoubles(allSaccadeDurations)));
-
-			headers.add("Min. saccade duration");
-			data.add(String.valueOf(DescriptiveStats.getMinOfDoubles(allSaccadeDurations)));
-
-			headers.add("Max. saccade duration");
-			data.add(String.valueOf(DescriptiveStats.getMaxOfDoubles(allSaccadeDurations)));
-
-			headers.add("scanpath duration");
-			data.add(String.valueOf(getScanpathDuration(allFixationDurations, allSaccadeDurations)));
-
-
-			headers.add("fixation to saccade ratio");
-			data.add(String.valueOf(getFixationToSaccadeRatio(allFixationDurations, allSaccadeDurations)));
-     */
-   
-    static public LinkedHashMap<String,String> analyze(ArrayList<List<String>> data) {
+    final static String DURATION_INDEX = "FPOGD";
+    final static String TIMESTAMP_INDEX = "FPOGS";
+    final static String FIXATIONID_INDEX = "FPOGID";
+    final static String FIXATIONX_INDEX = "FPOGX";
+    final static String FIXATIONY_INDEX = "FPOGY";
+    
+    static public LinkedHashMap<String,String> analyze(DataEntry data) {
         LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
-        List<String> headers = data.get(0);
-        
-        int durationIndex = headers.indexOf("FPOGD");
-        int timestampIndex = headers.indexOf("FPOGS");
-        int fixationIDIndex = headers.indexOf("FPOGID");
-        int fixationXIndex = headers.indexOf("FPOGX");
-        int fixationYIndex = headers.indexOf("FPOGY");
 
         ArrayList<Double> allFixationDurations = new ArrayList<>();
         ArrayList<Double[]> saccadeDetails = new ArrayList<>();
         ArrayList<Object> allCoordinates = new ArrayList<>();
-        int fixationCount = data.size() - 1;
+        int fixationCount = data.rowCount();
 
         System.out.println("FixationCount: "+Integer.toString(fixationCount));
         
-        for (int row = 1; row < data.size(); row++) {
-            Double fixationDurationSeconds = Double.valueOf(data.get(row).get(durationIndex));
+        for (int row = 0; row < data.rowCount(); row++) {
+            Double fixationDurationSeconds = Double.valueOf(data.getValue(DURATION_INDEX, row));;
 
             Double[] eachSaccadeDetail = new Double[3];
-            eachSaccadeDetail[0] = Double.valueOf(data.get(row).get(timestampIndex));
-            eachSaccadeDetail[1] = Double.valueOf(data.get(row).get(durationIndex));
-            eachSaccadeDetail[2] = Double.valueOf(data.get(row).get(fixationIDIndex));
+            eachSaccadeDetail[0] = Double.valueOf(data.getValue(TIMESTAMP_INDEX, row));
+            eachSaccadeDetail[1] = Double.valueOf(data.getValue(DURATION_INDEX, row));
+            eachSaccadeDetail[2] = Double.valueOf(data.getValue(FIXATIONID_INDEX, row));
             saccadeDetails.add(eachSaccadeDetail);
 
             Double[] eachCoordinate = new Double[3];
-            eachCoordinate[0] = Double.valueOf(data.get(row).get(fixationXIndex));
-            eachCoordinate[1] = Double.valueOf(data.get(row).get(fixationYIndex));
-            eachCoordinate[2] = Double.valueOf(data.get(row).get(fixationIDIndex));
+            eachCoordinate[0] = Double.valueOf(data.getValue(FIXATIONX_INDEX, row));
+            eachCoordinate[1] = Double.valueOf(data.getValue(FIXATIONY_INDEX, row));
+            eachCoordinate[2] = Double.valueOf(data.getValue(FIXATIONID_INDEX, row));
             allCoordinates.add(eachCoordinate);
             allFixationDurations.add(fixationDurationSeconds);
         }

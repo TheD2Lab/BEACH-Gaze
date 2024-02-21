@@ -1,10 +1,13 @@
 package analysis;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
+import javafx.scene.chart.PieChart.Data;
+
 public class DataFiltering {
-    static public DataEntry FilterByFixations(DataEntry data) { //Cleanses the data by filtering out repeated fixations
+    static public DataEntry filterByFixations(DataEntry data) { //Cleanses the data by filtering out repeated fixations
         System.out.println("Filtering now");
         DataEntry filtered = new DataEntry(data.getHeaders());
 
@@ -25,5 +28,10 @@ public class DataFiltering {
         
         System.out.println("Filtered from "+data.rowCount()+" rows to "+filtered.rowCount()+" rows.");
         return filtered;
+    }
+
+    static public LinkedHashMap<String, Data> filterByAOI(DataEntry data ){
+        
+        return new LinkedHashMap<String, Data>();
     }
 }

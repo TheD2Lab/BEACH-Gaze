@@ -25,17 +25,19 @@ public class Analysis {
             for (int i = 0; i < inputFiles.length; i++) {
                 File f = inputFiles[i];
                 DataEntry rawData = FileHandler.buildDataEntry(f);
-                DataEntry data = DataFiltering.FilterByFixations(rawData);
+                DataEntry data = DataFiltering.filterByFixations(rawData);
 
                 String pName = f.getName().replace("_all_gaze.csv", "");
                 String pDirectory = params.getOutputDirectory() + "\\" + pName;
 
+                data.writeToCSV(pDirectory, pName+"_FixationData"); //Writes filtered data to a new CSV
+
                 System.out.println(pName);
                 System.out.println(pDirectory);
-                
-                //calculateResults(data, pDirectory)
-                ArrayList<List<String>> fixationOutput = calculateResults(data, pDirectory);
+
+                ArrayList<List<String>> fixationOutput = generateResults(data);
                 FileHandler.writeToCSV(fixationOutput, pDirectory, pName);
+
                 generateWindows(data, pDirectory);
             }
 
@@ -47,35 +49,7 @@ public class Analysis {
         }
     }
 
-    //public void calculateResults(DataEntry data, String outputDirectory) {
-    public ArrayList<List<String>> calculateResults(DataEntry data, String outputDirectory) {
-        ArrayList<List<String>> results = new ArrayList<List<String>>();
-        results.add(new ArrayList<String>()); //Headers
-        results.add(new ArrayList<String>()); //Values
-
-        //ArrayList<List<String>> fixationData = data.getData(false, false);
-        ArrayList<List<String>> fixationData = data.getAllData();
-        fixationData.add(0, data.getHeaders()); // Add headers to data list
-        System.out.println(fixationData.get(0).toString());
-
-        LinkedHashMap<String,String> fixation = Fixations.analyze(fixationData);
-        results.get(0).addAll(fixation.keySet());
-        results.get(1).addAll(fixation.values());
-
-        LinkedHashMap<String,String> saccades = Saccades.analyze(fixationData);
-        results.get(0).addAll(saccades.keySet());
-        results.get(1).addAll(saccades.values());
-
-        LinkedHashMap<String,String> entropy = GazeEntropy.analyze(fixationData);
-        results.get(0).addAll(entropy.keySet());
-        results.get(1).addAll(entropy.values());
-
-        //FileHandler.writeToCSV(results, outputDirectory, "analytics.csv");
-        return results;
-    }
-
-    //public void calculateResults(ArrayList<List<String>> data, String outputDirectory, String fileName) {
-    public ArrayList<List<String>> calculateResults(ArrayList<List<String>> data, String outputDirectory, String fileName) {
+    public ArrayList<List<String>> generateResults(DataEntry data) {
         ArrayList<List<String>> results = new ArrayList<List<String>>();
         results.add(new ArrayList<String>()); //Headers
         results.add(new ArrayList<String>()); //Values
@@ -92,14 +66,13 @@ public class Analysis {
         results.get(0).addAll(entropy.keySet());
         results.get(1).addAll(entropy.values());
 
-        //FileHandler.writeToCSV(results, outputDirectory, fileName);
         return results;
     }
 
     public void generateWindows(DataEntry data, String outputDirectory) {
         WindowSettings settings = params.getWindowSettings();
         int timeIndex = data.getHeaderIndex("TIME");
-        ArrayList<List<String>> rawGazeData = data.getAllData();//data.getData(true, true);
+        ArrayList<List<String>> rawGazeData = data.getAllData();
         
         List<String> headers = data.getHeaders();
 
@@ -135,8 +108,10 @@ public class Analysis {
             int windowCount = 1;
             for (ArrayList<List<String>> w : windows) {
                 String fileName = "window" + windowCount;
-                FileHandler.writeToCSV(w, subDirectory, fileName);
-                calculateResults(w, subDirectory, fileName + "_analytics.csv");
+                FileHandler.writeToCSV(w, subDirectory, fileName); //Commented these sections out since analyze now takes a DataEntry.
+                //generateResults(w, subDirectory, fileName + "_analytics.csv");
+                //ArrayList<List<String>> windowOutput = generateResultsOld(w);//, pDirectory);
+                //FileHandler.writeToCSV(windowOutput, subDirectory, fileName + "_analytics.csv");
                 windowCount++;
             }
             System.out.println(windows.size());

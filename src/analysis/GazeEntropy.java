@@ -7,24 +7,23 @@ import java.util.List;
 import java.util.Map;
 
 public class GazeEntropy {
-    static public LinkedHashMap<String,String> analyze(ArrayList<List<String>> data) {
+    final static String AOI_INDEX = "AOI";
+
+    static public LinkedHashMap<String,String> analyze(DataEntry data) {
         LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
-        List<String> headers = data.get(0);
 
         HashMap<String, Double> aoiProbability = new HashMap<String, Double>();
         HashMap<String, HashMap<String, Double>> transitionProbability = new HashMap<String, HashMap<String, Double>>();
         ArrayList<String> aoiSequence = new ArrayList<String>();
         String lastAoi = "";
         
-        int aoiIndex = headers.indexOf("AOI");
-        
         ArrayList<Double> allFixationDurations = new ArrayList<>();
-        int fixationCount = data.size() - 1;
+        int fixationCount = data.rowCount();
 
         System.out.println("FixationCount: "+Integer.toString(fixationCount));
         
-        for (int row = 1; row < data.size(); row++) {
-            String aoi = data.get(row).get(aoiIndex);
+        for (int row = 0; row < data.rowCount(); row++) {
+            String aoi = data.getValue(AOI_INDEX, row);
             aoiSequence.add(aoi);
             
             if (aoi.equals(""))

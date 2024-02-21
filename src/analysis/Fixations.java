@@ -6,29 +6,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public class Fixations {
-    /* Taken from old fixations file to use as reference
-     *      int fixationDurationIndex = list.indexOf("FPOGD");
-            int fixationIDIndex = list.indexOf("FPOGID");
-            int fixationXIndex = list.indexOf("FPOGX");
-            int fixationYIndex = list.indexOf("FPOGY");
-            int aoiIndex = list.indexOf("AOI");
-            int timestampIndex = list.indexOf("FPOGS");
-     */
+    final static String DURATION_INDEX = "FPOGD";
 
-    static public LinkedHashMap<String,String> analyze(ArrayList<List<String>> data) {
+    static public LinkedHashMap<String,String> analyze(DataEntry data) {
         LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
-        List<String> headers = data.get(0);
-        
-        int durationIndex = headers.indexOf("FPOGD");
-        System.out.println("Duration Index: "+durationIndex);
 
         ArrayList<Double> allFixationDurations = new ArrayList<>();
-        int fixationCount = data.size() - 1;
+        int fixationCount = data.rowCount();
 
         System.out.println("FixationCount: "+Integer.toString(fixationCount));
         
-        for (int row = 1; row < data.size(); row++) {
-            Double fixationDurationSeconds = Double.valueOf(data.get(row).get(durationIndex));
+        for (int row = 0; row < data.rowCount(); row++) {    
+            Double fixationDurationSeconds = Double.valueOf(data.getValue(DURATION_INDEX, row));
             allFixationDurations.add(fixationDurationSeconds);
         }
         System.out.println("Fixations done");
@@ -72,26 +61,3 @@ public class Fixations {
         return results;
     }
 }
-
-/*
- *      x    headers.add("total number of fixations");
-            data.add(String.valueOf(fixationCount));
-
-			headers.add("sum of all fixation duration");
-			data.add(String.valueOf(descriptiveStats.getSumOfDoubles(allFixationDurations)));
-
-			headers.add("mean fixation duration (ms)");
-			data.add(String.valueOf(descriptiveStats.getMeanOfDoubles(allFixationDurations)));
-
-			headers.add("median fixation duration (ms)");
-			data.add(String.valueOf(descriptiveStats.getMedianOfDoubles(allFixationDurations)));
-
-			headers.add(" StDev of fixation durations (ms)");
-			data.add(String.valueOf(descriptiveStats.getStDevOfDoubles(allFixationDurations)));
-
-			headers.add("Min. fixation duration (ms)");
-			data.add(String.valueOf(descriptiveStats.getMinOfDoubles(allFixationDurations)));
-
-			headers.add("Max. fixation duration (ms)");
-			data.add(String.valueOf(descriptiveStats.getMaxOfDoubles(allFixationDurations)));
- */

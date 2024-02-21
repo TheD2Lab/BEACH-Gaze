@@ -9,33 +9,12 @@ public class DataEntry {
     
     ArrayList<String> headers;
     HashMap<String,Integer> headerToIndex; //Stores the index of all headers
-    //ArrayList<List<String>> gazeData;
     ArrayList<List<String>> fixationData;
-    //ArrayList<List<String>> rawGazeData;
-    //ArrayList<List<String>> rawFixationData;
     
     List<String> lastValidFixation;
     String[] currLine; //The current line being read
     int currFixation;
-    /*
-    public DataEntry(List<String> headers) { //The constructor takes the first line of the CSV file so it can store the headers
-        headerToIndex = new HashMap<String,Integer>();
-        for (int i = 0; i < headers.size(); i++) {
-            String header = headers.get(i).contains("TIME(") ? "TIME" : headers.get(i);
-            headerToIndex.put(header, i);
-        }
 
-        this.headers = new ArrayList<String>();
-        this.headers.addAll(headers);
-
-        this.gazeData = new ArrayList<List<String>>();
-        this.fixationData = new ArrayList<List<String>>();
-        this.rawGazeData = new ArrayList<List<String>>();
-        this.rawFixationData = new ArrayList<List<String>>();
-        
-        this.currFixation = 1;
-    }
-    */
     public DataEntry(List<String> headers) { //The constructor takes the first line of the CSV file so it can store the headers
         
         headerToIndex = new HashMap<String,Integer>(); 
@@ -52,27 +31,16 @@ public class DataEntry {
     public DataEntry(String[] headers) { //Allows constructing from an arrayList instead of just an array
         this(Arrays.asList(headers));
     }
-    /*
-    public void process(String[] currLine) { 
-        // Add this line to the list of total lines
-        this.currLine = currLine;
-        List<String> line = Arrays.asList(currLine);
-        this.rawGazeData.add(line);
 
-        // Determine if this line is representative of a fixation
-        int fixationID = Integer.parseInt(getCurrentValue("FPOGID"));
-        int fixationValidity = Integer.parseInt(getCurrentValue("FPOGV"));
-        if (fixationID != currFixation) {
-            if (lastValidFixation != null) this.rawFixationData.add(lastValidFixation);
-            currFixation = fixationID;
-        } else if (fixationID == currFixation && fixationValidity == 1) {
-            lastValidFixation = line;
-        }
-        
-        // Temporary line for now until cleansing process is finished
-        this.fixationData = this.rawFixationData;
+    public void writeToCSV(String outputDirectory, String fileName) {
+        ArrayList<List<String>> outputData = new ArrayList<List<String>>();
+        outputData.add(headers);
+        outputData.addAll(fixationData);
+
+        FileHandler.writeToCSV(outputData, outputDirectory, fileName);
     }
-    */
+
+    //Adds a line of data to the DataEntry object
     public void process(List<String> currLine) {
         this.fixationData.add(currLine);
     }
@@ -82,11 +50,6 @@ public class DataEntry {
 
     }
 
-    /*
-    public void process(List<String> currLine) { //Allows inputting an arrayList instead of an array
-        process((String[])currLine.toArray());
-    }
-    */
 
     public String getCurrentValue(String header) { //Returns the value on the current line with the given header.
         return this.currLine[headerToIndex.get(header)];
@@ -126,19 +89,4 @@ public class DataEntry {
     public ArrayList<List<String>> getAllData() {
         return this.fixationData;
     }
-    /*
-    public ArrayList<List<String>> getData(boolean raw, boolean allGaze) {
-        if (raw) {
-            if (allGaze) 
-                return this.rawGazeData;
-            else 
-                return this.rawFixationData;
-        } else {
-            if (allGaze) 
-                return this.gazeData;
-            else 
-                return this.fixationData;
-        }
-    }
-     */
 }

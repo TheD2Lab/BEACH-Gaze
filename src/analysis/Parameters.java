@@ -41,7 +41,7 @@ public class Parameters {
         data.put("InputFiles", Arrays.toString(inputFiles));
         data.put("OutputDirectory", outputDirectory);
         System.out.println("Saving: "+data.toString());
-        FileHandler.SaveParametersAsJSON(data, saveLocation + "\\" + fileName);
+        FileHandler.saveParametersAsJSON(data, saveLocation + "\\" + fileName);
     }
 
     public String toString() {
