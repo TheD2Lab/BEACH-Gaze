@@ -24,31 +24,37 @@ public class Analysis {
             File[] inputFiles = params.getInputFiles();
             for (int i = 0; i < inputFiles.length; i++) {
                 File f = inputFiles[i];
-                DataEntry data = FileHandler.buildDataEntry(f);
+                DataEntry rawData = FileHandler.buildDataEntry(f);
+                DataEntry data = DataFiltering.FilterByFixations(rawData);
 
                 String pName = f.getName().replace("_all_gaze.csv", "");
                 String pDirectory = params.getOutputDirectory() + "\\" + pName;
 
                 System.out.println(pName);
                 System.out.println(pDirectory);
-
-                calculateResults(data, pDirectory);
+                
+                //calculateResults(data, pDirectory)
+                ArrayList<List<String>> fixationOutput = calculateResults(data, pDirectory);
+                FileHandler.writeToCSV(fixationOutput, pDirectory, pName);
                 generateWindows(data, pDirectory);
             }
 
             System.out.println("Analysis Complete.");
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
 
-    public void calculateResults(DataEntry data, String outputDirectory) {
+    //public void calculateResults(DataEntry data, String outputDirectory) {
+    public ArrayList<List<String>> calculateResults(DataEntry data, String outputDirectory) {
         ArrayList<List<String>> results = new ArrayList<List<String>>();
         results.add(new ArrayList<String>()); //Headers
         results.add(new ArrayList<String>()); //Values
 
-        ArrayList<List<String>> fixationData = data.getData(false, false);
+        //ArrayList<List<String>> fixationData = data.getData(false, false);
+        ArrayList<List<String>> fixationData = data.getAllData();
         fixationData.add(0, data.getHeaders()); // Add headers to data list
         System.out.println(fixationData.get(0).toString());
 
@@ -64,10 +70,12 @@ public class Analysis {
         results.get(0).addAll(entropy.keySet());
         results.get(1).addAll(entropy.values());
 
-        FileHandler.writeToCSV(results, outputDirectory, "analytics.csv");
+        //FileHandler.writeToCSV(results, outputDirectory, "analytics.csv");
+        return results;
     }
 
-    public void calculateResults(ArrayList<List<String>> data, String outputDirectory, String fileName) {
+    //public void calculateResults(ArrayList<List<String>> data, String outputDirectory, String fileName) {
+    public ArrayList<List<String>> calculateResults(ArrayList<List<String>> data, String outputDirectory, String fileName) {
         ArrayList<List<String>> results = new ArrayList<List<String>>();
         results.add(new ArrayList<String>()); //Headers
         results.add(new ArrayList<String>()); //Values
@@ -84,13 +92,14 @@ public class Analysis {
         results.get(0).addAll(entropy.keySet());
         results.get(1).addAll(entropy.values());
 
-        FileHandler.writeToCSV(results, outputDirectory, fileName);
+        //FileHandler.writeToCSV(results, outputDirectory, fileName);
+        return results;
     }
 
     public void generateWindows(DataEntry data, String outputDirectory) {
         WindowSettings settings = params.getWindowSettings();
         int timeIndex = data.getHeaderIndex("TIME");
-        ArrayList<List<String>> rawGazeData = data.getData(true, true);
+        ArrayList<List<String>> rawGazeData = data.getAllData();//data.getData(true, true);
         
         List<String> headers = data.getHeaders();
 
