@@ -12,7 +12,7 @@ public class DataFilter {
         DataEntry filtered = new DataEntry(data.getHeaders());
 
         List<String> lastValidFixation = null;
-        int currFixation = -1;
+        int currFixation = 1;
 
         for (int row = 0; row < data.rowCount(); row++) {
             int fixationID = Integer.parseInt(data.getValue("FPOGID", row));
