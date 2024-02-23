@@ -48,8 +48,8 @@ public class DataFilter {
         for (int rowNum = 0; rowNum < data.rowCount(); rowNum++) {
             // Note: It is extremely slow to parse a string over and over again
             // Check if Gazepoint could detect the pupils
-            Boolean leftValid = Integer.parseInt(data.getValue("LPMMV", rowNum)) == 1;
-            Boolean rightValid = Integer.parseInt(data.getValue("RPMMV", rowNum)) == 1;
+            boolean leftValid = Integer.parseInt(data.getValue("LPMMV", rowNum)) == 1;
+            boolean rightValid = Integer.parseInt(data.getValue("RPMMV", rowNum)) == 1;
             if (!(leftValid && rightValid)) {
                 continue;   // skip invalid entry
             } 
@@ -72,7 +72,6 @@ public class DataFilter {
                 && (Math.abs(leftDiameter-rightDiameter) <= MAX_PUPIL_DIFF)
             ) {
                 filtered.process(data.getRow(rowNum));
-                continue;
             }
         }
         return filtered;
