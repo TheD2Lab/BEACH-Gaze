@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import javafx.scene.chart.PieChart.Data;
+//import javafx.scene.chart.PieChart.Data;
 
-public class DataFiltering {
+public class DataFilter {
     static public DataEntry filterByFixations(DataEntry data) { //Cleanses the data by filtering out repeated fixations
         System.out.println("Filtering now");
         DataEntry filtered = new DataEntry(data.getHeaders());
@@ -79,8 +79,8 @@ public class DataFiltering {
     }
 
 
-    static public LinkedHashMap<String, Data> filterByAOI(DataEntry data ){
+    static public LinkedHashMap<String, DataEntry> filterByAOI(DataEntry data ){
         
-        return new LinkedHashMap<String, Data>();
+        return new LinkedHashMap<String, DataEntry>();
     }
 }

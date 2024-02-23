@@ -24,21 +24,18 @@ public class Analysis {
             File[] inputFiles = params.getInputFiles();
             for (int i = 0; i < inputFiles.length; i++) {
                 File f = inputFiles[i];
-                DataEntry rawData = FileHandler.buildDataEntry(f);
-                DataEntry data = DataFiltering.filterByFixations(rawData);
+                DataEntry rawGaze = FileHandler.buildDataEntry(f);
+                DataEntry fixations = DataFilter.filterByFixations(rawGaze);
 
                 String pName = f.getName().replace("_all_gaze.csv", "");
                 String pDirectory = params.getOutputDirectory() + "\\" + pName;
 
-                data.writeToCSV(pDirectory, pName+"_FixationData"); //Writes filtered data to a new CSV
+                fixations.writeToCSV(pDirectory, pName+"_FixationData"); //Writes filtered data to a new CSV
 
-                System.out.println(pName);
-                System.out.println(pDirectory);
-
-                ArrayList<List<String>> fixationOutput = generateResults(data);
+                ArrayList<List<String>> fixationOutput = generateResults(fixations);
                 FileHandler.writeToCSV(fixationOutput, pDirectory, pName);
 
-                generateWindows(data, pDirectory);
+                generateWindows(rawGaze, pDirectory);
             }
 
             System.out.println("Analysis Complete.");
