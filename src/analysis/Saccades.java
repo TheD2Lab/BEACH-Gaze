@@ -112,13 +112,15 @@ public class Saccades {
             "scanpath duration", 
             String.valueOf(getScanpathDuration(allFixationDurations, allSaccadeDurations))
             );
-            
+
         results.put(
             "fixation to saccade ratio", 
             String.valueOf(getFixationToSaccadeRatio(allFixationDurations, allSaccadeDurations))
             );
+
         return results;
     } 
+    
 
     public static Double[] getAllSaccadeLength(ArrayList<Object> allCoordinates) {
 		ArrayList<Double> allSaccadeLengths = new ArrayList<Double>();
