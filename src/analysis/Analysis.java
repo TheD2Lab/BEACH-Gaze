@@ -63,6 +63,10 @@ public class Analysis {
         results.get(0).addAll(angles.keySet());
         results.get(1).addAll(angles.values());
 
+        LinkedHashMap<String,String> convexHull = ConvexHull.analyze(data);
+        results.get(0).addAll(convexHull.keySet());
+        results.get(1).addAll(convexHull.values());
+
         LinkedHashMap<String,String> entropy = GazeEntropy.analyze(data);
         results.get(0).addAll(entropy.keySet());
         results.get(1).addAll(entropy.values());
