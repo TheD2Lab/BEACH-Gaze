@@ -58,6 +58,10 @@ public class Analysis {
         LinkedHashMap<String,String> saccades = Saccades.analyze(data);
         results.get(0).addAll(saccades.keySet());
         results.get(1).addAll(saccades.values());
+    
+        LinkedHashMap<String,String> angles = Angles.analyze(data);
+        results.get(0).addAll(angles.keySet());
+        results.get(1).addAll(angles.values());
 
         LinkedHashMap<String,String> entropy = GazeEntropy.analyze(data);
         results.get(0).addAll(entropy.keySet());
