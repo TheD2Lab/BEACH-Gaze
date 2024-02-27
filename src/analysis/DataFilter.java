@@ -11,7 +11,7 @@ import javafx.scene.chart.PieChart.Data;
 public class DataFilter {
     static public DataEntry filterByFixations(DataEntry data) { //Cleanses the data by filtering out repeated fixations
         System.out.println("Filtering now");
-        DataEntry fixations = new DataEntry(data.getHeaders());
+        DataEntry filtered = new DataEntry(data.getHeaders());
 
         List<String> lastValidFixation = null;
         int currFixation = 1;
@@ -20,17 +20,17 @@ public class DataFilter {
             int fixationID = Integer.parseInt(data.getValue("FPOGID", row));
             int fixationValidity = Integer.parseInt(data.getValue("FPOGV", row));
             if (fixationID != currFixation) {
-                if (lastValidFixation != null) fixations.process(lastValidFixation);
+                if (lastValidFixation != null) filtered.process(lastValidFixation);
                 if (fixationValidity == 1) lastValidFixation = data.getRow(row); // Edge case; check to see if the first line associated with a given fixation is valid
                 currFixation = fixationID;
             } else if (fixationID == currFixation && fixationValidity == 1) {
                 lastValidFixation = data.getRow(row);
             }
         }
-        if (lastValidFixation != null) fixations.process(lastValidFixation);
+        if (lastValidFixation != null) filtered.process(lastValidFixation);
         
-        System.out.println("Filtered from "+data.rowCount()+" rows to "+fixations.rowCount()+" rows.");
-        return fixations;
+        System.out.println("Filtered from "+data.rowCount()+" rows to "+filtered.rowCount()+" rows.");
+        return filtered;
     }
 
     /**
