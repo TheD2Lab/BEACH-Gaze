@@ -118,6 +118,11 @@ public class Saccades {
             String.valueOf(getFixationToSaccadeRatio(allFixationDurations, allSaccadeDurations))
             );
 
+        /*
+         *  headers.add("Average Peak Saccade Velocity");
+            data.add(avgPeakSaccadeVelocity(inputFile, outputFile));
+         */
+
         return results;
     } 
     

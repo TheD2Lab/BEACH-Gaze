@@ -12,6 +12,8 @@ public class Analysis {
     /*
      * Accepts parameters object and initilizes the analysis
      */
+    final static int SCREEN_WIDTH = 1920;
+	final static int SCREEN_HEIGHT = 1080;
 
     private Parameters params;
     
@@ -47,6 +49,7 @@ public class Analysis {
     }
 
     public ArrayList<List<String>> generateResults(DataEntry data) {
+        data = DataFilter.applyScreenSize(data, SCREEN_WIDTH,SCREEN_HEIGHT);
         ArrayList<List<String>> results = new ArrayList<List<String>>();
         results.add(new ArrayList<String>()); //Headers
         results.add(new ArrayList<String>()); //Values
@@ -70,6 +73,11 @@ public class Analysis {
         LinkedHashMap<String,String> entropy = GazeEntropy.analyze(data);
         results.get(0).addAll(entropy.keySet());
         results.get(1).addAll(entropy.values());
+
+        LinkedHashMap<String,String> event = Event.analyze(data);
+        results.get(0).addAll(event.keySet());
+        results.get(1).addAll(event.values());
+
 
         return results;
     }

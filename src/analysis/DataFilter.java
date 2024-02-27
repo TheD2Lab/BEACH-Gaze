@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import javafx.scene.chart.PieChart.Data;
+
 //import javafx.scene.chart.PieChart.Data;
 
 public class DataFilter {
@@ -74,6 +76,25 @@ public class DataFilter {
                 filtered.process(data.getRow(rowNum));
             }
         }
+        return filtered;
+    }
+
+    static public DataEntry applyScreenSize(DataEntry data, int screenWidth, int screenHeight) {
+        System.out.println("Filtering now");
+        DataEntry filtered = new DataEntry(data.getHeaders());
+
+
+        for (int row = 0; row < data.rowCount(); row++) {
+            List<String> currentRow = data.getRow(row);
+            int fixationXIndex = data.getHeaderIndex("FPOGX");
+            int fixationYIndex = data.getHeaderIndex("FPOGY");
+
+            currentRow.set(fixationXIndex,String.valueOf(Double.valueOf(currentRow.get(fixationXIndex)) * screenWidth));
+            currentRow.set(fixationYIndex,String.valueOf(Double.valueOf(currentRow.get(fixationYIndex)) * screenWidth));
+
+            filtered.process(currentRow);
+        }
+
         return filtered;
     }
 

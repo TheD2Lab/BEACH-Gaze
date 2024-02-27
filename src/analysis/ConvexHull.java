@@ -23,7 +23,6 @@ public class ConvexHull {
             double y = Double.valueOf(data.getValue(FIXATIONY_INDEX, row));
             allPoints.add(new Point2D.Double(x, y));
         }  
-
         List<Point2D.Double> boundingPoints = getConvexHull(allPoints);
 
         results.put(
@@ -59,13 +58,13 @@ public class ConvexHull {
 
         for(int i = 2; i < points.size(); i++) {
 
-        	Point2D.Double c = points.get(i);
 
+        	Point2D.Double c = points.get(i);
+            
             if(getTurn(a, b, c) != Turn.COLLINEAR) {
                 return false;
             }
         }
-
         return true;
     }
 
