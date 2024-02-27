@@ -74,6 +74,10 @@ public class Analysis {
         results.get(0).addAll(entropy.keySet());
         results.get(1).addAll(entropy.values());
 
+        LinkedHashMap<String,String> gaze = Gaze.analyze(data);
+        results.get(0).addAll(gaze.keySet());
+        results.get(1).addAll(gaze.values());
+
         LinkedHashMap<String,String> event = Event.analyze(data);
         results.get(0).addAll(event.keySet());
         results.get(1).addAll(event.values());
