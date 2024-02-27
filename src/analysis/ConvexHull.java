@@ -30,9 +30,6 @@ public class ConvexHull {
             String.valueOf(getPolygonArea(boundingPoints))
             );
 
-        //headers.add("convex hull area");
-        //data.add(String.valueOf(convexHull.getPolygonArea(points)));
-
         return results;
     }
 
