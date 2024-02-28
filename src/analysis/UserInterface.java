@@ -321,12 +321,31 @@ public class UserInterface {
 
         JLabel windowsLabel = new JLabel("Understanding Windows");
         windowsLabel.setFont(windowsLabel.getFont().deriveFont(Font.BOLD, 12f));
-        componentGBC.insets = new Insets(0, 0, 0, 350);
+        componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 0;
         componentGBC.gridy = 0;
         componentGBC.gridwidth = 1;
         componentGBC.gridheight = 1;
         windowsHelpPanel.add(windowsLabel, componentGBC);
+
+        JTextArea windowsAbstract = new JTextArea(
+            "To further support predictive gaze analytics, we offer additional, optional approaches to analyzing gaze data with the use of discrete-timed windows. " +
+            "This approach to predictive gaze analytics focuses on learning from digests of user gaze (tumbling window), snapshots of the most recent user gaze (hopping window)," +
+            "gaze captured during significant events (event-based window), as well as all known gaze to date (expanding window). "
+        );
+        windowsAbstract.setFont(windowsLabel.getFont().deriveFont(Font.PLAIN));
+        windowsAbstract.setLineWrap(true);
+        windowsAbstract.setWrapStyleWord(true);
+        windowsAbstract.setEditable(false);
+
+        JLabel tumblingLabel = new JLabel("Tumbling Window");
+
+        componentGBC.insets = new Insets(0, 0, 0, 20);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 1;
+        componentGBC.gridwidth = GridBagConstraints.REMAINDER;
+        componentGBC.gridheight = 10;
+        windowsHelpPanel.add(windowsAbstract, componentGBC);
 
         helpPanel.add(windowsHelpPanel, panelGBC);
     }
