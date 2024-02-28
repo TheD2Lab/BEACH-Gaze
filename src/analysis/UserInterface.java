@@ -16,6 +16,7 @@ public class UserInterface {
     private JFrame frame;
     private JTabbedPane tabs;
     private JPanel analysisPanel;
+    private JPanel helpPanel;
     private JCheckBox batchAnalysisCheckBox;
     private JButton selectFilesButton;
     private JLabel fileCountLabel;
@@ -40,7 +41,7 @@ public class UserInterface {
 
         // Default values
         inputFiles = new File[0];
-        outputDirectory = "C:\\";
+        outputDirectory = System.getProperty("user.dir");
         windowSettings = new WindowSettings();
 
         buildFrame();
@@ -62,7 +63,7 @@ public class UserInterface {
     private void buildGazePanel() {
         // Panel contains all components pertaining to gaze settings
         JPanel gazePanel = new JPanel();
-        gazePanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        //gazePanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         gazePanel.setLayout(new GridBagLayout());
 
         // Constraints dictate location of UI components
@@ -288,7 +289,7 @@ public class UserInterface {
         
         runAnalysisButton = new JButton("Run Analysis");
         runAnalysisButton.setFont(runAnalysisButton.getFont().deriveFont(20f));
-        componentGBC.insets = new Insets(190, 10, 20, 10);
+        componentGBC.insets = new Insets(190, 0, 20, 0);
         componentGBC.gridx = 0;
         componentGBC.gridy = 1;
         componentGBC.gridwidth = 1;
@@ -296,6 +297,38 @@ public class UserInterface {
         consolePanel.add(runAnalysisButton, componentGBC);
 
         analysisPanel.add(consolePanel, panelGBC);
+    }
+
+    private void buildHelpPagePanel() {
+        JPanel windowsHelpPanel = new JPanel();
+        windowsHelpPanel.setLayout(new GridBagLayout());
+
+        GridBagConstraints panelGBC = new GridBagConstraints();
+        panelGBC.anchor = GridBagConstraints.FIRST_LINE_START;
+        panelGBC.gridx = 1;
+        panelGBC.gridy = 0;
+        panelGBC.gridwidth = 1;
+        panelGBC.gridheight = 1;
+        panelGBC.weightx = 1;
+        panelGBC.weighty = 1;
+
+        GridBagConstraints componentGBC = new GridBagConstraints();
+        componentGBC.anchor = GridBagConstraints.FIRST_LINE_START;
+        componentGBC.ipadx = 10;
+        componentGBC.ipady = 10;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+
+        JLabel windowsLabel = new JLabel("Understanding Windows");
+        windowsLabel.setFont(windowsLabel.getFont().deriveFont(Font.BOLD, 12f));
+        componentGBC.insets = new Insets(0, 0, 0, 350);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 0;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+        windowsHelpPanel.add(windowsLabel, componentGBC);
+
+        helpPanel.add(windowsHelpPanel, panelGBC);
     }
 
     private void setEventHandlers() {
@@ -408,11 +441,14 @@ public class UserInterface {
         tabs = new JTabbedPane();
 
         analysisPanel = new JPanel(new GridBagLayout());
+        analysisPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         buildGazePanel();
         buildWindowsPanel();
         buildConsolePanel();
 
-        JPanel helpPanel = new JPanel(new GridBagLayout());
+        helpPanel = new JPanel(new GridBagLayout());
+        helpPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        buildHelpPagePanel();
 
         tabs.addTab("Analysis", analysisPanel);
         tabs.addTab("Help", helpPanel);

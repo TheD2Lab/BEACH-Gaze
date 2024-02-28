@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import javafx.scene.chart.PieChart.Data;
-
 //import javafx.scene.chart.PieChart.Data;
 
 public class DataFilter {
