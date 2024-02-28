@@ -586,22 +586,26 @@ public class UserInterface {
     }
 
     private void runAnalysis() {
-        // Create a subfolder within the given output directory called "analysis"
-        File f = new File(outputDirectory + "\\results");
+        // Append a results folder to the output directory path
+        String resultsDirectory = outputDirectory + "/results";
+
+        // Create a subfolder within the given output directory called "results" if one does not exist
+        File f = new File(resultsDirectory);
         if (!f.exists()) {
             f.mkdirs();
-            outputDirectory += "\\results";
         } else {
             int fileCount = 1;
-            outputDirectory += "\\results (" + fileCount + ")";
-            f = new File(outputDirectory);
+            if (!resultsDirectory.contains ("results (")) resultsDirectory += (" (" + fileCount + ")");
+            f = new File(resultsDirectory);
             while (f.exists()) {
                 fileCount++;
-                outputDirectory.replace(String.valueOf(fileCount - 1), String.valueOf(fileCount));
+                System.out.println(resultsDirectory);
+                resultsDirectory = resultsDirectory.replace(String.valueOf(fileCount - 1), String.valueOf(fileCount));
+                f = new File(resultsDirectory);
             }
         }
 
-        Parameters params = new Parameters(inputFiles, outputDirectory, windowSettings);
+        Parameters params = new Parameters(inputFiles, resultsDirectory, windowSettings);
         Analysis analysis = new Analysis(params);
         boolean isSuccessful = analysis.run();
     }

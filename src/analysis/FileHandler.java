@@ -68,7 +68,7 @@ public class FileHandler {
             // Append a .csv to the file name if it's missing
             String fString = fileName.contains(".csv") ? fileName : fileName + ".csv";
             
-            File file = new File(outputDirectory + "\\" + fString);
+            File file = new File(outputDirectory + "/" + fString);
             FileWriter fileWriter = new FileWriter(file);
             CSVWriter csvWriter = new CSVWriter(fileWriter);
 

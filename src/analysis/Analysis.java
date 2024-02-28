@@ -30,12 +30,12 @@ public class Analysis {
                 DataEntry fixations = DataFilter.filterByFixations(rawGaze);
 
                 String pName = f.getName().replace("_all_gaze.csv", "");
-                String pDirectory = params.getOutputDirectory() + "\\" + pName;
+                String pDirectory = params.getOutputDirectory() + "/" + pName;
 
                 fixations.writeToCSV(pDirectory, pName+"_FixationData"); //Writes filtered data to a new CSV
 
-                ArrayList<List<String>> fixationOutput = generateResults(fixations);
-                FileHandler.writeToCSV(fixationOutput, pDirectory, pName);
+                ArrayList<List<String>> analytics = generateResults(fixations);
+                FileHandler.writeToCSV(analytics, pDirectory, pName + "_analytics");
 
                 generateWindows(rawGaze, pDirectory);
             }
@@ -121,7 +121,7 @@ public class Analysis {
                 }
             }
 
-            String subDirectory = outputDirectory + "\\tumbling";
+            String subDirectory = outputDirectory + "/tumbling";
             int windowCount = 1;
             for (ArrayList<List<String>> w : windows) {
                 String fileName = "window" + windowCount;
