@@ -10,7 +10,7 @@ public class WindowSettings {
 
     public boolean hoppingEnabled;
     public int hoppingWindowSize;
-    public int hoppingOverlapSize;
+    public int hoppingHopSize;
     
     public boolean eventEnabled;
 

@@ -145,7 +145,7 @@ public class Analysis {
 
         if (settings.hoppingEnabled) {
             int windowSize = settings.hoppingWindowSize;
-            int overlapSize = settings.hoppingOverlapSize;
+            int hopSize = settings.hoppingHopSize;
 
             for (int i = 0; i < rawGazeData.size(); i++) {
                 List<String> row = rawGazeData.get(i);

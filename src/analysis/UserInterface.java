@@ -2,7 +2,9 @@ package analysis;
 
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.awt.image.BufferedImage;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.io.File;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -13,6 +15,10 @@ public class UserInterface {
     String outputDirectory;
     WindowSettings windowSettings;
 
+    private BufferedImage tumblingWindowImage;
+    private BufferedImage hoppingWindowImage;
+    private BufferedImage eventWindowImage;
+    private BufferedImage expandingWindowImage;
     private JFrame frame;
     private JTabbedPane tabs;
     private JPanel analysisPanel;
@@ -29,12 +35,19 @@ public class UserInterface {
     private JTextField expandingWindowSizeField;
     private JCheckBox hoppingCheckBox;
     private JTextField hoppingWindowSizeField;
-    private JTextField hoppingOverlapSizeField;
+    private JTextField hoppingHopSizeField;
     private JCheckBox eventCheckBox;
 
     public UserInterface() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+            String imageFilePath = System.getProperty("user.dir") + "/img/";
+            
+            tumblingWindowImage = ImageIO.read(new File(imageFilePath + "tumblingWindow.jpg"));
+            hoppingWindowImage = ImageIO.read(new File(imageFilePath + "hoppingWindow.jpg"));
+            eventWindowImage = ImageIO.read(new File(imageFilePath + "eventBasedWindow.jpg"));
+            expandingWindowImage = ImageIO.read(new File(imageFilePath + "expandingWindow.jpg"));
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -187,7 +200,7 @@ public class UserInterface {
         windowsPanel.add(tumblingWindowSizeField, componentGBC);
         
         expandingCheckBox = new JCheckBox("Expanding");
-        String expandingToolTip = "A cumulative view of the gaze data using an expanding window that is overlapping and non-fixed in size.";
+        String expandingToolTip = "A cumulative view of the gaze data using an expanding window that is non-overlapping and non-fixed in size.";
         expandingCheckBox.setToolTipText("<html><p width=\"500\">" + expandingToolTip + "</p></html>");
         componentGBC.gridx = 0;
         componentGBC.gridy = 3;
@@ -230,19 +243,19 @@ public class UserInterface {
         componentGBC.gridwidth = 1;
         windowsPanel.add(hoppingWindowSizeField, componentGBC);
 
-        JLabel overlapSizeLabel = new JLabel("Overlap Size (s)");
+        JLabel hopSizeLabel = new JLabel("Hop Size (s)");
         componentGBC.insets = new Insets(0, 20, 0, 0);
         componentGBC.gridx = 0;
         componentGBC.gridy = 7;
         componentGBC.gridwidth = 1;
-        windowsPanel.add(overlapSizeLabel, componentGBC);
+        windowsPanel.add(hopSizeLabel, componentGBC);
 
-        hoppingOverlapSizeField = new JTextField("", 10);
+        hoppingHopSizeField = new JTextField("", 10);
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 1;
         componentGBC.gridy = 7;
         componentGBC.gridwidth = 1;
-        windowsPanel.add(hoppingOverlapSizeField, componentGBC);
+        windowsPanel.add(hoppingHopSizeField, componentGBC);
 
         eventCheckBox = new JCheckBox("Event-Based");
         String eventToolTip = "An event-based view of the gaze data using a session window that is non-overlapping and non-fixed in size";
@@ -320,7 +333,7 @@ public class UserInterface {
         componentGBC.gridheight = 1;
 
         JLabel windowsLabel = new JLabel("Understanding Windows");
-        windowsLabel.setFont(windowsLabel.getFont().deriveFont(Font.BOLD, 12f));
+        windowsLabel.setFont(windowsLabel.getFont().deriveFont(Font.BOLD, 16f));
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 0;
         componentGBC.gridy = 0;
@@ -328,24 +341,161 @@ public class UserInterface {
         componentGBC.gridheight = 1;
         windowsHelpPanel.add(windowsLabel, componentGBC);
 
-        JTextArea windowsAbstract = new JTextArea(
-            "To further support predictive gaze analytics, we offer additional, optional approaches to analyzing gaze data with the use of discrete-timed windows. " +
-            "This approach to predictive gaze analytics focuses on learning from digests of user gaze (tumbling window), snapshots of the most recent user gaze (hopping window)," +
-            "gaze captured during significant events (event-based window), as well as all known gaze to date (expanding window). "
-        );
-        windowsAbstract.setFont(windowsLabel.getFont().deriveFont(Font.PLAIN));
-        windowsAbstract.setLineWrap(true);
-        windowsAbstract.setWrapStyleWord(true);
-        windowsAbstract.setEditable(false);
+        // JTextArea windowsAbstract = new JTextArea(
+        //     "To further support predictive gaze analytics, we offer additional, optional approaches to analyzing gaze data with the use of discrete-timed windows. " +
+        //     "This approach to predictive gaze analytics focuses on learning from digests of user gaze (tumbling window), snapshots of the most recent user gaze (hopping window)," +
+        //     "gaze captured during significant events (event-based window), as well as all known gaze to date (expanding window). "
+        // );
+        // windowsAbstract.setFont(windowsLabel.getFont().deriveFont(Font.PLAIN));
+        // windowsAbstract.setLineWrap(true);
+        // windowsAbstract.setWrapStyleWord(true);
+        // windowsAbstract.setEditable(false);
+        // componentGBC.insets = new Insets(0, 0, 0, 20);
+        // componentGBC.gridx = GridBagConstraints.REMAINDER;
+        // componentGBC.gridy = 1;
+        // componentGBC.gridwidth = GridBagConstraints.REMAINDER;
+        // componentGBC.gridheight = 10;
+        // windowsHelpPanel.add(windowsAbstract, componentGBC);
 
-        JLabel tumblingLabel = new JLabel("Tumbling Window");
-
-        componentGBC.insets = new Insets(0, 0, 0, 20);
+        String windowsAbstract = "<html><p width=\"750\">" +
+        "To further support predictive gaze analytics, we offer additional, optional approaches to analyzing gaze data with the use of discrete-timed windows. " +
+        "This approach to predictive gaze analytics focuses on learning from digests of user gaze (tumbling window), snapshots of the most recent user gaze (hopping window), " +
+        "gaze captured during significant events (event-based window), as well as all known gaze to date (expanding window)." +
+        "</p></html>";
+        JLabel windowsDescriptionLabel = new JLabel(windowsAbstract);
+        //componentGBC.insets = new Insets(0, 0, 0, 20);
         componentGBC.gridx = 0;
         componentGBC.gridy = 1;
         componentGBC.gridwidth = GridBagConstraints.REMAINDER;
-        componentGBC.gridheight = 10;
-        windowsHelpPanel.add(windowsAbstract, componentGBC);
+        componentGBC.gridheight = 3;
+        windowsHelpPanel.add(windowsDescriptionLabel, componentGBC);
+
+
+        JLabel tumblingLabel = new JLabel("Tumbling Window");
+        tumblingLabel.setFont(tumblingLabel.getFont().deriveFont(Font.BOLD, 12f));
+        componentGBC.insets = new Insets(10, 0, 0, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 4;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+        componentGBC.ipady = 2;
+        windowsHelpPanel.add(tumblingLabel, componentGBC);
+
+        String tumblingDescription = "<html><p width=\"700\">" +
+        "Tumbling windows are used to generate scheduled digests of user gaze. The window size parameter determines the fixed length of each window." + 
+        "For example, if a window size of 20 seconds is provided, the participant's gaze data will be bisected into increments of 20, with the first window ranging from 0-20 seconds, the 2nd window 20-40 seconds, and so forth." +
+        "</p></html>";
+        JLabel tumblingDescriptionLabel = new JLabel(tumblingDescription);
+        componentGBC.insets = new Insets(0, 0, 10, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 5;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+        windowsHelpPanel.add(tumblingDescriptionLabel, componentGBC);
+
+        JLabel tumblingImageLabel = new JLabel(new ImageIcon(tumblingWindowImage));
+        componentGBC.insets = new Insets(0, 0, 0, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 6;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+        windowsHelpPanel.add(tumblingImageLabel, componentGBC);
+
+        JLabel hoppingLabel = new JLabel("Hopping Window");
+        hoppingLabel.setFont(hoppingLabel.getFont().deriveFont(Font.BOLD, 12f));
+        componentGBC.insets = new Insets(0, 0, 0, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 7;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+        windowsHelpPanel.add(hoppingLabel, componentGBC);
+
+        String hoppingDescription = "<html><p width=\"700\">" +
+        "Hopping windows are used to analyze recent gaze snapshots. It can be argued that taking a digest view on user gaze can ignore potential relations and dependencies " +
+        "between chunks of data; as such, this approach aims to capture the most recent state of user attention. Two parameters are taken; window size and hop size. " +
+        "Window size dictates the fixed length of the window, and hop size describes the size of the next scheduled hop relative to the previous window." +
+        "For example, a window size of 120 seconds and a hop size of 60 seconds means that each window has a length 120 seconds, and each window will have a starting time " +
+        "60 seconds later relative to the previous window. The 1st window will be from time intervals 0-120, the 2nd window will be from 60-180, the 3rd 120-240, and so forth." +
+        "</p></html>";
+        JLabel hoppingDescriptionLabel = new JLabel(hoppingDescription);
+        componentGBC.insets = new Insets(0, 0, 10, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 8;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+        windowsHelpPanel.add(hoppingDescriptionLabel, componentGBC);
+
+        JLabel hoppingImageLabel = new JLabel(new ImageIcon(hoppingWindowImage));
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 9;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+        windowsHelpPanel.add(hoppingImageLabel, componentGBC);
+
+
+        JLabel eventLabel = new JLabel("Event-Based Window");
+        eventLabel.setFont(eventLabel.getFont().deriveFont(Font.BOLD, 12f));
+        componentGBC.insets = new Insets(0, 0, 0, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 10;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+        windowsHelpPanel.add(eventLabel, componentGBC);
+
+        String eventDescription = "<html><p width=\"700\">" +
+        "During interactions with the presented stimuli, users may experience defining moments that are impactful enough to affect their performance. These may translate " +
+        "to notable gaze behaviors, which are likely to be indicative of a user's performance. Events in this software are defined as an analytic that exceeds its baseline value (generated from the first two minutes of a participant's data) " +
+        "Specifically, a session window begins when the first event is found, to which it then keeps searching for the next event within a specified time period. If nothing is found, the event window closes out after the timeout period; if an " +
+        "event is found, the timeout period is renewed. Two parameters are needed: the event-defining analytic and the timeout length. As an example: if the fixation duration is chosen as the analytic and " +
+        "a timeout period of 20 seconds is chosen, whenever the user's fixation duration exceeds the baseline value, a window session will be created until 20 seconds have elapsed, or the user's fixation duration once again exceeds the baseline value, thereby prolonging the session by another 20 seconds." +
+        "</p></html>";
+        JLabel eventDescriptionLabel = new JLabel(eventDescription);
+        componentGBC.insets = new Insets(0, 0, 10, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 11;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+        windowsHelpPanel.add(eventDescriptionLabel, componentGBC);
+
+        JLabel eventImageLabel = new JLabel(new ImageIcon(eventWindowImage));
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 12;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+        windowsHelpPanel.add(eventImageLabel, componentGBC);
+
+        JLabel expandingLabel = new JLabel("Expanding Window");
+        expandingLabel.setFont(expandingLabel.getFont().deriveFont(Font.BOLD, 12f));
+        componentGBC.insets = new Insets(0, 0, 0, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 13;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+        windowsHelpPanel.add(expandingLabel, componentGBC);
+
+        
+        String expandingDescription = 
+        """
+        <html><p width=\"700\"> 
+            Expanding windows are used to analyze the cumulation of gaze data as the user's data continues to grow until the end of the task, allowing for an insight into
+            cumulative gaze behavior. The window size defines the length of each window and the amount each subsequent window grows. Each nth window will be a of length n * window size.
+            For example, if a window size of 20 seconds is given, the 1st window will be of length 20, the 2nd window will be of length 40, the 3rd 60, and so on.
+        </p></html>
+        """;
+        JLabel expandingDescriptionLabel = new JLabel(expandingDescription);
+        componentGBC.insets = new Insets(0, 0, 10, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 14;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+        windowsHelpPanel.add(expandingDescriptionLabel, componentGBC);
+
+        JLabel expandingImageLabel = new JLabel(new ImageIcon(expandingWindowImage));
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 15;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+        windowsHelpPanel.add(expandingImageLabel, componentGBC);
 
         helpPanel.add(windowsHelpPanel, panelGBC);
     }
@@ -403,8 +553,8 @@ public class UserInterface {
             windowSettings.hoppingWindowSize = Integer.parseInt(hoppingWindowSizeField.getText());
         });
 
-        hoppingOverlapSizeField.addActionListener(e -> {
-            windowSettings.hoppingOverlapSize = Integer.parseInt(hoppingOverlapSizeField.getText());
+        hoppingHopSizeField.addActionListener(e -> {
+            windowSettings.hoppingHopSize = Integer.parseInt(hoppingHopSizeField.getText());
         });
     }
 
@@ -469,8 +619,10 @@ public class UserInterface {
         helpPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         buildHelpPagePanel();
 
+        JScrollPane helpPanelScrollable = new JScrollPane(helpPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
         tabs.addTab("Analysis", analysisPanel);
-        tabs.addTab("Help", helpPanel);
+        tabs.addTab("Help", helpPanelScrollable);
     }
 
     private boolean validateFields() {
