@@ -93,7 +93,6 @@ public class ConvexHull {
         stack.push(sorted.get(0));
         stack.push(sorted.get(1));
 	        for (int i = 2; i < sorted.size(); i++) {
-                System.out.println(stack.size());
 	        	Point2D.Double head = sorted.get(i);
 	        	Point2D.Double middle = stack.pop();
 	        	Point2D.Double tail = stack.peek();

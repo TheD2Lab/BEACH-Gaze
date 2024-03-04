@@ -25,18 +25,21 @@ public class Analysis {
             File[] inputFiles = params.getInputFiles();
             for (int i = 0; i < inputFiles.length; i++) {
                 File f = inputFiles[i];
-                DataEntry rawGaze = FileHandler.buildDataEntry(f);
-                DataEntry fixations = DataFilter.filterByFixations(rawGaze);
 
                 String pName = f.getName().replace("_all_gaze.csv", "");
                 String pDirectory = params.getOutputDirectory() + "/" + pName;
 
+                DataEntry rawGaze = FileHandler.buildDataEntry(f);
+                DataEntry fixations = DataFilter.filterByFixations(rawGaze);
+                DataEntry validGaze = DataFilter.filterByValidity(rawGaze);
+                DataEntry validFixations = DataFilter.filterByValidity(fixations);
+
                 fixations.writeToCSV(pDirectory, pName+"_FixationData"); //Writes filtered data to a new CSV
 
-                ArrayList<List<String>> analytics = generateResults(fixations);
+                ArrayList<List<String>> analytics = generateResults(validFixations);
                 FileHandler.writeToCSV(analytics, pDirectory, pName + "_analytics");
 
-                generateWindows(rawGaze, pDirectory);
+                generateWindows(validGaze, pDirectory);
             }
 
             System.out.println("Analysis Complete.");
@@ -120,7 +123,8 @@ public class Analysis {
             for (DataEntry w : windows) {
                 String fileName = "window" + windowCount;
                 w.writeToCSV(subDirectory, fileName);
-                FileHandler.writeToCSV(generateResults(w), subDirectory, fileName + "_analytics");
+                //DataEntry fixations = DataFilter.filterByFixations(w);
+                //FileHandler.writeToCSV(generateResults(fixations), subDirectory, fileName + "_analytics");
                 windowCount++;
             }
         }
@@ -154,7 +158,8 @@ public class Analysis {
             for (DataEntry w : windows) {
                 String fileName = "window" + windowCount;
                 w.writeToCSV(subDirectory, fileName);
-                FileHandler.writeToCSV(generateResults(w), subDirectory, fileName + "_analytics");
+                //DataEntry fixations = DataFilter.filterByFixations(w);
+                //FileHandler.writeToCSV(generateResults(fixations), subDirectory, fileName + "_analytics");
                 windowCount++;
             }
         }
