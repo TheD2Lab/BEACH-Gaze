@@ -29,7 +29,7 @@ public class Analysis {
             File[] inputFiles = params.getInputFiles();
             for (int i = 0; i < inputFiles.length; i++) {
                 File f = inputFiles[i];
-                DataEntry rawGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(FileHandler.buildDataEntry(f)), SCREEN_WIDTH, SCREEN_HEIGHT);
+                DataEntry rawGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(FileHandler.buildDataEntry(f)), SCREEN_WIDTH, SCREEN_HEIGHT); //Filters the data by validity, then applies the screen size to it.
                 DataEntry fixations = DataFilter.filterByFixations(rawGaze);
 
                 String pName = f.getName().replace("_all_gaze.csv", "");
@@ -208,6 +208,7 @@ public class Analysis {
             ArrayList<List<String>> results = generateResults(d);
             results.get(1).add(0,key);
             if (isFirst) {
+                isFirst = false;
                 List<String> headers = results.get(0);
                 headers.add(0, "AOI");
                 metrics.get(0).addAll(headers);
