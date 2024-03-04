@@ -4,8 +4,12 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.Set;
 import java.util.List;
 import com.opencsv.CSVReader;
+
+import javafx.scene.chart.PieChart.Data;
+
 import java.io.File;
 
 public class Analysis {
@@ -25,7 +29,7 @@ public class Analysis {
             File[] inputFiles = params.getInputFiles();
             for (int i = 0; i < inputFiles.length; i++) {
                 File f = inputFiles[i];
-                DataEntry rawGaze = FileHandler.buildDataEntry(f);
+                DataEntry rawGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(FileHandler.buildDataEntry(f)), SCREEN_WIDTH, SCREEN_HEIGHT);
                 DataEntry fixations = DataFilter.filterByFixations(rawGaze);
 
                 String pName = f.getName().replace("_all_gaze.csv", "");
@@ -37,6 +41,8 @@ public class Analysis {
                 FileHandler.writeToCSV(analytics, pDirectory, pName + "_analytics");
 
                 generateWindows(rawGaze, pDirectory);
+                generateAOIs(fixations, pDirectory, pName+"_Fixation");
+                generateAOIs(rawGaze, pDirectory, pName+"_Raw");
             }
 
             System.out.println("Analysis Complete.");
@@ -48,7 +54,6 @@ public class Analysis {
     }
 
     public ArrayList<List<String>> generateResults(DataEntry data) {
-        data = DataFilter.applyScreenSize(data, SCREEN_WIDTH,SCREEN_HEIGHT);
         ArrayList<List<String>> results = new ArrayList<List<String>>();
         results.add(new ArrayList<String>()); //Headers
         results.add(new ArrayList<String>()); //Values
@@ -177,5 +182,38 @@ public class Analysis {
             }
         }
 
+    }
+
+    public void generateAOIs(DataEntry data, String outputDirectory, String fileName) {
+        System.out.println("Building AOIs");
+        LinkedHashMap<String, DataEntry> aoiMetrics = new LinkedHashMap<>();
+        for (int i = 0; i < data.rowCount(); i++) {
+            String aoi = data.getValue("AOI", i);
+            if (!aoiMetrics.containsKey(aoi)) {
+                DataEntry d = new DataEntry(data.getHeaders());
+                aoiMetrics.put(aoi, d);
+                System.out.println("New AOI found: "+aoi);
+            }
+            aoiMetrics.get(aoi).process(data.getRow(i));
+        }
+        
+        // printing the elements of LinkedHashMap
+        ArrayList<List<String>> metrics = new ArrayList<>();
+        metrics.add(new ArrayList<String>());
+
+        boolean isFirst = true;
+        for (String key : aoiMetrics.keySet()) {
+            DataEntry d = aoiMetrics.get(key);
+            System.out.println("Analyzing: "+key +", rows: "+d.rowCount());
+            ArrayList<List<String>> results = generateResults(d);
+            results.get(1).add(0,key);
+            if (isFirst) {
+                List<String> headers = results.get(0);
+                headers.add(0, "AOI");
+                metrics.get(0).addAll(headers);
+            }
+            metrics.add(results.get(1));
+        }
+        FileHandler.writeToCSV(metrics, outputDirectory, fileName + "_AOI_Metrics");
     }
 }
