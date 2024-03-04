@@ -87,7 +87,7 @@ public class Analysis {
 
     public void generateWindows(DataEntry data, String outputDirectory) {
         WindowSettings settings = params.getWindowSettings();
-        int timeIndex = data.getHeaderIndex("TIME");
+        int timeIndex = data.getHeaderIndex(TIME_INDEX);
         ArrayList<List<String>> rawGazeData = data.getAllData();
         List<String> headers = data.getHeaders();
 
