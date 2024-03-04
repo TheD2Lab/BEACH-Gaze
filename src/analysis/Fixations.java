@@ -13,15 +13,11 @@ public class Fixations {
 
         ArrayList<Double> allFixationDurations = new ArrayList<>();
         int fixationCount = data.rowCount();
-
-        System.out.println("FixationCount: "+Integer.toString(fixationCount));
         
         for (int row = 0; row < data.rowCount(); row++) {    
             Double fixationDurationSeconds = Double.valueOf(data.getValue(DURATION_INDEX, row));
             allFixationDurations.add(fixationDurationSeconds);
         }
-        System.out.println("Fixations done");
-        System.out.println(allFixationDurations.size());
         
         results.put(
             "Total Number of Fixations", //Output Header

@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-//import javafx.scene.chart.PieChart.Data;
-
 public class DataFilter {
     static public DataEntry filterByFixations(DataEntry data) { //Cleanses the data by filtering out repeated fixations
-        System.out.println("Filtering now");
         DataEntry filtered = new DataEntry(data.getHeaders());
 
         List<String> lastValidFixation = null;
@@ -27,7 +24,6 @@ public class DataFilter {
         }
         if (lastValidFixation != null) filtered.process(lastValidFixation);
         
-        System.out.println("Filtered from "+data.rowCount()+" rows to "+filtered.rowCount()+" rows.");
         return filtered;
     }
 
@@ -79,7 +75,6 @@ public class DataFilter {
     }
 
     static public DataEntry applyScreenSize(DataEntry data, int screenWidth, int screenHeight) {
-        System.out.println("Filtering now");
         DataEntry filtered = new DataEntry(data.getHeaders());
 
 

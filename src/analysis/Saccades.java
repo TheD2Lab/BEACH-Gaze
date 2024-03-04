@@ -18,9 +18,6 @@ public class Saccades {
         ArrayList<Double> allFixationDurations = new ArrayList<>();
         ArrayList<Double[]> saccadeDetails = new ArrayList<>();
         ArrayList<Object> allCoordinates = new ArrayList<>();
-        int fixationCount = data.rowCount();
-
-        System.out.println("FixationCount: "+Integer.toString(fixationCount));
         
         for (int row = 0; row < data.rowCount(); row++) {
             Double fixationDurationSeconds = Double.valueOf(data.getValue(DURATION_INDEX, row));;

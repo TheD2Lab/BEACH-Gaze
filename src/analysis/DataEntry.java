@@ -9,7 +9,7 @@ public class DataEntry {
     
     ArrayList<String> headers;
     HashMap<String,Integer> headerToIndex; //Stores the index of all headers
-    ArrayList<List<String>> fixationData;
+    ArrayList<List<String>> data;
     
     List<String> lastValidFixation;
     String[] currLine; //The current line being read
@@ -25,7 +25,7 @@ public class DataEntry {
 
         this.headers = new ArrayList<String>();
         this.headers.addAll(headers);
-        this.fixationData = new ArrayList<List<String>>();
+        this.data = new ArrayList<List<String>>();
     }
 
     public DataEntry(String[] headers) { //Allows constructing from an arrayList instead of just an array
@@ -35,14 +35,14 @@ public class DataEntry {
     public void writeToCSV(String outputDirectory, String fileName) {
         ArrayList<List<String>> outputData = new ArrayList<List<String>>();
         outputData.add(headers);
-        outputData.addAll(fixationData);
+        outputData.addAll(data);
 
         FileHandler.writeToCSV(outputData, outputDirectory, fileName);
     }
 
     //Adds a line of data to the DataEntry object
     public void process(List<String> currLine) {
-        this.fixationData.add(currLine);
+        this.data.add(currLine);
     }
 
     public void process(String[] currLine) {
@@ -56,24 +56,24 @@ public class DataEntry {
     }
 
     public List<String> getRow(int row) {
-        return this.fixationData.get(row);
+        return this.data.get(row);
     }
 
     public String getValue(String header, int row) {
-        return this.fixationData.get(row).get(headerToIndex.get(header)); //Gets the value in the selected row under the desired header
+        return this.data.get(row).get(headerToIndex.get(header)); //Gets the value in the selected row under the desired header
     }
 
     public String getValue(String header, int row, boolean shortened) {
-        return this.fixationData.get(row).get(headerToIndex.get(header)); //Gets the value in the selected row under the desired header
+        return this.data.get(row).get(headerToIndex.get(header)); //Gets the value in the selected row under the desired header
     }
 
     public int rowCount() {
-        return this.fixationData.size();
+        return this.data.size();
     }
 
     public int columnCount() {
-        if (fixationData.get(0) != null) {
-            return this.fixationData.get(0).size();
+        if (data.get(0) != null) {
+            return this.data.get(0).size();
         }
         return 0;
     }
@@ -87,6 +87,16 @@ public class DataEntry {
     }
 
     public ArrayList<List<String>> getAllData() {
-        return this.fixationData;
+        return this.data;
+    }
+
+    public DataEntry clone() {
+        DataEntry clone = new DataEntry(headers);
+         
+        for (int i = 0; i < data.size(); i++) {
+            clone.process(data.get(i));
+        }
+
+        return clone();
     }
 }

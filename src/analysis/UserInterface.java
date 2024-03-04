@@ -54,7 +54,7 @@ public class UserInterface {
 
         // Default values
         inputFiles = new File[0];
-        outputDirectory = System.getProperty("user.dir");
+        outputDirectory = new File(System.getProperty("user.dir")).getParent();
         windowSettings = new WindowSettings();
 
         buildFrame();

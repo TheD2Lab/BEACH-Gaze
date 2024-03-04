@@ -59,7 +59,6 @@ public class FileHandler {
     }
 
     static public void writeToCSV(ArrayList<List<String>> data, String outputDirectory, String fileName) {
-        System.out.println("Writing to CSV");
         try {
             // Check to see if the output directory exists. If not, create it
             File dir = new File(outputDirectory);
@@ -80,7 +79,6 @@ public class FileHandler {
             }
 
             csvWriter.close();
-            System.out.println("Written Succesfully to "+outputDirectory+"//"+fileName);
         } catch (Exception e) {
             System.err.println(e);
         }

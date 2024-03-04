@@ -19,8 +19,6 @@ public class GazeEntropy {
         
         ArrayList<Double> allFixationDurations = new ArrayList<>();
         int fixationCount = data.rowCount();
-
-        System.out.println("FixationCount: "+Integer.toString(fixationCount));
         
         for (int row = 0; row < data.rowCount(); row++) {
             String aoi = data.getValue(AOI_INDEX, row);
@@ -64,9 +62,6 @@ public class GazeEntropy {
             }
         }
 
-
-        System.out.println("Stationary Entropy");
-        System.out.println(allFixationDurations.size());
         results.put(
             "stationary entropy", //Output Header
             String.valueOf(String.valueOf(getStationaryEntropy(aoiProbability))) //Output Value

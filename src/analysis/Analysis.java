@@ -9,11 +9,10 @@ import com.opencsv.CSVReader;
 import java.io.File;
 
 public class Analysis {
-    /*
-     * Accepts parameters object and initilizes the analysis
-     */
     final static int SCREEN_WIDTH = 1920;
 	final static int SCREEN_HEIGHT = 1080;
+
+    final static String TIME_INDEX = "TIME";
 
     private Parameters params;
     
@@ -90,15 +89,12 @@ public class Analysis {
         WindowSettings settings = params.getWindowSettings();
         int timeIndex = data.getHeaderIndex("TIME");
         ArrayList<List<String>> rawGazeData = data.getAllData();
-        
         List<String> headers = data.getHeaders();
 
-        System.out.println(params.getWindowSettings());
+        // Tumbling Window
         if (settings.tumblingEnabled) {
-            List<ArrayList<List<String>>> windows = new  ArrayList<ArrayList<List<String>>>();
-            ArrayList<List<String>> window = new ArrayList<List<String>>();
-            window.add(headers);
-
+            ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
+            DataEntry window = new DataEntry(headers);
             int windowSize = settings.tumblingWindowSize;
             int end = windowSize;
 
@@ -106,43 +102,64 @@ public class Analysis {
                 List<String> row = rawGazeData.get(i);
                 Double t = Double.parseDouble(row.get(timeIndex));
                 
-                if (t > end) {
+                if (t > end) { 
                     end += windowSize;
                     windows.add(window);
-
-                    window = new ArrayList<List<String>>();
-                    window.add(headers);
-                    window.add(row);
-                } else if (i == rawGazeData.size() - 1) { 
-                    window.add(row);
+                    window = new DataEntry(headers);
+                    window.process(row);
+                } else if (i == rawGazeData.size() - 1) { // Check to see if this is the last row of data in the list, if so append it to the last window
+                    window.process(row);
                     windows.add(window);
                 } else {
-                    window.add(row);
+                    window.process(row);
                 }
             }
 
             String subDirectory = outputDirectory + "/tumbling";
             int windowCount = 1;
-            for (ArrayList<List<String>> w : windows) {
+            for (DataEntry w : windows) {
                 String fileName = "window" + windowCount;
-                FileHandler.writeToCSV(w, subDirectory, fileName); //Commented these sections out since analyze now takes a DataEntry.
-                //generateResults(w, subDirectory, fileName + "_analytics.csv");
-                //ArrayList<List<String>> windowOutput = generateResultsOld(w);//, pDirectory);
-                //FileHandler.writeToCSV(windowOutput, subDirectory, fileName + "_analytics.csv");
+                w.writeToCSV(subDirectory, fileName);
+                FileHandler.writeToCSV(generateResults(w), subDirectory, fileName + "_analytics");
                 windowCount++;
             }
-            System.out.println(windows.size());
         }
 
+        // Expanding Window
         if (settings.expandingEnabled) {
+            ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
+            DataEntry window = new DataEntry(headers);
             int windowSize = settings.expandingWindowSize;
+            int end = windowSize;
 
             for (int i = 0; i < rawGazeData.size(); i++) {
                 List<String> row = rawGazeData.get(i);
+                Double t = Double.parseDouble(row.get(timeIndex));
+
+                if (t > end) { 
+                    end += windowSize;
+                    windows.add(window);
+                    window = window.clone();
+                    window.process(row);
+                } else if (i == rawGazeData.size() - 1) { // Check to see if this is the last row of data in the list, if so append it to the last window
+                    window.process(row);
+                    windows.add(window);
+                } else {
+                    window.process(row);
+                }
+            }
+
+            String subDirectory = outputDirectory + "/expanding";
+            int windowCount = 1;
+            for (DataEntry w : windows) {
+                String fileName = "window" + windowCount;
+                w.writeToCSV(subDirectory, fileName);
+                FileHandler.writeToCSV(generateResults(w), subDirectory, fileName + "_analytics");
+                windowCount++;
             }
         }
 
-
+        // Hopping Window
         if (settings.hoppingEnabled) {
             int windowSize = settings.hoppingWindowSize;
             int hopSize = settings.hoppingHopSize;
@@ -152,6 +169,7 @@ public class Analysis {
             }
         }
 
+        // Event-based Window
         if (settings.eventEnabled) {
 
             for (int i = 0; i < rawGazeData.size(); i++) {
