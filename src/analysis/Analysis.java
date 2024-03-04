@@ -30,13 +30,13 @@ public class Analysis {
                 String pDirectory = params.getOutputDirectory() + "/" + pName;
 
                 DataEntry rawGaze = FileHandler.buildDataEntry(f);
-                DataEntry fixations = DataFilter.filterByFixations(rawGaze);
                 DataEntry validGaze = DataFilter.filterByValidity(rawGaze);
-                DataEntry validFixations = DataFilter.filterByValidity(fixations);
+                DataEntry fixations = DataFilter.filterByValidity(validGaze);
 
-                fixations.writeToCSV(pDirectory, pName+"_FixationData"); //Writes filtered data to a new CSV
+                validGaze.writeToCSV(pDirectory, pName + "_cleansed");
+                fixations.writeToCSV(pDirectory, pName + "_fixations");
 
-                ArrayList<List<String>> analytics = generateResults(validFixations);
+                ArrayList<List<String>> analytics = generateResults(validGaze);
                 FileHandler.writeToCSV(analytics, pDirectory, pName + "_analytics");
 
                 generateWindows(validGaze, pDirectory);
@@ -52,38 +52,43 @@ public class Analysis {
 
     public ArrayList<List<String>> generateResults(DataEntry data) {
         data = DataFilter.applyScreenSize(data, SCREEN_WIDTH,SCREEN_HEIGHT);
+        DataEntry fixations = DataFilter.filterByFixations(data);
+
         ArrayList<List<String>> results = new ArrayList<List<String>>();
         results.add(new ArrayList<String>()); //Headers
         results.add(new ArrayList<String>()); //Values
 
-        LinkedHashMap<String,String> fixation = Fixations.analyze(data);
+        LinkedHashMap<String,String> fixation = Fixations.analyze(fixations);
         results.get(0).addAll(fixation.keySet());
         results.get(1).addAll(fixation.values());
 
-        LinkedHashMap<String,String> saccades = Saccades.analyze(data);
+        LinkedHashMap<String,String> saccades = Saccades.analyze(fixations);
         results.get(0).addAll(saccades.keySet());
         results.get(1).addAll(saccades.values());
+
+        LinkedHashMap<String, String> saccadeVelocity = SaccadeVelocity.analyze(data);
+        results.get(0).addAll(saccadeVelocity.keySet());
+        results.get(1).addAll(saccadeVelocity.values());
     
-        LinkedHashMap<String,String> angles = Angles.analyze(data);
+        LinkedHashMap<String,String> angles = Angles.analyze(fixations);
         results.get(0).addAll(angles.keySet());
         results.get(1).addAll(angles.values());
 
-        LinkedHashMap<String,String> convexHull = ConvexHull.analyze(data);
+        LinkedHashMap<String,String> convexHull = ConvexHull.analyze(fixations);
         results.get(0).addAll(convexHull.keySet());
         results.get(1).addAll(convexHull.values());
 
-        LinkedHashMap<String,String> entropy = GazeEntropy.analyze(data);
+        LinkedHashMap<String,String> entropy = GazeEntropy.analyze(fixations);
         results.get(0).addAll(entropy.keySet());
         results.get(1).addAll(entropy.values());
 
-        LinkedHashMap<String,String> gaze = Gaze.analyze(data);
+        LinkedHashMap<String,String> gaze = Gaze.analyze(fixations);
         results.get(0).addAll(gaze.keySet());
         results.get(1).addAll(gaze.values());
 
-        LinkedHashMap<String,String> event = Event.analyze(data);
+        LinkedHashMap<String,String> event = Event.analyze(fixations);
         results.get(0).addAll(event.keySet());
         results.get(1).addAll(event.values());
-
 
         return results;
     }
