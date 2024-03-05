@@ -1,16 +1,9 @@
 package analysis;
+
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.Set;
 import java.util.List;
-import com.opencsv.CSVReader;
-
-import javafx.scene.chart.PieChart.Data;
-
-import java.io.File;
 
 public class Analysis {
     final static int SCREEN_WIDTH = 1920;
@@ -29,20 +22,22 @@ public class Analysis {
             File[] inputFiles = params.getInputFiles();
             for (int i = 0; i < inputFiles.length; i++) {
                 File f = inputFiles[i];
-                DataEntry rawGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(FileHandler.buildDataEntry(f)), SCREEN_WIDTH, SCREEN_HEIGHT); //Filters the data by validity, then applies the screen size to it.
-                DataEntry fixations = DataFilter.filterByFixations(rawGaze);
 
                 String pName = f.getName().replace("_all_gaze.csv", "");
                 String pDirectory = params.getOutputDirectory() + "/" + pName;
 
-                fixations.writeToCSV(pDirectory, pName+"_FixationData"); //Writes filtered data to a new CSV
+                DataEntry rawGaze = FileHandler.buildDataEntry(f);
+                DataEntry validGaze = DataFilter.filterByValidity(rawGaze);
+                DataEntry fixations = DataFilter.filterByFixations(validGaze);
+                
+                validGaze.writeToCSV(pDirectory, pName + "_cleansed");
+                fixations.writeToCSV(pDirectory, pName + "_fixations");
 
-                ArrayList<List<String>> analytics = generateResults(fixations);
+                ArrayList<List<String>> analytics = generateResults(validGaze);
                 FileHandler.writeToCSV(analytics, pDirectory, pName + "_analytics");
 
-                generateWindows(rawGaze, pDirectory);
-                generateAOIs(fixations, pDirectory, pName+"_Fixation");
-                generateAOIs(rawGaze, pDirectory, pName+"_Raw");
+                generateWindows(validGaze, pDirectory);
+                generateAOIs(validGaze, pDirectory, pName);
             }
 
             System.out.println("Analysis Complete.");
@@ -54,38 +49,44 @@ public class Analysis {
     }
 
     public ArrayList<List<String>> generateResults(DataEntry data) {
+        DataEntry allGaze = DataFilter.applyScreenSize(data, SCREEN_WIDTH, SCREEN_HEIGHT);
+        DataEntry fixations = DataFilter.filterByFixations(allGaze);
+
         ArrayList<List<String>> results = new ArrayList<List<String>>();
         results.add(new ArrayList<String>()); //Headers
         results.add(new ArrayList<String>()); //Values
 
-        LinkedHashMap<String,String> fixation = Fixations.analyze(data);
+        LinkedHashMap<String,String> fixation = Fixations.analyze(fixations);
         results.get(0).addAll(fixation.keySet());
         results.get(1).addAll(fixation.values());
 
-        LinkedHashMap<String,String> saccades = Saccades.analyze(data);
+        LinkedHashMap<String,String> saccades = Saccades.analyze(fixations);
         results.get(0).addAll(saccades.keySet());
         results.get(1).addAll(saccades.values());
+
+        LinkedHashMap<String, String> saccadeVelocity = SaccadeVelocity.analyze(allGaze);
+        results.get(0).addAll(saccadeVelocity.keySet());
+        results.get(1).addAll(saccadeVelocity.values());
     
-        LinkedHashMap<String,String> angles = Angles.analyze(data);
+        LinkedHashMap<String,String> angles = Angles.analyze(fixations);
         results.get(0).addAll(angles.keySet());
         results.get(1).addAll(angles.values());
 
-        LinkedHashMap<String,String> convexHull = ConvexHull.analyze(data);
+        LinkedHashMap<String,String> convexHull = ConvexHull.analyze(fixations);
         results.get(0).addAll(convexHull.keySet());
         results.get(1).addAll(convexHull.values());
 
-        LinkedHashMap<String,String> entropy = GazeEntropy.analyze(data);
+        LinkedHashMap<String,String> entropy = GazeEntropy.analyze(fixations);
         results.get(0).addAll(entropy.keySet());
         results.get(1).addAll(entropy.values());
 
-        LinkedHashMap<String,String> gaze = Gaze.analyze(data);
+        LinkedHashMap<String,String> gaze = Gaze.analyze(fixations);
         results.get(0).addAll(gaze.keySet());
         results.get(1).addAll(gaze.values());
 
-        LinkedHashMap<String,String> event = Event.analyze(data);
+        LinkedHashMap<String,String> event = Event.analyze(fixations);
         results.get(0).addAll(event.keySet());
         results.get(1).addAll(event.values());
-
 
         return results;
     }
@@ -125,7 +126,8 @@ public class Analysis {
             for (DataEntry w : windows) {
                 String fileName = "window" + windowCount;
                 w.writeToCSV(subDirectory, fileName);
-                FileHandler.writeToCSV(generateResults(w), subDirectory, fileName + "_analytics");
+                //DataEntry fixations = DataFilter.filterByFixations(w);
+                //FileHandler.writeToCSV(generateResults(fixations), subDirectory, fileName + "_analytics");
                 windowCount++;
             }
         }
@@ -159,7 +161,8 @@ public class Analysis {
             for (DataEntry w : windows) {
                 String fileName = "window" + windowCount;
                 w.writeToCSV(subDirectory, fileName);
-                FileHandler.writeToCSV(generateResults(w), subDirectory, fileName + "_analytics");
+                //DataEntry fixations = DataFilter.filterByFixations(w);
+                //FileHandler.writeToCSV(generateResults(fixations), subDirectory, fileName + "_analytics");
                 windowCount++;
             }
         }
@@ -185,14 +188,12 @@ public class Analysis {
     }
 
     public void generateAOIs(DataEntry data, String outputDirectory, String fileName) {
-        System.out.println("Building AOIs");
         LinkedHashMap<String, DataEntry> aoiMetrics = new LinkedHashMap<>();
         for (int i = 0; i < data.rowCount(); i++) {
             String aoi = data.getValue("AOI", i);
             if (!aoiMetrics.containsKey(aoi)) {
                 DataEntry d = new DataEntry(data.getHeaders());
                 aoiMetrics.put(aoi, d);
-                System.out.println("New AOI found: "+aoi);
             }
             aoiMetrics.get(aoi).process(data.getRow(i));
         }
@@ -204,7 +205,6 @@ public class Analysis {
         boolean isFirst = true;
         for (String key : aoiMetrics.keySet()) {
             DataEntry d = aoiMetrics.get(key);
-            System.out.println("Analyzing: "+key +", rows: "+d.rowCount());
             ArrayList<List<String>> results = generateResults(d);
             results.get(1).add(0,key);
             if (isFirst) {
@@ -215,6 +215,6 @@ public class Analysis {
             }
             metrics.add(results.get(1));
         }
-        FileHandler.writeToCSV(metrics, outputDirectory, fileName + "_AOI_Metrics");
+        FileHandler.writeToCSV(metrics, outputDirectory, fileName + "_AOI_Analytics");
     }
 }
