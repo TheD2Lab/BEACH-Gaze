@@ -36,8 +36,8 @@ public class Analysis {
                 ArrayList<List<String>> analytics = generateResults(validGaze);
                 FileHandler.writeToCSV(analytics, pDirectory, pName + "_analytics");
 
-                generateWindows(validGaze, pDirectory);
-                generateAOIs(validGaze, pDirectory, pName);
+                Windows.generateWindows(validGaze, pDirectory, params.getWindowSettings());
+                AreaOfInterests.generateAOIs(validGaze, pDirectory, pName);
                 Sequences.generateSequenceFiles(validGaze, pDirectory);
             }
 
@@ -49,7 +49,7 @@ public class Analysis {
         }
     }
 
-    public ArrayList<List<String>> generateResults(DataEntry data) {
+    public static ArrayList<List<String>> generateResults(DataEntry data) {
         DataEntry allGaze = DataFilter.applyScreenSize(data, SCREEN_WIDTH, SCREEN_HEIGHT);
         DataEntry fixations = DataFilter.filterByFixations(allGaze);
 
@@ -90,132 +90,5 @@ public class Analysis {
         results.get(1).addAll(event.values());
 
         return results;
-    }
-
-    public void generateWindows(DataEntry data, String outputDirectory) {
-        WindowSettings settings = params.getWindowSettings();
-        int timeIndex = data.getHeaderIndex(TIME_INDEX);
-        ArrayList<List<String>> rawGazeData = data.getAllData();
-        List<String> headers = data.getHeaders();
-
-        // Tumbling Window
-        if (settings.tumblingEnabled) {
-            ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
-            DataEntry window = new DataEntry(headers);
-            int windowSize = settings.tumblingWindowSize;
-            int end = windowSize;
-
-            for (int i = 0; i < rawGazeData.size(); i++) {
-                List<String> row = rawGazeData.get(i);
-                Double t = Double.parseDouble(row.get(timeIndex));
-                
-                if (t > end) { 
-                    end += windowSize;
-                    windows.add(window);
-                    window = new DataEntry(headers);
-                    window.process(row);
-                } else if (i == rawGazeData.size() - 1) { // Check to see if this is the last row of data in the list, if so append it to the last window
-                    window.process(row);
-                    windows.add(window);
-                } else {
-                    window.process(row);
-                }
-            }
-
-            String subDirectory = outputDirectory + "/tumbling";
-            int windowCount = 1;
-            for (DataEntry w : windows) {
-                String fileName = "window" + windowCount;
-                w.writeToCSV(subDirectory, fileName);
-                //DataEntry fixations = DataFilter.filterByFixations(w);
-                //FileHandler.writeToCSV(generateResults(fixations), subDirectory, fileName + "_analytics");
-                windowCount++;
-            }
-        }
-
-        // Expanding Window
-        if (settings.expandingEnabled) {
-            ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
-            DataEntry window = new DataEntry(headers);
-            int windowSize = settings.expandingWindowSize;
-            int end = windowSize;
-
-            for (int i = 0; i < rawGazeData.size(); i++) {
-                List<String> row = rawGazeData.get(i);
-                Double t = Double.parseDouble(row.get(timeIndex));
-
-                if (t > end) { 
-                    end += windowSize;
-                    windows.add(window);
-                    window = window.clone();
-                    window.process(row);
-                } else if (i == rawGazeData.size() - 1) { // Check to see if this is the last row of data in the list, if so append it to the last window
-                    window.process(row);
-                    windows.add(window);
-                } else {
-                    window.process(row);
-                }
-            }
-
-            String subDirectory = outputDirectory + "/expanding";
-            int windowCount = 1;
-            for (DataEntry w : windows) {
-                String fileName = "window" + windowCount;
-                w.writeToCSV(subDirectory, fileName);
-                //DataEntry fixations = DataFilter.filterByFixations(w);
-                //FileHandler.writeToCSV(generateResults(fixations), subDirectory, fileName + "_analytics");
-                windowCount++;
-            }
-        }
-
-        // Hopping Window
-        if (settings.hoppingEnabled) {
-            int windowSize = settings.hoppingWindowSize;
-            int hopSize = settings.hoppingHopSize;
-
-            for (int i = 0; i < rawGazeData.size(); i++) {
-                List<String> row = rawGazeData.get(i);
-            }
-        }
-
-        // Event-based Window
-        if (settings.eventEnabled) {
-
-            for (int i = 0; i < rawGazeData.size(); i++) {
-                List<String> row = rawGazeData.get(i);
-            }
-        }
-
-    }
-
-    public void generateAOIs(DataEntry data, String outputDirectory, String fileName) {
-        LinkedHashMap<String, DataEntry> aoiMetrics = new LinkedHashMap<>();
-        for (int i = 0; i < data.rowCount(); i++) {
-            String aoi = data.getValue("AOI", i);
-            if (!aoiMetrics.containsKey(aoi)) {
-                DataEntry d = new DataEntry(data.getHeaders());
-                aoiMetrics.put(aoi, d);
-            }
-            aoiMetrics.get(aoi).process(data.getRow(i));
-        }
-        
-        // printing the elements of LinkedHashMap
-        ArrayList<List<String>> metrics = new ArrayList<>();
-        metrics.add(new ArrayList<String>());
-
-        boolean isFirst = true;
-        for (String key : aoiMetrics.keySet()) {
-            DataEntry d = aoiMetrics.get(key);
-            ArrayList<List<String>> results = generateResults(d);
-            results.get(1).add(0,key);
-            if (isFirst) {
-                isFirst = false;
-                List<String> headers = results.get(0);
-                headers.add(0, "AOI");
-                metrics.get(0).addAll(headers);
-            }
-            metrics.add(results.get(1));
-        }
-        FileHandler.writeToCSV(metrics, outputDirectory, fileName + "_AOI_Analytics");
     }
 }
