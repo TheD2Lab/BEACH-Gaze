@@ -188,14 +188,12 @@ public class Analysis {
     }
 
     public void generateAOIs(DataEntry data, String outputDirectory, String fileName) {
-        System.out.println("Building AOIs");
         LinkedHashMap<String, DataEntry> aoiMetrics = new LinkedHashMap<>();
         for (int i = 0; i < data.rowCount(); i++) {
             String aoi = data.getValue("AOI", i);
             if (!aoiMetrics.containsKey(aoi)) {
                 DataEntry d = new DataEntry(data.getHeaders());
                 aoiMetrics.put(aoi, d);
-                System.out.println("New AOI found: "+aoi);
             }
             aoiMetrics.get(aoi).process(data.getRow(i));
         }
@@ -207,7 +205,6 @@ public class Analysis {
         boolean isFirst = true;
         for (String key : aoiMetrics.keySet()) {
             DataEntry d = aoiMetrics.get(key);
-            System.out.println("Analyzing: "+key +", rows: "+d.rowCount());
             ArrayList<List<String>> results = generateResults(d);
             results.get(1).add(0,key);
             if (isFirst) {
@@ -218,6 +215,6 @@ public class Analysis {
             }
             metrics.add(results.get(1));
         }
-        FileHandler.writeToCSV(metrics, outputDirectory, fileName + "_AOI_Metrics");
+        FileHandler.writeToCSV(metrics, outputDirectory, fileName + "_AOI_Analytics");
     }
 }
