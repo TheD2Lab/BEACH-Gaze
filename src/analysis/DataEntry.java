@@ -12,7 +12,7 @@ public class DataEntry {
     ArrayList<List<String>> data;
     
     List<String> lastValidFixation;
-    String[] currLine; //The current line being read
+    //String[] currLine; //The current line being read
     int currFixation;
 
     public DataEntry(List<String> headers) { //The constructor takes the first line of the CSV file so it can store the headers
@@ -51,9 +51,9 @@ public class DataEntry {
     }
 
 
-    public String getCurrentValue(String header) { //Returns the value on the current line with the given header.
-        return this.currLine[headerToIndex.get(header)];
-    }
+    //public String getCurrentValue(String header) { //Returns the value on the current line with the given header.
+    //    return this.currLine[headerToIndex.get(header)];
+    //}
 
     public List<String> getRow(int row) {
         return this.data.get(row);
