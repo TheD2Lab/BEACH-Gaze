@@ -38,6 +38,7 @@ public class Analysis {
 
                 generateWindows(validGaze, pDirectory);
                 generateAOIs(validGaze, pDirectory, pName);
+                Sequences.generateSequenceFiles(validGaze, pDirectory);
             }
 
             System.out.println("Analysis Complete.");

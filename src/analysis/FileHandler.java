@@ -84,31 +84,25 @@ public class FileHandler {
         }
     }
 
-    /*
-    public static void main(String[] args) {
-        ArrayList<ArrayList<String>> data = new ArrayList<ArrayList<String>>();
-        data.add(new ArrayList<String>());
-        data.add(new ArrayList<String>());
-        data.add(new ArrayList<String>());
+    static public void writeToText(String s, String outputDirectory, String fileName) {
+        try {
+            // Check to see if the output directory exists. If not, create it
+            File dir = new File(outputDirectory);
+            if (!dir.exists()) dir.mkdirs();
 
-        data.get(0).add("Header 1");
-        data.get(0).add("Header 2");
-        data.get(0).add("Header 3");
-        data.get(0).add("Header 4");
+            // Append a .csv to the file name if it's missing
+            String fString = fileName.contains(".txt") ? fileName : fileName + ".txt";
+            
+            File file = new File(outputDirectory + "/" + fString);
+            FileWriter fileWriter = new FileWriter(file);
 
-        data.get(1).add("Value 1a");
-        data.get(1).add("Value 2a");
-        data.get(1).add("Value 3a");
-        data.get(1).add("Value 4a");
-
-        data.get(2).add("Value 1b");
-        data.get(2).add("Value 2b");
-        data.get(2).add("Value 3b");
-        data.get(2).add("Value 4b");
-        System.out.println("Writing!");
-        writeAnalytics(data, "C:/Users/Productivity/Documents/Testing/Doc1.csv");
+            fileWriter.write(s);
+            fileWriter.close();
+        } catch (Exception e) {
+            System.err.println(e);
+        }
     }
-    */
+
     static public boolean saveParametersAsJSON(HashMap<String,String> data,String saveLocation) {
         try {
             System.out.println("Writing file!");
