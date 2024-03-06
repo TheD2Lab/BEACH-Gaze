@@ -20,8 +20,11 @@ public class Analysis {
     public boolean run() {
         try {
             File[] inputFiles = params.getInputFiles();
+
+
             for (int i = 0; i < inputFiles.length; i++) {
                 File f = inputFiles[i];
+                List<String> sequences = new ArrayList<String>();
 
                 String pName = f.getName().replace("_all_gaze.csv", "");
                 String pDirectory = params.getOutputDirectory() + "/" + pName;
@@ -38,7 +41,12 @@ public class Analysis {
 
                 Windows.generateWindows(validGaze, pDirectory, params.getWindowSettings());
                 AreaOfInterests.generateAOIs(validGaze, pDirectory, pName);
-                Sequences.generateSequenceFiles(validGaze, pDirectory);
+                Sequences.generateSequenceFiles(validGaze, pDirectory, sequences);
+            }
+
+            // Batch analysis
+            if (inputFiles.length > 1) {
+
             }
 
             System.out.println("Analysis Complete.");

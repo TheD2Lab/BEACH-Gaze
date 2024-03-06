@@ -114,16 +114,12 @@ public class Windows {
 
     public static void outputWindowFiles(ArrayList<DataEntry> windows, String outputDirectory) {
         int windowCount = 1;
-        int rowCount = 0;
         for (DataEntry w : windows) {
-            rowCount += w.rowCount();
             String fileName = "window" + windowCount;
             w.writeToCSV(outputDirectory, fileName);
             ArrayList<List<String>> results = Analysis.generateResults(w);
             FileHandler.writeToCSV(results, outputDirectory, fileName + "_analytics");
             windowCount++;
         }
-
-        System.out.println(rowCount);
     }
 }

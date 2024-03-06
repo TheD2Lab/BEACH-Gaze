@@ -599,7 +599,6 @@ public class UserInterface {
             f = new File(resultsDirectory);
             while (f.exists()) {
                 fileCount++;
-                System.out.println(resultsDirectory);
                 resultsDirectory = resultsDirectory.replace(String.valueOf(fileCount - 1), String.valueOf(fileCount));
                 f = new File(resultsDirectory);
             }
