@@ -14,6 +14,7 @@ public class WindowSettings {
     
     public boolean eventEnabled;
     public String event;
+    public int eventTimeout;
 
     public WindowSettings() {
         this.tumblingEnabled = false;
