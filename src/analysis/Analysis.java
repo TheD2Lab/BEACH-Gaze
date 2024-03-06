@@ -9,6 +9,11 @@ public class Analysis {
     final static int SCREEN_WIDTH = 1920;
 	final static int SCREEN_HEIGHT = 1080;
 
+    final static int MIN_PATTERN_LENGTH = 3;
+    final static int MAX_PATTERN_LENGTH = 7;
+    final static int MIN_PATTERN_FREQUENCY = 2;
+    final static int MIN_SEQUENCE_SIZE = 3;
+
     final static String TIME_INDEX = "TIME";
 
     private Parameters params;
@@ -20,6 +25,8 @@ public class Analysis {
     public boolean run() {
         try {
             File[] inputFiles = params.getInputFiles();
+            List<String> sequences = new ArrayList<String>();
+
             for (int i = 0; i < inputFiles.length; i++) {
                 File f = inputFiles[i];
 
@@ -37,8 +44,25 @@ public class Analysis {
                 FileHandler.writeToCSV(analytics, pDirectory, pName + "_analytics");
 
                 Windows.generateWindows(validGaze, pDirectory, params.getWindowSettings());
-                AreaOfInterests.generateAOIs(validGaze, pDirectory, pName);
-                Sequences.generateSequenceFiles(validGaze, pDirectory);
+                //AreaOfInterests.generateAOIs(validGaze, pDirectory, pName);
+                Sequences.generateSequenceFiles(validGaze, pDirectory, sequences);
+            }
+
+            // Batch analysis
+            if (inputFiles.length > 1) {
+                List<String> expandedSequences = sequences;
+                List<String> collapsedSequences = new ArrayList<String>();
+
+                for (String s : expandedSequences) {
+                    collapsedSequences.add(Sequences.getCollapsedSequence(s));
+                }
+
+                ArrayList<List<String>> expandedPatterns = Patterns.discoverPatterns(expandedSequences, MIN_PATTERN_LENGTH, MAX_PATTERN_LENGTH, MIN_PATTERN_FREQUENCY, MIN_SEQUENCE_SIZE);
+                ArrayList<List<String>> collapsedPatterns = Patterns.discoverPatterns(expandedSequences, MIN_PATTERN_LENGTH, MAX_PATTERN_LENGTH, MIN_PATTERN_FREQUENCY, MIN_SEQUENCE_SIZE);
+                
+                String directory = params.getOutputDirectory();
+                FileHandler.writeToCSV(expandedPatterns, directory, "expandedPatterns");
+                FileHandler.writeToCSV(collapsedPatterns, directory, "collapsedPatterns");
             }
 
             System.out.println("Analysis Complete.");

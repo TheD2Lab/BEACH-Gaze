@@ -78,7 +78,6 @@ public class ConvexHull {
      *                                  are less than 3 unique points present.
      */
     public static List<Point2D.Double> getConvexHull(List<Point2D.Double> points) throws IllegalArgumentException {
-
         List<Point2D.Double> sorted = new ArrayList<>(getSortedPointSet(points));
 
         if(sorted.size() < 3) {

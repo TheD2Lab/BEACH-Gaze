@@ -92,11 +92,9 @@ public class DataEntry {
 
     public DataEntry clone() {
         DataEntry clone = new DataEntry(headers);
-         
         for (int i = 0; i < data.size(); i++) {
             clone.process(data.get(i));
         }
-
-        return clone();
+        return clone;
     }
 }

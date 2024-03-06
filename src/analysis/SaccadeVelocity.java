@@ -5,6 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public class SaccadeVelocity {
+    final static int SCREEN_WIDTH = 1920;
+	final static int SCREEN_HEIGHT = 1080;
 
     final static String TIME_INDEX = "TIME";
     final static String FIXATIONX_INDEX = "FPOGX";
@@ -21,8 +23,8 @@ public class SaccadeVelocity {
         for (int i = 0; i < data.rowCount(); i++) {
             boolean saccade = Integer.parseInt(data.getValue(FIXATION_VALIDITY_INDEX, i)) == 0 ? true : false;
             if (saccade) {
-                Double x = Double.parseDouble(data.getValue(FIXATIONX_INDEX, i));
-                Double y = Double.parseDouble(data.getValue(FIXATIONY_INDEX, i));
+                Double x = Double.parseDouble(data.getValue(FIXATIONX_INDEX, i)) * SCREEN_WIDTH;
+                Double y = Double.parseDouble(data.getValue(FIXATIONY_INDEX, i))* SCREEN_HEIGHT;
                 Double t = Double.parseDouble(data.getValue(TIME_INDEX, i));
 
                 positionProfile.add(new Double[] {x, y, t});
