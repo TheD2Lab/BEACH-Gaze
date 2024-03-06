@@ -9,7 +9,7 @@ public class Windows {
 
     public static void generateWindows(DataEntry data, String outputDirectory, WindowSettings settings) {
         int timeIndex = data.getHeaderIndex(TIME_INDEX);
-        ArrayList<List<String>> rawGazeData = data.getAllData();
+        ArrayList<List<String>> dataList = data.getAllData();
         List<String> headers = data.getHeaders();
 
         // Tumbling Window
@@ -19,8 +19,8 @@ public class Windows {
             int windowSize = settings.tumblingWindowSize;
             int end = windowSize;
 
-            for (int i = 0; i < rawGazeData.size(); i++) {
-                List<String> row = rawGazeData.get(i);
+            for (int i = 0; i < dataList.size(); i++) {
+                List<String> row = dataList.get(i);
                 Double t = Double.parseDouble(row.get(timeIndex));
                 
                 if (t > end) { 
@@ -28,7 +28,7 @@ public class Windows {
                     windows.add(window);
                     window = new DataEntry(headers);
                     window.process(row);
-                } else if (i == rawGazeData.size() - 1) { // Check to see if this is the last row of data in the list, if so append it to the last window
+                } else if (i == dataList.size() - 1) { // Check to see if this is the last row of data in the list, if so append it to the last window
                     window.process(row);
                     windows.add(window);
                 } else {
@@ -46,8 +46,8 @@ public class Windows {
             int windowSize = settings.expandingWindowSize;
             int end = windowSize;
 
-            for (int i = 0; i < rawGazeData.size(); i++) {
-                List<String> row = rawGazeData.get(i);
+            for (int i = 0; i < dataList.size(); i++) {
+                List<String> row = dataList.get(i);
                 Double t = Double.parseDouble(row.get(timeIndex));
 
                 if (t > end) { 
@@ -55,7 +55,7 @@ public class Windows {
                     windows.add(window);
                     window = window.clone();
                     window.process(row);
-                } else if (i == rawGazeData.size() - 1) { // Check to see if this is the last row of data in the list, if so append it to the last window
+                } else if (i == dataList.size() - 1) { // Check to see if this is the last row of data in the list, if so append it to the last window
                     window.process(row);
                     windows.add(window);
                 } else {
@@ -68,31 +68,62 @@ public class Windows {
 
         // Hopping Window
         if (settings.hoppingEnabled) {
+            ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
+            DataEntry window = new DataEntry(headers);
             int windowSize = settings.hoppingWindowSize;
             int hopSize = settings.hoppingHopSize;
+            int start = 0;
+            int end = windowSize;
 
-            for (int i = 0; i < rawGazeData.size(); i++) {
-                List<String> row = rawGazeData.get(i);
+            for (int i = 0; i < dataList.size(); i++) {
+                List<String> row1 = dataList.get(i);
+                Double t1 = Double.parseDouble(row1.get(timeIndex));
+                
+                if (t1 >= start) {
+                    for (int j = i; j < dataList.size(); j++) {
+                        List<String> row2 = dataList.get(j);
+                        Double t2 = Double.parseDouble(row2.get(timeIndex));
+
+                        if (t2 >= end || j == dataList.size()) {
+                            window.process(row2);
+                            windows.add(window);
+
+                            start += hopSize;
+                            end = start + windowSize;
+                            window = new DataEntry(headers);
+
+                            break;
+                        } else {
+                            window.process(row2);
+                        }
+                    }
+                }
             }
+
+            outputWindowFiles(windows, outputDirectory + "/hopping");
         }
 
         // Event-based Window
         if (settings.eventEnabled) {
 
-            for (int i = 0; i < rawGazeData.size(); i++) {
-                List<String> row = rawGazeData.get(i);
+            for (int i = 0; i < dataList.size(); i++) {
+                List<String> row = dataList.get(i);
             }
         }
     }
 
     public static void outputWindowFiles(ArrayList<DataEntry> windows, String outputDirectory) {
         int windowCount = 1;
+        int rowCount = 0;
         for (DataEntry w : windows) {
+            rowCount += w.rowCount();
             String fileName = "window" + windowCount;
             w.writeToCSV(outputDirectory, fileName);
             ArrayList<List<String>> results = Analysis.generateResults(w);
             FileHandler.writeToCSV(results, outputDirectory, fileName + "_analytics");
             windowCount++;
         }
+
+        System.out.println(rowCount);
     }
 }
