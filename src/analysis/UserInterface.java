@@ -281,6 +281,7 @@ public class UserInterface {
                                               "Min. fixation duration (s)",
                                               "Max. fixation duration (s)",
                                               "total number of saccades",
+                                              "sum of all saccade length"
                                              };
         eventComboBox = new JComboBox<String>(eventOptions);
         componentGBC.insets = new Insets(0, 0, 0, 0);
