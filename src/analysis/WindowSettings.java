@@ -13,6 +13,7 @@ public class WindowSettings {
     public int hoppingHopSize;
     
     public boolean eventEnabled;
+    public String event;
 
     public WindowSettings() {
         this.tumblingEnabled = false;

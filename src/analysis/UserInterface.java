@@ -274,7 +274,13 @@ public class UserInterface {
         windowsPanel.add(eventLabel, componentGBC);
 
         String[] eventOptions = new String[] {"Total Number of Fixations",
-                                              "Sum of all fixation duration (s)"
+                                              "Sum of all fixation duration (s)",
+                                              "Mean fixation duration (s)",
+                                              "Median fixation duration (s)",
+                                              "St.Dev. of fixation durations (s)",
+                                              "Min. fixation duration (s)",
+                                              "Max. fixation duration (s)",
+                                              "total number of saccades",
                                              };
         eventComboBox = new JComboBox<String>(eventOptions);
         componentGBC.insets = new Insets(0, 0, 0, 0);

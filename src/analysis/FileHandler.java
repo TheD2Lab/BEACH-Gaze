@@ -1,16 +1,10 @@
 package analysis;
 
 import java.io.File;
-import java.io.FileNotFoundException; 
 import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.io.FileReader;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.HashMap; 
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 //import javax.swing.text.html.HTMLDocument.Iterator;
 import java.util.Iterator;
 import java.util.ArrayList;
