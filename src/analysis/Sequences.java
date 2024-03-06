@@ -17,7 +17,7 @@ public class Sequences {
             String aoi = data.getValue(AOI_INDEX, i);
 
             if (!map.containsKey(aoi)) {
-                map.put(aoi, map.size() + ascii - 1);
+                map.put(aoi, map.size() + ascii);
 
                 String description = aoi == "" ? "No AOI" : aoi;
                 aoiDescriptions += (char)(map.size() + ascii - 1) + ", " +  description  + "\n";

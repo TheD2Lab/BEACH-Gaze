@@ -6,11 +6,15 @@ import java.util.List;
 public class Windows {
 
     final static String TIME_INDEX = "TIME";
+    final static int BASELINE_LENGTH = 120;
 
     public static void generateWindows(DataEntry data, String outputDirectory, WindowSettings settings) {
         int timeIndex = data.getHeaderIndex(TIME_INDEX);
         ArrayList<List<String>> dataList = data.getAllData();
         List<String> headers = data.getHeaders();
+
+        // Create a baseline file
+        generateBaselineFile(data, outputDirectory + "/baseline");
 
         // Tumbling Window
         if (settings.tumblingEnabled) {
@@ -121,5 +125,22 @@ public class Windows {
             FileHandler.writeToCSV(results, outputDirectory, fileName + "_analytics");
             windowCount++;
         }
+    }
+
+    public static void generateBaselineFile(DataEntry data, String outputDirectory) {
+        DataEntry baseline = new DataEntry(data.getHeaders());
+
+        for (int i = 0; i < data.rowCount(); i++) {
+            Double t = Double.parseDouble(data.getValue(TIME_INDEX, i));
+
+            if (t >= BASELINE_LENGTH) {
+                break;
+            } else {
+                baseline.process(data.getRow(i));
+            }
+        }
+
+        baseline.writeToCSV(outputDirectory, "baseline");
+        FileHandler.writeToCSV(Analysis.generateResults(baseline), outputDirectory, "baseline_analytics");
     }
 }

@@ -1,26 +1,17 @@
 package analysis;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-
-import com.opencsv.CSVWriter;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 public class Patterns {
-    private static void discoverPatterns(ArrayList<String> sequences, int minPatternLength, int maxPatternLength, int minFrequency, int minSequenceSize, String outputFile, ArrayList<String> descriptions, ArrayList<String> codes) throws IOException {
-        
-        String[] aoiDescriptions = descriptions.toArray(new String[descriptions.size()]);
-        String[] aoiCodes = codes.toArray(new String[codes.size()]);
-        outputCSVWriter.writeNext(aoiDescriptions);
-        outputCSVWriter.writeNext(aoiCodes);
-        outputCSVWriter.writeNext(new String[0]);
-        
-        String[] headers = new String[] {"Pattern String", "Frequency", "Sequence Support", "Average Pattern Frequency", "Proportional Pattern Frequency"};
-        outputCSVWriter.writeNext(headers);
-            
+    public static ArrayList<List<String>> discoverPatterns(List<String> sequences, int minPatternLength, int maxPatternLength, int minFrequency, int minSequenceSize) {
+        ArrayList<List<String>> results = new ArrayList<List<String>>();
+        results.add(Arrays.asList(new String[] {"Pattern String", "Frequency", "Sequence Support", "Average Pattern Frequency", "Proportional Pattern Frequency"})); 
         int totalPatternCount = 0;
+
         for (int patternLength = minPatternLength; patternLength <= maxPatternLength; patternLength++) {
             HashMap<String, Integer> frequencyMap = new HashMap<String, Integer>();
             HashMap<String, ArrayList<String>> sequenceMap = new HashMap<String, ArrayList<String>>();
@@ -38,23 +29,30 @@ public class Patterns {
                 }
             }
             
-            for (String s: frequencyMap.keySet()) {
-                int frequency = frequencyMap.get(s);
-                double sequenceSupport = (double) sequenceMap.get(s).size()/sequences.size();
-                double averagePatternFrequency = (double) frequencyMap.get(s)/sequences.size();
-                double proportionalPatternFrequency = (double) frequencyMap.get(s)/totalPatternCount;
+            for (String pattern: frequencyMap.keySet()) {
+                int frequency = frequencyMap.get(pattern);
+                double sequenceSupport = (double) sequenceMap.get(pattern).size()/sequences.size();
+                double averagePatternFrequency = (double) frequencyMap.get(pattern)/sequences.size();
+                double proportionalPatternFrequency = (double) frequencyMap.get(pattern)/totalPatternCount;
                 
-                if (frequency >= minFrequency && sequenceMap.get(s).size() >= minSequenceSize) {
-                    ArrayList<String> data = new ArrayList<String>();
-                    data.add(s);
-                    data.add(String.valueOf(frequency));
-                    data.add(String.valueOf(sequenceSupport));
-                    data.add(String.valueOf(averagePatternFrequency));
-                    data.add(String.valueOf(proportionalPatternFrequency));
-                    outputCSVWriter.writeNext(data.toArray(new String[data.size()]));
+                // System.out.print(pattern + " ");
+                // System.out.print(frequency + " ");
+                // System.out.print(sequenceSupport + " ");
+                // System.out.print(averagePatternFrequency + " ");
+                // System.out.println(proportionalPatternFrequency + " ");
+                
+                if (frequency >= minFrequency && sequenceMap.get(pattern).size() >= minSequenceSize) {
+                    List<String> patternData = new ArrayList<String>();
+                    patternData.add(pattern);
+                    patternData.add(String.valueOf(frequency));
+                    patternData.add(String.valueOf(sequenceSupport));
+                    patternData.add(String.valueOf(averagePatternFrequency));
+                    patternData.add(String.valueOf(proportionalPatternFrequency));
+                    results.add(patternData);
                 }
             }
         }
         
-}
+        return results;
+    }
 }

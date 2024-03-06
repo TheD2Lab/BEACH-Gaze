@@ -19,6 +19,7 @@ public class UserInterface {
     private BufferedImage hoppingWindowImage;
     private BufferedImage eventWindowImage;
     private BufferedImage expandingWindowImage;
+    private JComboBox eventComboBox;
     private JFrame frame;
     private JTabbedPane tabs;
     private JPanel analysisPanel;
@@ -265,6 +266,23 @@ public class UserInterface {
         componentGBC.gridwidth = 3;
         windowsPanel.add(eventCheckBox, componentGBC);
 
+        JLabel eventLabel = new JLabel("Event");
+        componentGBC.insets = new Insets(0, 20, 0, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 9;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(eventLabel, componentGBC);
+
+        String[] eventOptions = new String[] {"Total Number of Fixations",
+                                              "Sum of all fixation duration (s)"
+                                             };
+        eventComboBox = new JComboBox<String>(eventOptions);
+        componentGBC.insets = new Insets(0, 0, 0, 0);
+        componentGBC.gridx = 1;
+        componentGBC.gridy = 9;
+        componentGBC.gridwidth = 3;
+        windowsPanel.add(eventComboBox, componentGBC);
+
         analysisPanel.add(windowsPanel, panelGBC);
     }
 
@@ -302,7 +320,7 @@ public class UserInterface {
         
         runAnalysisButton = new JButton("Run Analysis");
         runAnalysisButton.setFont(runAnalysisButton.getFont().deriveFont(20f));
-        componentGBC.insets = new Insets(190, 0, 20, 0);
+        componentGBC.insets = new Insets(150, 0, 20, 0);
         componentGBC.gridx = 0;
         componentGBC.gridy = 1;
         componentGBC.gridwidth = 1;

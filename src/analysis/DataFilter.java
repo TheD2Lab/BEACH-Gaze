@@ -84,7 +84,7 @@ public class DataFilter {
             int fixationYIndex = data.getHeaderIndex("FPOGY");
 
             currentRow.set(fixationXIndex,String.valueOf(Double.valueOf(currentRow.get(fixationXIndex)) * screenWidth));
-            currentRow.set(fixationYIndex,String.valueOf(Double.valueOf(currentRow.get(fixationYIndex)) * screenWidth));
+            currentRow.set(fixationYIndex,String.valueOf(Double.valueOf(currentRow.get(fixationYIndex)) * screenHeight));
 
             filtered.process(currentRow);
         }

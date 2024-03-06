@@ -24,6 +24,7 @@ public class AreaOfInterests {
         boolean isFirst = true;
         for (String key : aoiMetrics.keySet()) {
             DataEntry d = aoiMetrics.get(key);
+            System.out.println(key + " " + d.rowCount());
             ArrayList<List<String>> results = Analysis.generateResults(d);
             results.get(1).add(0,key);
             if (isFirst) {
