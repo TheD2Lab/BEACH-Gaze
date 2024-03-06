@@ -44,7 +44,7 @@ public class Analysis {
                 FileHandler.writeToCSV(analytics, pDirectory, pName + "_analytics");
 
                 Windows.generateWindows(validGaze, pDirectory, params.getWindowSettings());
-                //AreaOfInterests.generateAOIs(validGaze, pDirectory, pName);
+                AreaOfInterests.generateAOIs(validGaze, pDirectory, pName);
                 Sequences.generateSequenceFiles(validGaze, pDirectory, sequences);
             }
 
