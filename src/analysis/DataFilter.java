@@ -77,16 +77,21 @@ public class DataFilter {
     static public DataEntry applyScreenSize(DataEntry data, int screenWidth, int screenHeight) {
         DataEntry filtered = new DataEntry(data.getHeaders());
 
-
         for (int row = 0; row < data.rowCount(); row++) {
             List<String> currentRow = data.getRow(row);
+            List<String> newRow = new ArrayList<String>();
+            newRow.addAll(currentRow);
+
             int fixationXIndex = data.getHeaderIndex("FPOGX");
             int fixationYIndex = data.getHeaderIndex("FPOGY");
 
-            currentRow.set(fixationXIndex,String.valueOf(Double.valueOf(currentRow.get(fixationXIndex)) * screenWidth));
-            currentRow.set(fixationYIndex,String.valueOf(Double.valueOf(currentRow.get(fixationYIndex)) * screenHeight));
+            newRow.set(fixationXIndex,String.valueOf(Double.valueOf(newRow.get(fixationXIndex)) * screenWidth));
+            newRow.set(fixationYIndex,String.valueOf(Double.valueOf(newRow.get(fixationYIndex)) * screenHeight));
 
-            filtered.process(currentRow);
+            if (Double.valueOf(newRow.get(fixationXIndex)) > 1920)
+                System.out.println("Coordinate exceeded");
+
+            filtered.process(newRow);
         }
 
         return filtered;
