@@ -82,6 +82,7 @@ public class Analysis {
         }
     }
 
+    // Generate should only take in all gaze data otherwise calculates will be incorrect
     public static ArrayList<List<String>> generateResults(DataEntry data) {
         DataEntry allGaze = DataFilter.applyScreenSize(data, SCREEN_WIDTH, SCREEN_HEIGHT);
         DataEntry fixations = DataFilter.filterByFixations(allGaze);

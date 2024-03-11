@@ -22,15 +22,15 @@ public class AreaOfInterests {
     private static final String[] perAoiHeaders = {"AOI Pair", "Transition Count", "Proportion including self-transitions", "Proportion excluding self-transitions"};
     
     
-    public static void generateAOIs(DataEntry allFixations, String outputDirectory, String fileName) {
+    public static void generateAOIs(DataEntry allGazeData, String outputDirectory, String fileName) {
         LinkedHashMap<String, DataEntry> aoiMetrics = new LinkedHashMap<>();
-        for (int i = 0; i < allFixations.rowCount(); i++) {
-            String aoi = allFixations.getValue(AOI_INDEX, i);
+        for (int i = 0; i < allGazeData.rowCount(); i++) {
+            String aoi = allGazeData.getValue(AOI_INDEX, i);
             if (!aoiMetrics.containsKey(aoi)) {
-                DataEntry d = new DataEntry(allFixations.getHeaders());
+                DataEntry d = new DataEntry(allGazeData.getHeaders());
                 aoiMetrics.put(aoi, d);
             }
-            aoiMetrics.get(aoi).process(allFixations.getRow(i));
+            aoiMetrics.get(aoi).process(allGazeData.getRow(i));
         }
 
         if (aoiMetrics.size() <= 1) {
@@ -39,17 +39,18 @@ public class AreaOfInterests {
         }
         
         // printing the elements of LinkedHashMap
-        DataEntry validFixations = new DataEntry(allFixations.getHeaders());
         ArrayList<List<String>> metrics = new ArrayList<>();
         metrics.add(new ArrayList<String>());
 
-        double totalDuration = getDuration(allFixations);
+        double totalDuration = getDuration(allGazeData);
         LinkedHashMap<String, DataEntry> validAOIs = new LinkedHashMap<>();
         boolean isFirst = true;
         Set<String> aoiKeySet = aoiMetrics.keySet();
         int row = 1;
         for (String aoiKey : aoiKeySet) {
-            DataEntry aoi = DataFilter.filterByFixations(aoiMetrics.get(aoiKey));
+            DataEntry aoi = aoiMetrics.get(aoiKey);
+            DataEntry aoiFixations = DataFilter.filterByFixations(aoi);
+
             if (aoi.rowCount() >= 2) {
                 ArrayList<List<String>> results = Analysis.generateResults(aoi);
                 if (isFirst) { //
@@ -60,20 +61,21 @@ public class AreaOfInterests {
                 }
                 results.get(1).add(aoiKey);
                 metrics.add(results.get(1));
-                metrics.get(row).addAll(getProportions(allFixations, aoi, totalDuration));
-                validAOIs.put(aoiKey, aoi);
+                metrics.get(row).addAll(getProportions(allGazeData, aoiFixations, totalDuration));
+                validAOIs.put(aoiKey, aoiFixations);
                 row++;
             }
         }
-        ArrayList<ArrayList<String>> pairResults = generatePairResults(allFixations, aoiMetrics);
+        ArrayList<ArrayList<String>> pairResults = generatePairResults(allGazeData, aoiMetrics);
         for (int i = 0; i < pairResults.size(); i++) { //Write values to all rows
             for (String s : perAoiHeaders) {
                 metrics.get(0).add(s + "_" + i); //Adds headersfor each pair.
             }
             metrics.get(i + 1).addAll(pairResults.get(i));
         }
-        FileHandler.writeToCSV(metrics, outputDirectory, fileName + "_AOI_Analytics");
+        FileHandler.writeToCSV(metrics, outputDirectory, fileName + "_AOI_DGMs");
     }
+
     public static ArrayList<String> generateAreaOfInterestResults(DataEntry all,DataEntry aoi, double totalDuration) {
         ArrayList<String> results = new ArrayList<>();
         List<String> proportions = getProportions(all, aoi, totalDuration);

@@ -61,11 +61,11 @@ public class DescriptiveStats {
 
 
 	public static double getMeanOfIntegers(ArrayList<Integer> allIntegers){
-		return getSumOfIntegers(allIntegers)/allIntegers.size();
+		return (allIntegers.size() == 0) ? 0 : getSumOfIntegers(allIntegers)/allIntegers.size();
 	}
 
 	public static double getMeanOfDoubles(ArrayList<Double> allDoubles){
-		return getSumOfDoubles(allDoubles)/allDoubles.size();
+		return (allDoubles.size() == 0) ? 0 : getSumOfDoubles(allDoubles)/allDoubles.size();
 	}
 
 	public static double getMean(Double[] allDoubles){
