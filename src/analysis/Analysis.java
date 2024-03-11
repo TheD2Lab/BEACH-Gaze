@@ -26,6 +26,7 @@ public class Analysis {
         try {
             File[] inputFiles = params.getInputFiles();
             List<String> sequences = new ArrayList<String>();
+            ArrayList<List<String>> allParticipantDGMs = new ArrayList<List<String>>();
 
             for (int i = 0; i < inputFiles.length; i++) {
                 File f = inputFiles[i];
@@ -40,8 +41,15 @@ public class Analysis {
                 validGaze.writeToCSV(pDirectory, pName + "_cleansed");
                 fixations.writeToCSV(pDirectory, pName + "_fixations");
 
-                ArrayList<List<String>> analytics = generateResults(validGaze);
-                FileHandler.writeToCSV(analytics, pDirectory, pName + "_analytics");
+                ArrayList<List<String>> descriptiveGazeMeasures = generateResults(validGaze);
+                FileHandler.writeToCSV(descriptiveGazeMeasures, pDirectory, pName + "_DGMs");
+
+                // If empty, add header row
+                if (allParticipantDGMs.size() == 0)
+                    allParticipantDGMs.add(descriptiveGazeMeasures.get(0));
+
+                // Populate allParticipantDGMs with the DGMs generated for a participant
+                allParticipantDGMs.add(descriptiveGazeMeasures.get(0));
 
                 Windows.generateWindows(validGaze, pDirectory, params.getWindowSettings());
                 AreaOfInterests.generateAOIs(validGaze, pDirectory, pName);
@@ -63,6 +71,7 @@ public class Analysis {
                 String directory = params.getOutputDirectory();
                 FileHandler.writeToCSV(expandedPatterns, directory, "expandedPatterns");
                 FileHandler.writeToCSV(collapsedPatterns, directory, "collapsedPatterns");
+                FileHandler.writeToCSV(allParticipantDGMs, directory, "combinedDGMs");
             }
 
             System.out.println("Analysis Complete.");
