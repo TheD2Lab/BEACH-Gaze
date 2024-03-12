@@ -51,7 +51,7 @@ public class Analysis {
                     allParticipantDGMs.add(descriptiveGazeMeasures.get(0));
 
                 // Populate allParticipantDGMs with the DGMs generated for a participant
-                allParticipantDGMs.add(descriptiveGazeMeasures.get(0));
+                allParticipantDGMs.add(descriptiveGazeMeasures.get(1));
 
                 Windows.generateWindows(validGaze, pDirectory, params.getWindowSettings());
                 AreaOfInterests.generateAOIs(validGaze, pDirectory, pName);
