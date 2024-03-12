@@ -20,8 +20,9 @@ public class Windows {
         if (settings.tumblingEnabled) {
             ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
             DataEntry window = new DataEntry(headers);
-            int windowSize = settings.tumblingWindowSize;
-            int end = windowSize;
+            double windowSize = settings.tumblingWindowSize;
+            double start = Double.valueOf(data.getValue(TIME_INDEX, 0));
+            double end = windowSize;
 
             for (int i = 0; i < dataList.size(); i++) {
                 List<String> row = dataList.get(i);
@@ -47,12 +48,13 @@ public class Windows {
         if (settings.expandingEnabled) {
             ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
             DataEntry window = new DataEntry(headers);
-            int windowSize = settings.expandingWindowSize;
-            int end = windowSize;
+            double windowSize = settings.expandingWindowSize;
+            double start = Double.valueOf(data.getValue(TIME_INDEX, 0));
+            double end = start + windowSize;
 
             for (int i = 0; i < dataList.size(); i++) {
                 List<String> row = dataList.get(i);
-                Double t = Double.parseDouble(row.get(timeIndex));
+                double t = Double.parseDouble(row.get(timeIndex));
 
                 if (t > end) { 
                     end += windowSize;
@@ -76,17 +78,17 @@ public class Windows {
             DataEntry window = new DataEntry(headers);
             int windowSize = settings.hoppingWindowSize;
             int hopSize = settings.hoppingHopSize;
-            int start = 0;
-            int end = windowSize;
+            double start = Double.valueOf(data.getValue(TIME_INDEX, 0));
+            double end = start + windowSize;
 
             for (int i = 0; i < dataList.size(); i++) {
                 List<String> row1 = dataList.get(i);
-                Double t1 = Double.parseDouble(row1.get(timeIndex));
+                double t1 = Double.parseDouble(row1.get(timeIndex));
                 
                 if (t1 >= start) {
                     for (int j = i; j < dataList.size(); j++) {
                         List<String> row2 = dataList.get(j);
-                        Double t2 = Double.parseDouble(row2.get(timeIndex));
+                        double t2 = Double.parseDouble(row2.get(timeIndex));
 
                         if (t2 >= end || j == dataList.size()) {
                             window.process(row2);
@@ -109,6 +111,8 @@ public class Windows {
 
         // Event-based Window
         if (settings.eventEnabled) {
+            String event = settings.event;
+            double timeout = settings.eventTimeout;
 
             for (int i = 0; i < dataList.size(); i++) {
                 List<String> row = dataList.get(i);

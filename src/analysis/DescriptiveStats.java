@@ -32,6 +32,7 @@ import java.util.Collections;
 public class DescriptiveStats {
 
 	public static double getSumOfIntegers(ArrayList<Integer> allIntegers){
+		if (allIntegers.size() == 0) return 0;
 
 		double total = 0.0;
 		for (Integer i:allIntegers){
@@ -41,6 +42,8 @@ public class DescriptiveStats {
 	}
 
 	public static double getSumOfDoubles(ArrayList<Double> allDoubles){
+		if (allDoubles.size() == 0) return 0;
+
 		double total = 0.0;
 		for (Double value : allDoubles) {
 			total += value;
@@ -50,6 +53,7 @@ public class DescriptiveStats {
 	}
 
 	public static double getSum(Double[] allDoubles){
+		if (allDoubles.length == 0) return 0;
 
 		double total = 0.0;
 		for (Double i:allDoubles){
@@ -69,11 +73,15 @@ public class DescriptiveStats {
 	}
 
 	public static double getMean(Double[] allDoubles){
+		if (allDoubles.length == 0) return 0;
+
 		double average = getSum(allDoubles)/allDoubles.length;
 		return average;
 	}
 
-	public static double getMedianOfIntegers(ArrayList<Integer> allIntegers){
+	public static double getMedianOfIntegers(ArrayList<Integer> allIntegers) {
+		if (allIntegers.size() == 0) return 0;
+
 		Collections.sort(allIntegers);
 		int middle = allIntegers.size()/2;
 		if(allIntegers.size()%2 == 1){
@@ -83,7 +91,9 @@ public class DescriptiveStats {
 		}
 	}
 
-	public static double getMedianOfDoubles(ArrayList<Double> allDoubles){
+	public static double getMedianOfDoubles(ArrayList<Double> allDoubles) {
+		if (allDoubles.size() == 0) return 0;
+
 		Collections.sort(allDoubles);
 		int middle = allDoubles.size()/2;
 		if(allDoubles.size()%2 == 1){
@@ -94,6 +104,8 @@ public class DescriptiveStats {
 	}
 
 	public static double getMedian(Double[] allDoubles){
+		if (allDoubles.length == 0) return 0;
+
 		Arrays.sort(allDoubles);
 		if (allDoubles.length%2 == 1){
 			return allDoubles[allDoubles.length/2];
@@ -104,17 +116,21 @@ public class DescriptiveStats {
 	}
 
 	public static double getStDevOfIntegers(ArrayList<Integer> allIntegers){
+		if (allIntegers.size() == 0) return 0;
+
 		double sum = 0;
-		  double mean = getMeanOfIntegers(allIntegers);
+		double mean = getMeanOfIntegers(allIntegers);
 
-		  for (double i : allIntegers){
-				sum += Math.pow((i - mean), 2);
-		  }
+		for (double i : allIntegers){
+			sum += Math.pow((i - mean), 2);
+		}
 
-		  return Math.sqrt( sum / (allIntegers.size()-1) );
+		return Math.sqrt( sum / (allIntegers.size()-1) );
 	}
 
 	public static double getStDevOfDoubles(ArrayList<Double> allDoubles){
+		if (allDoubles.size() == 0) return 0;
+
 		double sum = 0;
 		double mean = getMeanOfDoubles(allDoubles);
 		for(double i:allDoubles){
@@ -124,38 +140,40 @@ public class DescriptiveStats {
 	}
 
 	public static double getStDev(Double[] allDoubles){
+		if (allDoubles.length == 0) return 0;
+
 		double sum = 0;
-		  double mean = getMean(allDoubles);
+		double mean = getMean(allDoubles);
 
-		  for (double i : allDoubles){
-				sum += Math.pow((i - mean), 2);
-		  }
+		for (double i : allDoubles){
+			sum += Math.pow((i - mean), 2);
+		}
 
-		  return Math.sqrt( sum / (allDoubles.length-1) );
+		return Math.sqrt( sum / (allDoubles.length-1) );
 	}
 
 	public static double getMinOfIntegers(ArrayList<Integer> allIntegers){
-		return Collections.min(allIntegers);
+		return (allIntegers.size() == 0) ? 0 : Collections.min(allIntegers);
 	}
 
 	public static double getMinOfDoubles(ArrayList<Double> allDoubles){
-		return Collections.min(allDoubles);
+		return (allDoubles.size() == 0) ? 0 : Collections.min(allDoubles);
 	}
 
 	public static double getMin(Double[] allDoubles){
-		return Collections.min(Arrays.asList(allDoubles));
+		return (allDoubles.length == 0) ? 0 :Collections.min(Arrays.asList(allDoubles));
 	}
 
 	public static double getMaxOfIntegers(ArrayList<Integer> allIntegers){
-		return Collections.max(allIntegers);
+		return (allIntegers.size() == 0) ? 0 : Collections.max(allIntegers);
 	}
 
 	public static double getMaxOfDoubles(ArrayList<Double> allDoubles){
-		return Collections.max(allDoubles);
+		return (allDoubles.size() == 0) ? 0 : Collections.max(allDoubles);
 	}
 
 	public static double getMax(Double[] allDoubles){
-		return Collections.max(Arrays.asList(allDoubles));
+		return (allDoubles.length == 0) ? 0 : Collections.max(Arrays.asList(allDoubles));
 	}
 
 }

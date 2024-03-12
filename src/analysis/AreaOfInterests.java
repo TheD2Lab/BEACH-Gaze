@@ -51,6 +51,9 @@ public class AreaOfInterests {
             DataEntry aoi = aoiMetrics.get(aoiKey);
             DataEntry aoiFixations = DataFilter.filterByFixations(aoi);
 
+            String aoiFileName = aoiKey.equals("") ? "No AOI" : aoiKey;
+            aoi.writeToCSV(outputDirectory + "/AOIs", aoiFileName + "_all_gaze");
+
             if (aoi.rowCount() >= 2) {
                 ArrayList<List<String>> results = Analysis.generateResults(aoi);
                 if (isFirst) { //
