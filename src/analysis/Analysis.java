@@ -32,8 +32,9 @@ public class Analysis {
                 File f = inputFiles[i];
 
                 String pName = f.getName().replace("_all_gaze", "").replace(".csv", "");
-
                 String pDirectory = params.getOutputDirectory() + "/" + pName;
+
+                System.out.println("Analyzing " + pName);
 
                 DataEntry rawGaze = FileHandler.buildDataEntry(f);
                 DataEntry validGaze = DataFilter.filterByValidity(rawGaze);
