@@ -141,6 +141,6 @@ public class Windows {
         }
 
         baseline.writeToCSV(outputDirectory, "baseline");
-        FileHandler.writeToCSV(Analysis.generateResults(baseline), outputDirectory, "baseline_analytics");
+        FileHandler.writeToCSV(Analysis.generateResults(baseline), outputDirectory, "baseline_DGMs");
     }
 }
