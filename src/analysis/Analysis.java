@@ -31,7 +31,8 @@ public class Analysis {
             for (int i = 0; i < inputFiles.length; i++) {
                 File f = inputFiles[i];
 
-                String pName = f.getName().replace("_all_gaze.csv", "");
+                String pName = f.getName().replace("_all_gaze", "").replace(".csv", "");
+
                 String pDirectory = params.getOutputDirectory() + "/" + pName;
 
                 DataEntry rawGaze = FileHandler.buildDataEntry(f);
