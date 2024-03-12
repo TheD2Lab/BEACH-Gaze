@@ -37,7 +37,7 @@ public class Gaze {
 
         results.put(
             "Average Blink Rate per Minute", //Output Header
-            String.valueOf(bothAverage / minutes)
+            String.valueOf(totalBlinks / minutes)
             );   
 
         //Absolute Degrees
