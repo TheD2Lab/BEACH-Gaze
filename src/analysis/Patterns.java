@@ -10,9 +10,9 @@ public class Patterns {
     public static ArrayList<List<String>> discoverPatterns(List<String> sequences, int minPatternLength, int maxPatternLength, int minFrequency, int minSequenceSize) {
         ArrayList<List<String>> results = new ArrayList<List<String>>();
         results.add(Arrays.asList(new String[] {"Pattern String", "Frequency", "Sequence Support", "Average Pattern Frequency", "Proportional Pattern Frequency"})); 
-        int totalPatternCount = 0;
 
         for (int patternLength = minPatternLength; patternLength <= maxPatternLength; patternLength++) {
+            int totalPatternCount = 0;
             HashMap<String, Integer> frequencyMap = new HashMap<String, Integer>();
             HashMap<String, ArrayList<String>> sequenceMap = new HashMap<String, ArrayList<String>>();
             
