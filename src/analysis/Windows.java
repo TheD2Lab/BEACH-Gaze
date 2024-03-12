@@ -129,11 +129,13 @@ public class Windows {
 
     public static void generateBaselineFile(DataEntry data, String outputDirectory) {
         DataEntry baseline = new DataEntry(data.getHeaders());
+        double startTime = Double.valueOf(data.getValue(TIME_INDEX, 0));
+        double endTime = startTime + BASELINE_LENGTH;
 
         for (int i = 0; i < data.rowCount(); i++) {
             Double t = Double.parseDouble(data.getValue(TIME_INDEX, i));
 
-            if (t >= BASELINE_LENGTH) {
+            if (t >= endTime) {
                 break;
             } else {
                 baseline.process(data.getRow(i));
