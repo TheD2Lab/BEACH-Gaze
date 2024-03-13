@@ -36,14 +36,20 @@ public class Analysis {
 
                 System.out.println("Analyzing " + pName);
 
-                DataEntry rawGaze = FileHandler.buildDataEntry(f);
-                DataEntry validGaze = DataFilter.filterByValidity(rawGaze);
-                DataEntry fixations = DataFilter.filterByFixations(validGaze);
+                DataEntry allGaze = FileHandler.buildDataEntry(f);
+                DataEntry validGaze = DataFilter.filterByValidity(allGaze);
                 
-                validGaze.writeToCSV(pDirectory, pName + "_cleansed");
+                DataEntry fixations = DataFilter.filterByFixations(allGaze);
+                DataEntry validFixations = DataFilter.filterByValidity(fixations);
+
+                
+                // Write validated DataEntrys to file
+                validGaze.writeToCSV(pDirectory, pName + "_valid_all_gaze");
+                validFixations.writeToCSV(pDirectory, pName + "_valid_fixations");
+                
                 fixations.writeToCSV(pDirectory, pName + "_fixations");
 
-                ArrayList<List<String>> descriptiveGazeMeasures = generateResults(validGaze);
+                ArrayList<List<String>> descriptiveGazeMeasures = generateResults(allGaze);
                 FileHandler.writeToCSV(descriptiveGazeMeasures, pDirectory, pName + "_DGMs");
 
                 // If empty, add header row
@@ -53,9 +59,9 @@ public class Analysis {
                 // Populate allParticipantDGMs with the DGMs generated for a participant
                 allParticipantDGMs.add(descriptiveGazeMeasures.get(1));
 
-                Windows.generateWindows(validGaze, pDirectory, params.getWindowSettings());
-                AreaOfInterests.generateAOIs(validGaze, pDirectory, pName);
-                Sequences.generateSequenceFiles(validGaze, pDirectory, sequences);
+                Windows.generateWindows(allGaze, pDirectory, params.getWindowSettings());
+                AreaOfInterests.generateAOIs(allGaze, pDirectory, pName);
+                Sequences.generateSequenceFiles(validFixations, pDirectory, sequences);
             }
 
             // Batch analysis
@@ -84,44 +90,47 @@ public class Analysis {
         }
     }
 
-    // Generate should only take in all gaze data otherwise calculates will be incorrect
+    // This function should only take in raw gaze data as a parameter, otherwise derived DataEntrys will be produced with incorrect data
     public static ArrayList<List<String>> generateResults(DataEntry data) {
-        DataEntry allGaze = DataFilter.applyScreenSize(data, SCREEN_WIDTH, SCREEN_HEIGHT);
+        DataEntry allGaze = data;
         DataEntry fixations = DataFilter.filterByFixations(allGaze);
+
+        DataEntry validGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(allGaze), SCREEN_WIDTH, SCREEN_HEIGHT);
+        DataEntry validFixations = DataFilter.applyScreenSize(DataFilter.filterByValidity(fixations), SCREEN_WIDTH, SCREEN_HEIGHT);
 
         ArrayList<List<String>> results = new ArrayList<List<String>>();
         results.add(new ArrayList<String>()); //Headers
         results.add(new ArrayList<String>()); //Values
 
-        LinkedHashMap<String,String> fixation = Fixations.analyze(fixations);
+        LinkedHashMap<String,String> fixation = Fixations.analyze(validFixations);
         results.get(0).addAll(fixation.keySet());
         results.get(1).addAll(fixation.values());
 
-        LinkedHashMap<String,String> saccades = Saccades.analyze(fixations);
+        LinkedHashMap<String,String> saccades = Saccades.analyze(validFixations);
         results.get(0).addAll(saccades.keySet());
         results.get(1).addAll(saccades.values());
 
-        LinkedHashMap<String, String> saccadeVelocity = SaccadeVelocity.analyze(allGaze);
+        LinkedHashMap<String, String> saccadeVelocity = SaccadeVelocity.analyze(validGaze);
         results.get(0).addAll(saccadeVelocity.keySet());
         results.get(1).addAll(saccadeVelocity.values());
     
-        LinkedHashMap<String,String> angles = Angles.analyze(fixations);
+        LinkedHashMap<String,String> angles = Angles.analyze(validFixations);
         results.get(0).addAll(angles.keySet());
         results.get(1).addAll(angles.values());
 
-        LinkedHashMap<String,String> convexHull = ConvexHull.analyze(fixations);
+        LinkedHashMap<String,String> convexHull = ConvexHull.analyze(validFixations);
         results.get(0).addAll(convexHull.keySet());
         results.get(1).addAll(convexHull.values());
 
-        LinkedHashMap<String,String> entropy = GazeEntropy.analyze(fixations);
+        LinkedHashMap<String,String> entropy = GazeEntropy.analyze(validFixations);
         results.get(0).addAll(entropy.keySet());
         results.get(1).addAll(entropy.values());
 
-        LinkedHashMap<String,String> gaze = Gaze.analyze(fixations);
+        LinkedHashMap<String,String> gaze = Gaze.analyze(validFixations);
         results.get(0).addAll(gaze.keySet());
         results.get(1).addAll(gaze.values());
 
-        LinkedHashMap<String,String> event = Event.analyze(fixations);
+        LinkedHashMap<String,String> event = Event.analyze(validFixations);
         results.get(0).addAll(event.keySet());
         results.get(1).addAll(event.values());
 
