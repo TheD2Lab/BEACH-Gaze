@@ -78,6 +78,8 @@ public class ConvexHull {
      *                                  are less than 3 unique points present.
      */
     public static List<Point2D.Double> getConvexHull(List<Point2D.Double> points) throws IllegalArgumentException {
+        if (points.size() == 0) return new ArrayList<>();
+        
         List<Point2D.Double> sorted = new ArrayList<>(getSortedPointSet(points));
 
         // if(sorted.size() < 3) {
@@ -164,7 +166,6 @@ public class ConvexHull {
      * @see GrahamScan#getLowestPoint(java.util.List)
      */
     protected static Set<Point2D.Double> getSortedPointSet(List<Point2D.Double> points) {
-
         final Point2D.Double lowest = getLowestPoint(points);
 
         TreeSet<Point.Double> set = new TreeSet<>(new Comparator<Point2D.Double>() {
