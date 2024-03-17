@@ -80,13 +80,14 @@ public class AreaOfInterests {
     }
 
     public static ArrayList<String> generateAreaOfInterestResults(DataEntry all,DataEntry aoi, double totalDuration) {
+        DataEntry valid = DataFilter.filterByValidity(all);
         ArrayList<String> results = new ArrayList<>();
-        List<String> proportions = getProportions(all, aoi, totalDuration);
+        List<String> proportions = getProportions(valid, aoi, totalDuration);
         results.addAll(proportions);
         return results;
     }
 
-    public static ArrayList<String> getProportions(DataEntry all,DataEntry aoi, double totalDuration) {
+    public static ArrayList<String> getProportions(DataEntry all, DataEntry aoi, double totalDuration) {
         ArrayList<String> results = new ArrayList<>();
         double fixationProportion = (double)aoi.rowCount()/all.rowCount(); //Number of fixations in AOI divided by total fixations
         results.add(String.valueOf(fixationProportion));
@@ -105,7 +106,9 @@ public class AreaOfInterests {
         return durationSum;
     }
 
-    public static ArrayList<ArrayList<String>> generatePairResults(DataEntry fixations, LinkedHashMap<String,DataEntry> validAOIs) {
+    public static ArrayList<ArrayList<String>> generatePairResults(DataEntry allGazeData, LinkedHashMap<String,DataEntry> validAOIs) {
+        DataEntry fixations = DataFilter.filterByValidity(DataFilter.filterByFixations(allGazeData));
+
         LinkedHashMap<String, ArrayList<Integer>> totalTransitions = new LinkedHashMap<>(); // ArrayList<Integer>(Transtions, Inclusive, Exlusive);
         LinkedHashMap<String,LinkedHashMap<String, Integer>> transitionCounts = new LinkedHashMap<>();
         for (int i = 0; i < fixations.rowCount()-1; i++) {

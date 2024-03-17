@@ -125,6 +125,8 @@ public class Saccades {
     
 
     public static Double[] getAllSaccadeLength(ArrayList<Object> allCoordinates) {
+        if (allCoordinates.size() == 0) return new Double[0];
+
 		ArrayList<Double> allSaccadeLengths = new ArrayList<Double>();
 		int objectSize = allCoordinates.size();
 		Double[] allLengths = new Double[(objectSize-1)];
@@ -144,6 +146,8 @@ public class Saccades {
 	}
 
     public static ArrayList<Double> getAllSaccadeDurations(ArrayList<Double[]> saccadeDetails){
+        if (saccadeDetails.size() == 0) return new ArrayList<Double>();
+
 		ArrayList<Double> allSaccadeDurations = new ArrayList<>();
 		for (int i=0; (i+1)<saccadeDetails.size(); i++){
 			Double[] currentDetail = (Double[]) saccadeDetails.get(i);
@@ -169,6 +173,8 @@ public class Saccades {
 	}
 
 	public static double getFixationToSaccadeRatio(ArrayList<Double> allFixationDurations, ArrayList<Double> allSaccadeDurations){
+        if (allSaccadeDurations.size() == 0) return 0;
+
 		double fixationDuration = DescriptiveStats.getSumOfDoubles(allFixationDurations);
 		double saccadeDuration = DescriptiveStats.getSumOfDoubles(allSaccadeDurations);
 		return fixationDuration/saccadeDuration;
