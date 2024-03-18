@@ -91,8 +91,8 @@ public class Analysis {
     }
 
     // This function should only take in raw gaze data as a parameter, otherwise derived DataEntrys will be produced with incorrect data
-    public static ArrayList<List<String>> generateResults(DataEntry data) {
-        DataEntry allGaze = data;
+    public static ArrayList<List<String>> generateResults(DataEntry rawData) {
+        DataEntry allGaze = rawData;
         DataEntry fixations = DataFilter.filterByFixations(allGaze);
 
         DataEntry validGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(allGaze), SCREEN_WIDTH, SCREEN_HEIGHT);

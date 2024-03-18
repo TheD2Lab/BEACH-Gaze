@@ -20,9 +20,9 @@ import com.opencsv.CSVWriter;
  */
 
 public class FileHandler {
-   static public DataEntry buildDataEntry(File gazeFile) {
+   static public DataEntry buildDataEntry(File allGaze) {
         try {
-            FileReader fileReader = new FileReader(gazeFile);
+            FileReader fileReader = new FileReader(allGaze);
             CSVReader csvReader = new CSVReader(fileReader);
             DataEntry data = new DataEntry(csvReader.readNext());
             String[] line;
@@ -97,10 +97,10 @@ public class FileHandler {
         }
     }
 
-    static public boolean saveParametersAsJSON(HashMap<String,String> data,String saveLocation) {
+    static public boolean saveParametersAsJSON(HashMap<String,String> data, String outputDirectory) {
         try {
             System.out.println("Writing file!");
-            FileWriter pw = new FileWriter(saveLocation);
+            FileWriter pw = new FileWriter(outputDirectory);
             pw.write(buildJSON(data).toString()); //Save data as JSON to file
             pw.flush();
             pw.close();
