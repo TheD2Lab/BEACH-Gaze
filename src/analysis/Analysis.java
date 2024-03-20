@@ -53,11 +53,16 @@ public class Analysis {
                 FileHandler.writeToCSV(descriptiveGazeMeasures, pDirectory, pName + "_DGMs");
 
                 // If empty, add header row
-                if (allParticipantDGMs.size() == 0)
-                    allParticipantDGMs.add(descriptiveGazeMeasures.get(0));
+                if (allParticipantDGMs.size() == 0) {
+                    List<String> headers = descriptiveGazeMeasures.get(0);
+                    headers.add(0, "Participant ID"); // Add a participant ID colum to headers
+                    allParticipantDGMs.add(headers);
+                }
 
                 // Populate allParticipantDGMs with the DGMs generated for a participant
-                allParticipantDGMs.add(descriptiveGazeMeasures.get(1));
+                List<String> dgms = descriptiveGazeMeasures.get(1);
+                dgms.add(0, pName);
+                allParticipantDGMs.add(dgms);
 
                 Windows.generateWindows(allGaze, pDirectory, params.getWindowSettings());
                 AreaOfInterests.generateAOIs(allGaze, pDirectory, pName);
