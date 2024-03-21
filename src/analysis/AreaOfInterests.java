@@ -91,7 +91,6 @@ public class AreaOfInterests {
             }
         }
         ArrayList<ArrayList<String>> pairResults = generatePairResults(allFixations, aoiMetrics);
-        System.out.println(pairResults.size());
         for (int i = 0; i < pairResults.size(); i++) { //Write values to all rows
             for (String s : perAoiHeaders) {
                 metrics.get(0).add(s + "_" + i); //Adds headersfor each pair.
@@ -133,8 +132,10 @@ public class AreaOfInterests {
         LinkedHashMap<String,LinkedHashMap<String, Integer>> transitionCounts = new LinkedHashMap<>();
         for (int i = 0; i < fixations.rowCount()-1; i++) {
             String curAoi = fixations.getValue(AOI_INDEX, i);
+            curAoi = curAoi.equals("") ? "No AOI" : curAoi;
             int curId = Integer.valueOf(fixations.getValue(FIXATIONID_INDEX, i));
             String nextAoi = fixations.getValue(AOI_INDEX, i+1);
+            nextAoi = nextAoi.equals("") ? "No AOI" : nextAoi;
             int nextId = Integer.valueOf(fixations.getValue(FIXATIONID_INDEX, i+1));
             boolean isValidAOI = (validAOIs.containsKey(curAoi) && validAOIs.containsKey(nextAoi));
             if (isValidAOI && nextId == curId + 1) { //Check if fixations are subsequent
