@@ -36,7 +36,6 @@ public class AreaOfInterests {
         
         LinkedHashMap<String, DataEntry> aoiFixationMetrics = new LinkedHashMap<>();
         DataEntry allFixations = DataFilter.filterByValidity(DataFilter.filterByFixations(allGazeData));
-        System.out.println(allFixations.rowCount());
         for (int i = 0; i < allFixations.rowCount(); i++) {
             String aoi = allFixations.getValue(AOI_INDEX, i);
             String aoiKey = aoi.equals("") ? "No AOI" : aoi;
@@ -70,11 +69,9 @@ public class AreaOfInterests {
         Set<String> aoiKeySet = aoiMetrics.keySet();
         
         int row = 1;
-        int aoiRowCount = 0;
         for (String aoiKey : aoiKeySet) {
             DataEntry aoi = aoiMetrics.get(aoiKey);
             DataEntry aoiFixations = aoiFixationMetrics.get(aoiKey);
-            aoiRowCount += aoiFixations.rowCount();
 
             aoi.writeToCSV(outputDirectory + "/AOIs", aoiKey + "_all_gaze");
 
@@ -93,7 +90,8 @@ public class AreaOfInterests {
                 row++;
             }
         }
-        ArrayList<ArrayList<String>> pairResults = generatePairResults(allGazeData, aoiMetrics);
+        ArrayList<ArrayList<String>> pairResults = generatePairResults(allFixations, aoiMetrics);
+        System.out.println(pairResults.size());
         for (int i = 0; i < pairResults.size(); i++) { //Write values to all rows
             for (String s : perAoiHeaders) {
                 metrics.get(0).add(s + "_" + i); //Adds headersfor each pair.
@@ -101,7 +99,6 @@ public class AreaOfInterests {
             metrics.get(i + 1).addAll(pairResults.get(i));
         }
         FileHandler.writeToCSV(metrics, outputDirectory, fileName + "_AOI_DGMs");
-        System.out.println(aoiRowCount);
     }
 
     // public static ArrayList<String> generateAreaOfInterestResults(DataEntry all,DataEntry aoi, double totalDuration) {
@@ -131,9 +128,7 @@ public class AreaOfInterests {
         return durationSum;
     }
 
-    public static ArrayList<ArrayList<String>> generatePairResults(DataEntry allGazeData, LinkedHashMap<String,DataEntry> validAOIs) {
-        DataEntry fixations = DataFilter.filterByValidity(DataFilter.filterByFixations(allGazeData));
-
+    public static ArrayList<ArrayList<String>> generatePairResults(DataEntry fixations, LinkedHashMap<String,DataEntry> validAOIs) {
         LinkedHashMap<String, ArrayList<Integer>> totalTransitions = new LinkedHashMap<>(); // ArrayList<Integer>(Transtions, Inclusive, Exlusive);
         LinkedHashMap<String,LinkedHashMap<String, Integer>> transitionCounts = new LinkedHashMap<>();
         for (int i = 0; i < fixations.rowCount()-1; i++) {
