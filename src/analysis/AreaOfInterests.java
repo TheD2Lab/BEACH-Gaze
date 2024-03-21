@@ -10,7 +10,6 @@ import java.util.Set;
 
 import java_cup.runtime.lr_parser;
 // import javafx.scene.chart.PieChart.Data;
-import weka.core.pmml.jaxbbindings.RESULTFEATURE;
 
 public class AreaOfInterests {
     final static String FIXATIONID_INDEX = "FPOGID";
@@ -34,6 +33,28 @@ public class AreaOfInterests {
             aoiMetrics.get(aoiKey).process(allGazeData.getRow(i));
         }
 
+        
+        LinkedHashMap<String, DataEntry> aoiFixationMetrics = new LinkedHashMap<>();
+        DataEntry allFixations = DataFilter.filterByValidity(DataFilter.filterByFixations(allGazeData));
+        System.out.println(allFixations.rowCount());
+        for (int i = 0; i < allFixations.rowCount(); i++) {
+            String aoi = allFixations.getValue(AOI_INDEX, i);
+            String aoiKey = aoi.equals("") ? "No AOI" : aoi;
+            if (!aoiFixationMetrics.containsKey(aoiKey)) {
+                DataEntry d = new DataEntry(allFixations.getHeaders());
+                aoiFixationMetrics.put(aoiKey, d);
+            }
+            aoiFixationMetrics.get(aoiKey).process(allFixations.getRow(i));
+        }
+
+        // For any AOIs not in aoiFixationMetrics, add an empty DataEntry
+        for (String key : aoiMetrics.keySet()) {
+            if (!aoiFixationMetrics.containsKey(key)) {
+                DataEntry d = new DataEntry(allGazeData.getHeaders());
+                aoiFixationMetrics.put(key, d);
+            }
+        }
+
         if (aoiMetrics.size() <= 1) {
             System.out.println("File has no AOIs, no file will be output.");
             return;
@@ -42,15 +63,18 @@ public class AreaOfInterests {
         // printing the elements of LinkedHashMap
         ArrayList<List<String>> metrics = new ArrayList<>();
         metrics.add(new ArrayList<String>());
-
-        double totalDuration = getDuration(allGazeData);
+        
+        double totalDuration = getDuration(allFixations);
         LinkedHashMap<String, DataEntry> validAOIs = new LinkedHashMap<>();
         boolean isFirst = true;
         Set<String> aoiKeySet = aoiMetrics.keySet();
+        
         int row = 1;
+        int aoiRowCount = 0;
         for (String aoiKey : aoiKeySet) {
             DataEntry aoi = aoiMetrics.get(aoiKey);
-            DataEntry aoiFixations = DataFilter.filterByFixations(aoi);
+            DataEntry aoiFixations = aoiFixationMetrics.get(aoiKey);
+            aoiRowCount += aoiFixations.rowCount();
 
             aoi.writeToCSV(outputDirectory + "/AOIs", aoiKey + "_all_gaze");
 
@@ -64,7 +88,7 @@ public class AreaOfInterests {
                 }
                 results.get(1).add(aoiKey);
                 metrics.add(results.get(1));
-                metrics.get(row).addAll(getProportions(allGazeData, aoiFixations, totalDuration));
+                metrics.get(row).addAll(getProportions(allFixations, aoiFixations, totalDuration));
                 validAOIs.put(aoiKey, aoiFixations);
                 row++;
             }
@@ -77,21 +101,22 @@ public class AreaOfInterests {
             metrics.get(i + 1).addAll(pairResults.get(i));
         }
         FileHandler.writeToCSV(metrics, outputDirectory, fileName + "_AOI_DGMs");
+        System.out.println(aoiRowCount);
     }
 
-    public static ArrayList<String> generateAreaOfInterestResults(DataEntry all,DataEntry aoi, double totalDuration) {
-        DataEntry valid = DataFilter.filterByValidity(all);
-        ArrayList<String> results = new ArrayList<>();
-        List<String> proportions = getProportions(valid, aoi, totalDuration);
-        results.addAll(proportions);
-        return results;
-    }
+    // public static ArrayList<String> generateAreaOfInterestResults(DataEntry all,DataEntry aoi, double totalDuration) {
+    //     DataEntry valid = DataFilter.filterByValidity(all);
+    //     ArrayList<String> results = new ArrayList<>();
+    //     List<String> proportions = getProportions(valid, aoi, totalDuration);
+    //     results.addAll(proportions);
+    //     return results;
+    // }
 
-    public static ArrayList<String> getProportions(DataEntry all, DataEntry aoi, double totalDuration) {
+    public static ArrayList<String> getProportions(DataEntry fixations, DataEntry aoiFixations, double totalDuration) {
         ArrayList<String> results = new ArrayList<>();
-        double fixationProportion = (double)aoi.rowCount()/all.rowCount(); //Number of fixations in AOI divided by total fixations
+        double fixationProportion = (double)aoiFixations.rowCount()/fixations.rowCount(); //Number of fixations in AOI divided by total fixations
         results.add(String.valueOf(fixationProportion));
-        double durationIn = getDuration(aoi);
+        double durationIn = getDuration(aoiFixations);
         double durationProportion = durationIn/totalDuration;
         results.add(String.valueOf(durationProportion));
         return results;
