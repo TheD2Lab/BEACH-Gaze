@@ -36,7 +36,7 @@ public class AreaOfInterests {
         
         LinkedHashMap<String, DataEntry> aoiFixationMetrics = new LinkedHashMap<>();
         DataEntry allFixations = DataFilter.filterByValidity(DataFilter.filterByFixations(allGazeData));
-        System.out.println(allFixations.rowCount());
+        //System.out.println(allFixations.rowCount());
         for (int i = 0; i < allFixations.rowCount(); i++) {
             String aoi = allFixations.getValue(AOI_INDEX, i);
             String aoiKey = aoi.equals("") ? "No AOI" : aoi;
@@ -69,12 +69,12 @@ public class AreaOfInterests {
         boolean isFirst = true;
         Set<String> aoiKeySet = aoiMetrics.keySet();
         
-        int aoiFixationCount = 0;
+        //int aoiFixationCount = 0;
         int row = 1;
         for (String aoiKey : aoiKeySet) {
             DataEntry aoi = aoiMetrics.get(aoiKey);
             DataEntry aoiFixations = aoiFixationMetrics.get(aoiKey);
-            aoiFixationCount += aoiFixations.rowCount();
+            //aoiFixationCount += aoiFixations.rowCount();
 
             aoi.writeToCSV(outputDirectory + "/AOIs", aoiKey + "_all_gaze");
 
@@ -101,7 +101,7 @@ public class AreaOfInterests {
             metrics.get(i + 1).addAll(pairResults.get(i));
         }
         FileHandler.writeToCSV(metrics, outputDirectory, fileName + "_AOI_DGMs");
-        System.out.println(aoiFixationCount);
+        //System.out.println(aoiFixationCount);
     }
 
     // public static ArrayList<String> generateAreaOfInterestResults(DataEntry all,DataEntry aoi, double totalDuration) {
