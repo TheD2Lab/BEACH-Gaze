@@ -141,4 +141,47 @@ public class Analysis {
 
         return results;
     }
+
+    public static ArrayList<List<String>> generateResultsOfSubset(DataEntry allGaze, DataEntry fixations) {
+        DataEntry validGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(allGaze), SCREEN_WIDTH, SCREEN_HEIGHT);
+        DataEntry validFixations = DataFilter.applyScreenSize(DataFilter.filterByValidity(fixations), SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        ArrayList<List<String>> results = new ArrayList<List<String>>();
+        results.add(new ArrayList<String>()); //Headers
+        results.add(new ArrayList<String>()); //Values
+
+        LinkedHashMap<String,String> fixation = Fixations.analyze(validFixations);
+        results.get(0).addAll(fixation.keySet());
+        results.get(1).addAll(fixation.values());
+
+        LinkedHashMap<String,String> saccades = Saccades.analyze(validFixations);
+        results.get(0).addAll(saccades.keySet());
+        results.get(1).addAll(saccades.values());
+
+        LinkedHashMap<String, String> saccadeVelocity = SaccadeVelocity.analyze(validGaze);
+        results.get(0).addAll(saccadeVelocity.keySet());
+        results.get(1).addAll(saccadeVelocity.values());
+    
+        LinkedHashMap<String,String> angles = Angles.analyze(validFixations);
+        results.get(0).addAll(angles.keySet());
+        results.get(1).addAll(angles.values());
+
+        LinkedHashMap<String,String> convexHull = ConvexHull.analyze(validFixations);
+        results.get(0).addAll(convexHull.keySet());
+        results.get(1).addAll(convexHull.values());
+
+        LinkedHashMap<String,String> entropy = GazeEntropy.analyze(validFixations);
+        results.get(0).addAll(entropy.keySet());
+        results.get(1).addAll(entropy.values());
+
+        LinkedHashMap<String,String> gaze = Gaze.analyze(validFixations);
+        results.get(0).addAll(gaze.keySet());
+        results.get(1).addAll(gaze.values());
+
+        LinkedHashMap<String,String> event = Event.analyze(validFixations);
+        results.get(0).addAll(event.keySet());
+        results.get(1).addAll(event.values());
+
+        return results;
+    }
 }
