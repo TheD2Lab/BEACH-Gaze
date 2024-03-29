@@ -11,7 +11,7 @@ public class Windows {
     public static void generateWindows(DataEntry allGaze, String outputDirectory, WindowSettings settings) {
         DataEntry fixations = DataFilter.filterByFixations(allGaze);
 
-        generateBaselineFile(allGaze, outputDirectory);
+        generateBaselineFile(allGaze, outputDirectory + "/baseline");
 
         // Tumbling window
         if (settings.tumblingEnabled) {
