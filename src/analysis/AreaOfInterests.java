@@ -79,7 +79,7 @@ public class AreaOfInterests {
             aoi.writeToCSV(outputDirectory + "/AOIs", aoiKey + "_all_gaze");
 
             if (aoi.rowCount() >= 2) {
-                ArrayList<List<String>> results = Analysis.generateResultsOfSubset(aoi, aoiFixations);
+                ArrayList<List<String>> results = Analysis.generateResults(aoi, aoiFixations);
                 if (isFirst) { //
                     isFirst = false;
                     List<String> headers = results.get(0);
