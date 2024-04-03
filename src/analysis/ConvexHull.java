@@ -139,7 +139,6 @@ public class ConvexHull {
      *               is returned.
      */
     protected static Point2D.Double getLowestPoint(List<Point2D.Double> points) {
-
         Point2D.Double lowest = points.get(0);
 
         for(int i = 1; i < points.size(); i++) {
@@ -247,6 +246,8 @@ public class ConvexHull {
     }
 
 	public static double getPolygonArea(List<Point2D.Double> allPoints) {
+        if (allPoints.size() == 0) return Double.NaN;
+
 		int i, j, n = allPoints.size();
 		double area = 0;
 

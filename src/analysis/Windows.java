@@ -9,33 +9,118 @@ public class Windows {
     final static int BASELINE_LENGTH = 120;
 
     public static void generateWindows(DataEntry allGaze, String outputDirectory, WindowSettings settings) {
-        DataEntry fixations = DataFilter.filterByFixations(allGaze);
+        List<String> headers = allGaze.getHeaders();
 
+        // Generate baseline file
         generateBaselineFile(allGaze, outputDirectory + "/baseline");
 
-        // Tumbling window
+        // Tumbling Window
         if (settings.tumblingEnabled) {
+            ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
+            DataEntry window = new DataEntry(headers);
+            double windowSize = settings.tumblingWindowSize;
+            double start = Double.valueOf(allGaze.getValue(TIME_INDEX, 0));
+            double end = start + windowSize;
 
+            for (int i = 0; i < allGaze.rowCount(); i++) {
+                List<String> currRow = allGaze.getRow(i);
+                Double t = Double.valueOf(allGaze.getValue(TIME_INDEX, i));
+                
+                if (t > end) { 
+                    end += windowSize;
+                    windows.add(window);
+                    window = new DataEntry(headers);
+                    window.process(currRow);
+                } else if (i == allGaze.rowCount() - 1) { // Check to see if this is the last row of data in the list, if so append it to the last window
+                    window.process(currRow);
+                    windows.add(window);
+                } else {
+                    window.process(currRow);
+                }
+            }
+
+            outputWindowFiles(windows, outputDirectory + "/tumbling");
         }
 
-        // Expanding window
+        // Expanding Window
         if (settings.expandingEnabled) {
+            ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
+            DataEntry window = new DataEntry(headers);
+            double windowSize = settings.tumblingWindowSize;
+            double start = Double.valueOf(allGaze.getValue(TIME_INDEX, 0));
+            double end = start + windowSize;
 
+            for (int i = 0; i < allGaze.rowCount(); i++) {
+                List<String> currRow = allGaze.getRow(i);
+                Double t = Double.valueOf(allGaze.getValue(TIME_INDEX, i));
+
+                if (t > end) { 
+                    end += windowSize;
+                    windows.add(window);
+                    window = window.clone();
+                    window.process(currRow);
+                } else if (i == allGaze.rowCount() - 1) { // Check to see if this is the last row of data in the list, if so append it to the last window
+                    window.process(currRow);
+                    windows.add(window);
+                } else {
+                    window.process(currRow);
+                }
+            }
+
+            outputWindowFiles(windows, outputDirectory + "/expanding");
         }
 
-        // Hopping window
+        // Hopping Window
         if (settings.hoppingEnabled) {
+            ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
+            DataEntry window = new DataEntry(headers);
+            int windowSize = settings.hoppingWindowSize;
+            int hopSize = settings.hoppingHopSize;
+            double start = Double.valueOf(allGaze.getValue(TIME_INDEX, 0));
+            double end = start + windowSize;
 
+            for (int i = 0; i < allGaze.rowCount(); i++) {
+                double t1 = Double.parseDouble(allGaze.getValue(TIME_INDEX, i));
+                
+                if (t1 >= start) {
+                    for (int j = i; j < allGaze.rowCount(); j++) {
+                        List<String> row2 = allGaze.getRow(j);
+                        double t2 = Double.parseDouble(allGaze.getValue(TIME_INDEX, j));
+
+                        if (t2 >= end || j == allGaze.rowCount() - 1) {
+                            window.process(row2);
+                            windows.add(window);
+
+                            start += hopSize;
+                            end = start + windowSize;
+                            window = new DataEntry(headers);
+
+                            break;
+                        } else {
+                            window.process(row2);
+                        }
+                    }
+                }
+            }
+
+            outputWindowFiles(windows, outputDirectory + "/hopping");
         }
 
-        // Event window
+        // Event Window
         if (settings.eventEnabled) {
 
         }
     }
 
-    public static void outputWindowFiles(List<DataEntry> windowGaze, List<DataEntry> windowFixations, String outputDirectory) throws Exception {
-        if (windowGaze.size() != windowFixations.size()) throw new Exception("Invalid window paramters, please make sure lists are the same size");
+    public static void outputWindowFiles(ArrayList<DataEntry> windows, String outputDirectory) {
+        int windowCount = 1;
+        for (DataEntry w : windows) {
+            String fileName = "window" + windowCount;
+            w.writeToCSV(outputDirectory, fileName);
+            ArrayList<List<String>> results = Analysis.generateResults(w, DataFilter.filterByFixations(w)); // windows are continuous and raw, therefore fixation filtering will be valid
+            FileHandler.writeToCSV(results, outputDirectory, fileName + "_analytics");
+            windowCount++;
+        }
     }
 
     public static void generateBaselineFile(DataEntry allGaze, String outputDirectory) {

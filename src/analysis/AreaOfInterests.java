@@ -78,7 +78,7 @@ public class AreaOfInterests {
 
             aoi.writeToCSV(outputDirectory + "/AOIs", aoiKey + "_all_gaze");
 
-            if (aoi.rowCount() >= 2) {
+            // if (aoi.rowCount() >= 2) {
                 ArrayList<List<String>> results = Analysis.generateResults(aoi, aoiFixations);
                 if (isFirst) { //
                     isFirst = false;
@@ -91,7 +91,7 @@ public class AreaOfInterests {
                 metrics.get(row).addAll(getProportions(allFixations, aoiFixations, totalDuration));
                 validAOIs.put(aoiKey, aoiFixations);
                 row++;
-            }
+            // }
         }
         ArrayList<List<String>> pairResults = generatePairResults(allFixations, aoiMetrics);
         /*for (int i = 0; i < pairResults.size(); i++) { //Write values to all rows
