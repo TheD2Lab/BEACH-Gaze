@@ -32,7 +32,7 @@ import java.util.Collections;
 public class DescriptiveStats {
 
 	public static double getSumOfIntegers(ArrayList<Integer> allIntegers){
-		if (allIntegers.size() == 0) return Double.NaN;
+		if (allIntegers.size() == 0) return 0;
 
 		double total = 0.0;
 		for (Integer i:allIntegers){
@@ -42,7 +42,7 @@ public class DescriptiveStats {
 	}
 
 	public static double getSumOfDoubles(ArrayList<Double> allDoubles){
-		if (allDoubles.size() == 0) return Double.NaN;
+		if (allDoubles.size() == 0) return 0;
 
 		double total = 0.0;
 		for (Double value : allDoubles) {
@@ -53,7 +53,7 @@ public class DescriptiveStats {
 	}
 
 	public static double getSum(Double[] allDoubles){
-		if (allDoubles.length == 0) return Double.NaN;
+		if (allDoubles.length == 0) return 0;
 
 		double total = 0.0;
 		for (Double i:allDoubles){
