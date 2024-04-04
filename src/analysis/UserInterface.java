@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -688,16 +689,30 @@ public class UserInterface {
     }
 
     private static List<String> getHeaders(File f) {
-        List<String> headers = new ArrayList<String>();
+        List<String> numericHeaders = new ArrayList<String>();
 
         try {
             CSVReader reader = new CSVReader(new FileReader(f));
-            headers = Arrays.asList(reader.readNext());
+
+            List<String> headers = Arrays.asList(reader.readNext());
+            List<String> values = Arrays.asList(reader.readNext());
+
+            for (int i = 0; i < headers.size(); i++) {
+                String header = headers.get(i);
+                String val = values.get(i);
+
+                if (isNumeric(val)) numericHeaders.add(header);
+            }
+
             reader.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return headers;
+        return numericHeaders;
+    }
+
+    public static boolean isNumeric(String str) {
+        return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
     }
 }

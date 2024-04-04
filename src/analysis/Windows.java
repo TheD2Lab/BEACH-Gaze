@@ -121,9 +121,7 @@ public class Windows {
             double timeoutLength = settings.eventTimeout;
             double eventEnd = 0;
 
-            double[] eventValues = getEventBaseline(outputDirectory, event);
-            int eventValueIndex = (int)eventValues[0];
-            double baselineValue = eventValues[1];
+            double baselineValue = getEventBaseline(outputDirectory, event);
 
             for (int i = 0; i < allGaze.rowCount(); i++) {
                 Double t = Double.valueOf(allGaze.getValue(TIME_INDEX, i));
@@ -135,7 +133,7 @@ public class Windows {
                 }
 
                 if (isEventWindow) {
-                    if (t >= eventEnd || i == allGaze.rowCount() - 1) {
+                    if (t > eventEnd || i == allGaze.rowCount() - 1) {
                         windows.add(window);
                         window = new DataEntry(headers);
                         isEventWindow = false;
@@ -180,8 +178,8 @@ public class Windows {
         FileHandler.writeToCSV(Analysis.generateResults(baseline, DataFilter.filterByFixations(baseline)), outputDirectory, "baseline_DGMs");
     }
 
-    public static double[] getEventBaseline(String fileDirectory, String event) {
-        double[] eventValues = new double[] {Double.NaN, 0};
+    public static double getEventBaseline(String fileDirectory, String event) {
+        double eventValue = Double.NaN;
 
         try {
             File baselineDGMs = new File(fileDirectory + "/baseline/baseline.csv");
@@ -191,21 +189,20 @@ public class Windows {
             List<String> headers = Arrays.asList(reader.readNext());
 
             int eventIndex = headers.indexOf(event);
-            eventValues[0] = eventIndex;
 
             while (reader.peek() != null) {
                 // Read the DGM values line of the CSV file and cast into a list to obtain the DGM baseline value
-                eventValues[1] += Double.valueOf(Arrays.asList(reader.readNext()).get(eventIndex));
+                eventValue += Double.valueOf(Arrays.asList(reader.readNext()).get(eventIndex));
             }
 
-            eventValues[1] /= ((double) reader.getLinesRead() - 1);
+            eventValue /= ((double) reader.getLinesRead() - 1);
 
             reader.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
         
-        return eventValues;
+        return eventValue;
     }
 
     // public static double[] getEventBaseline(String fileDirectory, String event) {
