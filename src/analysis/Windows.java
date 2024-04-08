@@ -51,7 +51,7 @@ public class Windows {
         if (settings.expandingEnabled) {
             ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
             DataEntry window = new DataEntry(headers);
-            double windowSize = settings.tumblingWindowSize;
+            double windowSize = settings.expandingWindowSize;
             double start = Double.valueOf(allGaze.getValue(TIME_INDEX, 0));
             double end = start + windowSize;
 
@@ -60,6 +60,7 @@ public class Windows {
                 Double t = Double.valueOf(allGaze.getValue(TIME_INDEX, i));
 
                 if (t > end) { 
+                    System.out.println(end);
                     end += windowSize;
                     windows.add(window);
                     window = window.clone();
