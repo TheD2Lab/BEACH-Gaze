@@ -91,8 +91,6 @@ public class SaccadeVelocity {
 			double amplitude = 180/Math.PI * Math.atan(dx/participantDistance);
 			
 			double velocity = amplitude/dt;
-
-            System.out.println(velocity);
 			
 			if (velocity > peakVelocity && velocity <= velocityThreshold) {
 				peakVelocity = velocity;
