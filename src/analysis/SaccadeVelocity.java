@@ -1,13 +1,11 @@
 package analysis;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 public class SaccadeVelocity {
-    final static int SCREEN_WIDTH = 1920;
-	final static int SCREEN_HEIGHT = 1080;
-
     final static String TIME_INDEX = "TIME";
     final static String FIXATIONID_INDEX = "FPOGID";
     final static String FIXATIONX_INDEX = "FPOGX";
@@ -27,14 +25,14 @@ public class SaccadeVelocity {
             if (saccade) {                
                 // Check to see if these saccade points are part of the same saccade
                 String currID = data.getValue(FIXATIONID_INDEX, i);
-                if (prevID.equals(currID) && positionProfile.size() != 0) {
+                if (!prevID.equals(currID) && positionProfile.size() != 0) {
                     positionProfiles.add(positionProfile);
                     positionProfile = new ArrayList<Double[]>();
                     prevID = currID;
                 }
 
-                Double x = Double.parseDouble(data.getValue(FIXATIONX_INDEX, i)) * SCREEN_WIDTH;
-                Double y = Double.parseDouble(data.getValue(FIXATIONY_INDEX, i))* SCREEN_HEIGHT;
+                Double x = Double.parseDouble(data.getValue(FIXATIONX_INDEX, i));
+                Double y = Double.parseDouble(data.getValue(FIXATIONY_INDEX, i));
                 Double t = Double.parseDouble(data.getValue(TIME_INDEX, i));
                 positionProfile.add(new Double[] {x, y, t});
                 
@@ -47,7 +45,7 @@ public class SaccadeVelocity {
         for (int i = 0; i < positionProfiles.size(); i++) {
             List<Double[]> saccadePoints = positionProfiles.get(i);
             Double peakSaccadeVelocity = getPeakVelocity(saccadePoints);
-            if (peakSaccadeVelocity != Double.NaN) peakSaccadeVelocities.add(peakSaccadeVelocity);
+            if (!Double.isNaN(peakSaccadeVelocity)) peakSaccadeVelocities.add(peakSaccadeVelocity);
         }
 
         results.put(
@@ -93,6 +91,8 @@ public class SaccadeVelocity {
 			double amplitude = 180/Math.PI * Math.atan(dx/participantDistance);
 			
 			double velocity = amplitude/dt;
+
+            System.out.println(velocity);
 			
 			if (velocity > peakVelocity && velocity <= velocityThreshold) {
 				peakVelocity = velocity;
