@@ -24,7 +24,8 @@ public class Windows {
     final static Set<String> allGazeEvents = new HashSet<String>(
         Arrays.asList(
         "LPMM",
-        "RPMM"
+        "RPMM",
+        "BKPMIN"
     ));
 
     public static void generateWindows(DataEntry allGaze, String outputDirectory, WindowSettings settings) {
