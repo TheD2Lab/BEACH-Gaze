@@ -50,6 +50,7 @@ public class UserInterface {
     private JTextField hoppingHopSizeField;
     private JCheckBox eventCheckBox;
     private JTextField eventTimeoutField;
+    private JTextField eventMaxDurationField;
 
     public UserInterface() {
         try {
@@ -292,10 +293,24 @@ public class UserInterface {
         componentGBC.gridwidth = 1;
         windowsPanel.add(eventTimeoutField, componentGBC);
 
-        JLabel eventLabel = new JLabel("Event");
+        JLabel maxDurationLabel = new JLabel("Max Duration (s)");
         componentGBC.insets = new Insets(0, 20, 0, 0);
         componentGBC.gridx = 0;
         componentGBC.gridy = 11;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(maxDurationLabel, componentGBC);
+
+        eventMaxDurationField = new JTextField("", 10);
+        componentGBC.insets = new Insets(0, 0, 0, 0);
+        componentGBC.gridx = 1;
+        componentGBC.gridy = 11;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(eventMaxDurationField, componentGBC);
+
+        JLabel eventLabel = new JLabel("Event");
+        componentGBC.insets = new Insets(0, 20, 0, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 12;
         componentGBC.gridwidth = 1;
         windowsPanel.add(eventLabel, componentGBC);
 
@@ -305,7 +320,7 @@ public class UserInterface {
         eventComboBox = new JComboBox<String>(itemSet.toArray(new String[itemSet.size()]));
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 1;
-        componentGBC.gridy = 11;
+        componentGBC.gridy = 12;
         componentGBC.gridwidth = 3;
         windowsPanel.add(eventComboBox, componentGBC);
 
@@ -588,23 +603,33 @@ public class UserInterface {
         });
 
         tumblingWindowSizeField.addActionListener(e -> {
-            windowSettings.tumblingWindowSize = Double.parseDouble(tumblingWindowSizeField.getText());
+            String text = tumblingWindowSizeField.getText();
+            if (isNumeric(text)) windowSettings.tumblingWindowSize = Double.parseDouble(text);
         });
 
         expandingWindowSizeField.addActionListener(e -> {
-            windowSettings.expandingWindowSize = Double.parseDouble(expandingWindowSizeField.getText());
+            String text = expandingWindowSizeField.getText();
+            if (isNumeric(text)) windowSettings.expandingWindowSize = Double.parseDouble(text);
         });
 
         hoppingWindowSizeField.addActionListener(e -> {
-            windowSettings.hoppingWindowSize = Double.parseDouble(hoppingWindowSizeField.getText());
+            String text = hoppingWindowSizeField.getText();
+            if (isNumeric(text)) windowSettings.hoppingWindowSize = Double.parseDouble(text);
         });
 
         hoppingHopSizeField.addActionListener(e -> {
-            windowSettings.hoppingHopSize = Double.parseDouble(hoppingHopSizeField.getText());
+            String text = hoppingHopSizeField.getText();
+            if (isNumeric(text)) windowSettings.hoppingHopSize = Double.parseDouble(text);
         });
 
         eventTimeoutField.addActionListener(e -> {
-            windowSettings.eventTimeout = Double.parseDouble(eventTimeoutField.getText());
+            String text = eventTimeoutField.getText();
+            if (isNumeric(text)) windowSettings.eventTimeout = Double.parseDouble(text);
+        });
+
+        eventMaxDurationField.addActionListener(e -> {
+            String text = eventMaxDurationField.getText();
+            if (isNumeric(text)) windowSettings.eventMaxDuration = Double.parseDouble(text);
         });
 
         eventComboBox.addItemListener(e -> {

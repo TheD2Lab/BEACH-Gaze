@@ -134,6 +134,7 @@ public class Windows {
 
             String event = settings.event;
             double timeoutLength = settings.eventTimeout;
+            double maxDuration = settings.eventMaxDuration;
             double eventEnd = 0;
 
             double baselineValue = getEventBaselineValue(outputDirectory, event);
@@ -143,12 +144,13 @@ public class Windows {
                 Double windowValue =  Double.parseDouble(allGaze.getValue(event, i));
 
                 if (windowValue > baselineValue) {
+                    if (!isEventWindow) maxDuration = t + settings.eventMaxDuration;
                     isEventWindow = true;
                     eventEnd = t + timeoutLength;
                 }
 
                 if (isEventWindow) {
-                    if (t > eventEnd || i == allGaze.rowCount() - 1) {
+                    if (t > eventEnd || t > maxDuration || i == allGaze.rowCount() - 1) {
                         windows.add(window);
                         window = new DataEntry(headers);
                         isEventWindow = false;

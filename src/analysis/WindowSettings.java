@@ -15,6 +15,7 @@ public class WindowSettings {
     public boolean eventEnabled;
     public String event;
     public double eventTimeout;
+    public double eventMaxDuration;
 
     public WindowSettings() {
         this.tumblingEnabled = false;
