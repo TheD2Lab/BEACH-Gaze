@@ -3,8 +3,11 @@ package analysis;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Windows {
@@ -161,6 +164,72 @@ public class Windows {
             }
 
             outputWindowFiles(windows, outputDirectory + "/event");
+        }
+    }
+
+    public static void generateWindowsForBatch(Map<String, DataEntry> allGazes, String outputDirectory, WindowSettings settings) {
+        if (settings.eventThresholdEnabled) {
+            String event = settings.thresholdEvent;
+            double windowSize = settings.eventWindowSize;
+            int threshold = settings.eventThreshold;
+
+            LinkedHashMap<Integer, List<DataEntry>> windowMap = new LinkedHashMap<Integer, List<DataEntry>>();
+            
+            for (String pName: allGazes.keySet()) {
+                DataEntry d = allGazes.get(pName);
+                DataEntry window = new DataEntry(d.getHeaders());
+                Integer windowCount = 0;
+                
+                double baselineValue = getEventBaselineValue(outputDirectory + "/" + pName, event);
+
+                double start = Double.valueOf(d.getValue(TIME_INDEX, 0));
+                double end = start + windowSize;
+                boolean isEvent = false;
+
+                for (int i = 0; i < d.rowCount(); i++) {
+                    List<String> currRow = d.getRow(i);
+                    Double t = Double.valueOf(d.getValue(TIME_INDEX, i));
+                    Double windowValue =  Double.parseDouble(d.getValue(event, i));
+
+                    if (windowValue > baselineValue) isEvent = true;
+
+                    if (t >= end || i == d.rowCount() - 1) { 
+                        if (isEvent) {
+                            if (!windowMap.containsKey(windowCount)) windowMap.put(windowCount, new ArrayList<DataEntry>());
+                            List<DataEntry> list = windowMap.get(windowCount);
+                            list.add(window);
+                        }
+
+                        end += windowSize;
+                        windowCount++;
+                        isEvent = false;
+                        window = new DataEntry(window.getHeaders());
+                        window.process(currRow);
+                    } else {
+                        window.process(currRow);
+                    }
+                }
+            }
+
+            String directory = outputDirectory + "/eventDGMs";
+            for (Integer windowID : windowMap.keySet()) {
+                List<DataEntry> list = windowMap.get(windowID);
+
+                System.out.println(list.size());
+                System.out.print(threshold);
+
+                if (list.size() >= threshold) {
+                    List<List<String>> allParticipantDGMs = new ArrayList<List<String>>();
+
+                    for (DataEntry d : list) {
+                        List<List<String>> dgms = Analysis.generateResults(d, DataFilter.filterByFixations(d));
+                        if (allParticipantDGMs.size() == 0) allParticipantDGMs.add(dgms.get(0));
+                        allParticipantDGMs.add(dgms.get(1));
+                    }
+
+                    FileHandler.writeToCSV(allParticipantDGMs, directory, "window" + windowID);
+                }
+            }
         }
     }
 

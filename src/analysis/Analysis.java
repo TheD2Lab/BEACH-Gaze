@@ -1,9 +1,13 @@
 package analysis;
 
+import java.awt.Window;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import weka.knowledgeflow.Data;
 
 public class Analysis {
     final static int SCREEN_WIDTH = 1920;
@@ -26,7 +30,10 @@ public class Analysis {
         try {
             File[] inputFiles = params.getInputFiles();
             List<String> sequences = new ArrayList<String>();
-            ArrayList<List<String>> allParticipantDGMs = new ArrayList<List<String>>();
+            List<List<String>> allParticipantDGMs = new ArrayList<List<String>>();
+            HashMap<String, DataEntry> allParticipantAllGazes = new HashMap<String, DataEntry>();
+
+            WindowSettings settings = params.getWindowSettings();
 
             for (int i = 0; i < inputFiles.length; i++) {
                 File f = inputFiles[i];
@@ -36,12 +43,12 @@ public class Analysis {
 
                 System.out.println("Analyzing " + pName);
 
+                // Build DataEntrys
                 DataEntry allGaze = FileHandler.buildDataEntry(f);
                 DataEntry validGaze = DataFilter.filterByValidity(allGaze);
-                
                 DataEntry fixations = DataFilter.filterByFixations(allGaze);
                 DataEntry validFixations = DataFilter.filterByValidity(fixations);
-
+                allParticipantAllGazes.put(pName, allGaze);
                 
                 // Write validated DataEntrys to file
                 validGaze.writeToCSV(pDirectory, pName + "_valid_all_gaze");
@@ -65,13 +72,14 @@ public class Analysis {
                 allParticipantDGMs.add(dgms);
 
                 // File generators
-                Windows.generateWindows(allGaze, pDirectory, params.getWindowSettings());
+                Windows.generateWindows(allGaze, pDirectory, settings);
                 AreaOfInterests.generateAOIs(allGaze, pDirectory, pName);
                 Sequences.generateSequenceFiles(validFixations, pDirectory, sequences);
             }
 
             // Batch analysis
             if (inputFiles.length > 1) {
+                // Generate patterns
                 List<String> expandedSequences = sequences;
                 List<String> collapsedSequences = new ArrayList<String>();
 
@@ -79,10 +87,18 @@ public class Analysis {
                     collapsedSequences.add(Sequences.getCollapsedSequence(s));
                 }
 
+                System.out.println("Analyzing patterns");
                 ArrayList<List<String>> expandedPatterns = Patterns.discoverPatterns(expandedSequences, MIN_PATTERN_LENGTH, MAX_PATTERN_LENGTH, MIN_PATTERN_FREQUENCY, MIN_SEQUENCE_SIZE);
                 ArrayList<List<String>> collapsedPatterns = Patterns.discoverPatterns(collapsedSequences, MIN_PATTERN_LENGTH, MAX_PATTERN_LENGTH, MIN_PATTERN_FREQUENCY, MIN_SEQUENCE_SIZE);
                 
+                // Root directory
                 String directory = params.getOutputDirectory();
+
+                // Generate windows for batch analysis
+                System.out.println("Analyzing batch windows");
+                Windows.generateWindowsForBatch(allParticipantAllGazes, directory, settings);
+
+                // Output files
                 FileHandler.writeToCSV(expandedPatterns, directory, "expandedPatterns");
                 FileHandler.writeToCSV(collapsedPatterns, directory, "collapsedPatterns");
                 FileHandler.writeToCSV(allParticipantDGMs, directory, "combinedDGMs");
