@@ -1,13 +1,10 @@
 package analysis;
 
-import java.awt.Window;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-
-import weka.knowledgeflow.Data;
 
 public class Analysis {
     final static int SCREEN_WIDTH = 1920;
@@ -31,7 +28,6 @@ public class Analysis {
             File[] inputFiles = params.getInputFiles();
             List<String> sequences = new ArrayList<String>();
             List<List<String>> allParticipantDGMs = new ArrayList<List<String>>();
-            HashMap<String, DataEntry> allParticipantAllGazes = new HashMap<String, DataEntry>();
 
             WindowSettings settings = params.getWindowSettings();
 
@@ -48,7 +44,6 @@ public class Analysis {
                 DataEntry validGaze = DataFilter.filterByValidity(allGaze);
                 DataEntry fixations = DataFilter.filterByFixations(allGaze);
                 DataEntry validFixations = DataFilter.filterByValidity(fixations);
-                allParticipantAllGazes.put(pName, allGaze);
                 
                 // Write validated DataEntrys to file
                 validGaze.writeToCSV(pDirectory, pName + "_valid_all_gaze");
@@ -96,7 +91,7 @@ public class Analysis {
 
                 // Generate windows for batch analysis
                 System.out.println("Analyzing batch windows");
-                Windows.generateWindowsForBatch(allParticipantAllGazes, directory, settings);
+                Windows.generateWindowsForBatch(inputFiles, directory, settings);
 
                 // Output files
                 FileHandler.writeToCSV(expandedPatterns, directory, "expandedPatterns");

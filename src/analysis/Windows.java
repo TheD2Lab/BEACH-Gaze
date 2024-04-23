@@ -1,6 +1,7 @@
 package analysis;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -167,18 +168,25 @@ public class Windows {
         }
     }
 
-    public static void generateWindowsForBatch(Map<String, DataEntry> allGazes, String outputDirectory, WindowSettings settings) {
+    public static void generateWindowsForBatch(File[] inputFiles, String outputDirectory, WindowSettings settings) {
+        List<String> dgmHeaders = null;
+
         if (settings.eventThresholdEnabled) {
             String event = settings.thresholdEvent;
             double windowSize = settings.eventWindowSize;
             int threshold = settings.eventThreshold;
 
-            LinkedHashMap<Integer, List<DataEntry>> windowMap = new LinkedHashMap<Integer, List<DataEntry>>();
+            // LinkedHashMap<Integer, List<DataEntry>> dgmMap = new LinkedHashMap<Integer, List<DataEntry>>();
+            LinkedHashMap<Integer, List<List<String>>> dgmMap = new LinkedHashMap<Integer, List<List<String>>>();
+            HashMap<Integer, Integer> mapCount = new HashMap<Integer, Integer>();
             
-            for (String pName: allGazes.keySet()) {
-                DataEntry d = allGazes.get(pName);
+            for (int j = 0; j < inputFiles.length; j++) {
+                File f = inputFiles[j];
+                DataEntry d = FileHandler.buildDataEntry(f);
+                String pName = f.getName().replace("_all_gaze", "").replace(".csv", "");
+                
                 DataEntry window = new DataEntry(d.getHeaders());
-                Integer windowCount = 0;
+                Integer windowCount = 1;
                 
                 double baselineValue = getEventBaselineValue(outputDirectory + "/" + pName, event);
 
@@ -194,11 +202,33 @@ public class Windows {
                     if (windowValue > baselineValue) isEvent = true;
 
                     if (t >= end || i == d.rowCount() - 1) { 
+                        if (!mapCount.containsKey(windowCount)) 
+                            mapCount.put(windowCount, 0);
+
                         if (isEvent) {
-                            if (!windowMap.containsKey(windowCount)) windowMap.put(windowCount, new ArrayList<DataEntry>());
-                            List<DataEntry> list = windowMap.get(windowCount);
-                            list.add(window);
+                            int count = mapCount.get(windowCount);
+                            mapCount.put(windowCount, count + 1);
                         }
+
+                        List<List<String>> dgms = Analysis.generateResults(window, DataFilter.filterByFixations(window));
+                        
+                        if (dgmHeaders == null) {
+                            dgmHeaders = dgms.get(0);
+                            dgmHeaders.add(0, "Participant ID");
+                        }
+
+                        if (!dgmMap.containsKey(windowCount)) {
+                            List<List<String>> allParticipantDGMs = new ArrayList<List<String>>();
+                            allParticipantDGMs.add(dgmHeaders);
+                            dgmMap.put(windowCount, allParticipantDGMs);
+                        }
+
+                        List<List<String>> list = dgmMap.get(windowCount);
+
+                        List<String> dgmsData = dgms.get(1);
+                        dgmsData.add(0, pName);
+
+                        list.add(dgmsData);
 
                         end += windowSize;
                         windowCount++;
@@ -212,21 +242,9 @@ public class Windows {
             }
 
             String directory = outputDirectory + "/eventDGMs";
-            for (Integer windowID : windowMap.keySet()) {
-                List<DataEntry> list = windowMap.get(windowID);
-
-                System.out.println(list.size());
-                System.out.print(threshold);
-
-                if (list.size() >= threshold) {
-                    List<List<String>> allParticipantDGMs = new ArrayList<List<String>>();
-
-                    for (DataEntry d : list) {
-                        List<List<String>> dgms = Analysis.generateResults(d, DataFilter.filterByFixations(d));
-                        if (allParticipantDGMs.size() == 0) allParticipantDGMs.add(dgms.get(0));
-                        allParticipantDGMs.add(dgms.get(1));
-                    }
-
+            for (Integer windowID : dgmMap.keySet()) {
+                List<List<String>> allParticipantDGMs = dgmMap.get(windowID);
+                if (mapCount.get(windowID) >= threshold) {
                     FileHandler.writeToCSV(allParticipantDGMs, directory, "window" + windowID);
                 }
             }

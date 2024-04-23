@@ -711,7 +711,7 @@ public class UserInterface {
 
         eventThresholdCountField.addActionListener(e -> {
             String text = eventThresholdCountField.getText();
-            if (isNumeric(text)) windowSettings.eventWindowSize = Double.parseDouble(text);
+            if (isNumeric(text)) windowSettings.eventThreshold = Integer.parseInt(text);
         });
 
         // Comboboxes
