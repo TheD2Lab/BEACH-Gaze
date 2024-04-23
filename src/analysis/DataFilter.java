@@ -7,10 +7,7 @@ import java.util.List;
 // Note: Order used for data filtering matters and can invalidate DataEntrys if used incorrectly
 // Must first filter by fixations, then validate, then apply screen size; otherwise, fixation algorithm or validating algorithm will fail
 public class DataFilter {
-
-
-
-    static public DataEntry filterByFixations(DataEntry data) { //Cleanses the data by filtering out repeated fixations
+    static public DataEntry filterByFixations(DataEntry data) {
         DataEntry filtered = new DataEntry(data.getHeaders());
 
         List<String> lastValidFixation = null;

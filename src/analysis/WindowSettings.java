@@ -17,18 +17,17 @@ public class WindowSettings {
     public double eventTimeout;
     public double eventMaxDuration;
 
+    public boolean eventThresholdEnabled;
+    public double eventWindowSize;
+    public int eventThreshold;
+    public String thresholdEvent;
+
     public WindowSettings() {
         this.tumblingEnabled = false;
         this.expandingEnabled = false;
         this.hoppingEnabled = false;
         this.eventEnabled = false;
-    }
-    
-    public WindowSettings(boolean tumbling, boolean expanding, boolean hopping, boolean event) {
-        this.tumblingEnabled = tumbling;
-        this.expandingEnabled = expanding;
-        this.hoppingEnabled = hopping;
-        this.eventEnabled = event;
+        this.eventThresholdEnabled = false;
     }
 
     @Override

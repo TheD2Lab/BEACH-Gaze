@@ -51,6 +51,10 @@ public class UserInterface {
     private JCheckBox eventCheckBox;
     private JTextField eventTimeoutField;
     private JTextField eventMaxDurationField;
+    private JCheckBox eventThresholdCheckBox;
+    private JTextField eventWindowSizeField;
+    private JTextField eventThresholdCountField;
+    private JComboBox<String> eventComboBox2;
 
     public UserInterface() {
         try {
@@ -171,7 +175,7 @@ public class UserInterface {
         panelGBC.gridx = 1;
         panelGBC.gridy = 0;
         panelGBC.gridwidth = 1;
-        panelGBC.gridheight = 1;
+        panelGBC.gridheight = 2;
         panelGBC.weightx = 1;
         panelGBC.weighty = 1;
 
@@ -282,49 +286,101 @@ public class UserInterface {
         JLabel timeoutLabel = new JLabel("Timeout Length (s)");
         componentGBC.insets = new Insets(0, 20, 0, 0);
         componentGBC.gridx = 0;
-        componentGBC.gridy = 10;
+        componentGBC.gridy = 9;
         componentGBC.gridwidth = 1;
         windowsPanel.add(timeoutLabel, componentGBC);
 
         eventTimeoutField = new JTextField("", 10);
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 1;
-        componentGBC.gridy = 10;
+        componentGBC.gridy = 9;
         componentGBC.gridwidth = 1;
         windowsPanel.add(eventTimeoutField, componentGBC);
 
         JLabel maxDurationLabel = new JLabel("Max Duration (s)");
         componentGBC.insets = new Insets(0, 20, 0, 0);
         componentGBC.gridx = 0;
-        componentGBC.gridy = 11;
+        componentGBC.gridy = 10;
         componentGBC.gridwidth = 1;
         windowsPanel.add(maxDurationLabel, componentGBC);
 
         eventMaxDurationField = new JTextField("", 10);
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 1;
-        componentGBC.gridy = 11;
+        componentGBC.gridy = 10;
         componentGBC.gridwidth = 1;
         windowsPanel.add(eventMaxDurationField, componentGBC);
 
         JLabel eventLabel = new JLabel("Event");
         componentGBC.insets = new Insets(0, 20, 0, 0);
         componentGBC.gridx = 0;
-        componentGBC.gridy = 12;
+        componentGBC.gridy = 11;
         componentGBC.gridwidth = 1;
         windowsPanel.add(eventLabel, componentGBC);
 
         Set<String> itemSet = new HashSet<String>();
         itemSet.addAll(Windows.fixationEvents);
         itemSet.addAll(Windows.allGazeEvents);
+
         eventComboBox = new JComboBox<String>(itemSet.toArray(new String[itemSet.size()]));
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 1;
-        componentGBC.gridy = 12;
+        componentGBC.gridy = 11;
         componentGBC.gridwidth = 3;
         windowsPanel.add(eventComboBox, componentGBC);
 
         windowSettings.event = (String) eventComboBox.getSelectedItem();
+
+        eventThresholdCheckBox = new JCheckBox("Event-Based w/ Threshold");
+        eventThresholdCheckBox.setEnabled(false);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 12;
+        componentGBC.gridwidth = 3;
+        windowsPanel.add(eventThresholdCheckBox, componentGBC);
+
+        JLabel eventWindowSizeLabel = new JLabel("Window Size (s)");
+        componentGBC.insets = new Insets(0, 20, 0, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 13;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(eventWindowSizeLabel, componentGBC);
+
+        eventWindowSizeField = new JTextField("", 10);
+        componentGBC.insets = new Insets(0, 0, 0, 0);
+        componentGBC.gridx = 1;
+        componentGBC.gridy = 13;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(eventWindowSizeField, componentGBC);
+
+        JLabel countThresholdLabel = new JLabel("Threshold");
+        componentGBC.insets = new Insets(0, 20, 0, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 14;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(countThresholdLabel, componentGBC);
+
+        eventThresholdCountField = new JTextField("", 10);
+        componentGBC.insets = new Insets(0, 0, 0, 0);
+        componentGBC.gridx = 1;
+        componentGBC.gridy = 14;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(eventThresholdCountField, componentGBC);
+
+        JLabel eventLabel2 = new JLabel("Event");
+        componentGBC.insets = new Insets(0, 20, 0, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 15;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(eventLabel2, componentGBC);
+        
+        eventComboBox2 = new JComboBox<String>(itemSet.toArray(new String[itemSet.size()]));
+        componentGBC.insets = new Insets(0, 0, 0, 0);
+        componentGBC.gridx = 1;
+        componentGBC.gridy = 15;
+        componentGBC.gridwidth = 3;
+        windowsPanel.add(eventComboBox2, componentGBC);
+
+        windowSettings.thresholdEvent = (String) eventComboBox2.getSelectedItem();
 
         analysisPanel.add(windowsPanel, panelGBC);
     }
@@ -363,7 +419,6 @@ public class UserInterface {
         
         runAnalysisButton = new JButton("Run Analysis");
         runAnalysisButton.setFont(runAnalysisButton.getFont().deriveFont(20f));
-        componentGBC.insets = new Insets(100, 0, 20, 0);
         componentGBC.gridx = 0;
         componentGBC.gridy = 1;
         componentGBC.gridwidth = 1;
@@ -562,6 +617,7 @@ public class UserInterface {
     }
 
     private void setEventHandlers() {
+        // Buttons
         selectFilesButton.addActionListener(e -> {
             selectInputFiles();
         });
@@ -574,6 +630,7 @@ public class UserInterface {
             runAnalysis();
         });
 
+        // Checkboxes
         tumblingCheckBox.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) 
                 windowSettings.tumblingEnabled = true;
@@ -602,6 +659,21 @@ public class UserInterface {
                 windowSettings.eventEnabled = false;
         });
 
+        batchAnalysisCheckBox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED)
+                eventThresholdCheckBox.setEnabled(batchAnalysisCheckBox.isSelected());
+            else
+                eventThresholdCheckBox.setEnabled(batchAnalysisCheckBox.isSelected());
+        }); 
+
+        eventThresholdCheckBox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) 
+                windowSettings.eventThresholdEnabled = true;
+            else 
+                windowSettings.eventThresholdEnabled = false;
+        });
+
+        // Text fields
         tumblingWindowSizeField.addActionListener(e -> {
             String text = tumblingWindowSizeField.getText();
             if (isNumeric(text)) windowSettings.tumblingWindowSize = Double.parseDouble(text);
@@ -632,9 +704,24 @@ public class UserInterface {
             if (isNumeric(text)) windowSettings.eventMaxDuration = Double.parseDouble(text);
         });
 
+        eventWindowSizeField.addActionListener(e -> {
+            String text = eventWindowSizeField.getText();
+            if (isNumeric(text)) windowSettings.eventWindowSize = Double.parseDouble(text);
+        });
+
+        eventThresholdCountField.addActionListener(e -> {
+            String text = eventThresholdCountField.getText();
+            if (isNumeric(text)) windowSettings.eventThreshold = Integer.parseInt(text);
+        });
+
+        // Comboboxes
         eventComboBox.addItemListener(e -> {
             windowSettings.event = (String) eventComboBox.getSelectedItem();
         });
+        
+        eventComboBox2.addItemListener(e -> {
+            windowSettings.thresholdEvent = (String) eventComboBox2.getSelectedItem();
+        });   
     }
 
     private void selectInputFiles() {

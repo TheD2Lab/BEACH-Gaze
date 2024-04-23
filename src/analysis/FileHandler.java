@@ -51,7 +51,7 @@ public class FileHandler {
         return converted + " \n ";
     }
 
-    static public void writeToCSV(ArrayList<List<String>> data, String outputDirectory, String fileName) {
+    static public void writeToCSV(List<List<String>> data, String outputDirectory, String fileName) {
         try {
             // Check to see if the output directory exists. If not, create it
             File dir = new File(outputDirectory);
