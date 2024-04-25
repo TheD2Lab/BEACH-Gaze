@@ -89,10 +89,6 @@ public class Analysis {
                 // Root directory
                 String directory = params.getOutputDirectory();
 
-                // Generate windows for batch analysis
-                System.out.println("Analyzing batch windows");
-                Windows.generateWindowsForBatch(inputFiles, directory, settings);
-
                 // Output files
                 FileHandler.writeToCSV(expandedPatterns, directory, "expandedPatterns");
                 FileHandler.writeToCSV(collapsedPatterns, directory, "collapsedPatterns");
