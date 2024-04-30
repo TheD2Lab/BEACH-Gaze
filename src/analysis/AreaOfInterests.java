@@ -137,7 +137,7 @@ public class AreaOfInterests {
             nextAoi = nextAoi.equals("") ? "No AOI" : nextAoi;
             int nextId = Integer.valueOf(fixations.getValue(FIXATIONID_INDEX, i+1));
             boolean isValidAOI = (validAOIs.containsKey(curAoi) && validAOIs.containsKey(nextAoi));
-            if (isValidAOI && nextId <= curId + 1) { //Check if fixations are subsequent
+            if (isValidAOI && nextId == curId + 1) { //Check if fixations are subsequent
                 if (!totalTransitions.containsKey(curAoi)) { //Ensure AOI is initialized in map.
                     ArrayList<Integer> counts = new ArrayList<Integer>();
                     counts.add(0);
