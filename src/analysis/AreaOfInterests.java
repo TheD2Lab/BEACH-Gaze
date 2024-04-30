@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 public class AreaOfInterests {
-    final static String FIXATIONID_INDEX = "CNT"; //FPOGID
+    final static String FIXATIONID_INDEX = "FPOGID"; //CNT
     final static String DURATION_INDEX = "FPOGD";
     final static String AOI_INDEX = "AOI";
 
@@ -88,7 +88,7 @@ public class AreaOfInterests {
                 row++;
             // }
         }
-        ArrayList<List<String>> pairResults = generatePairResults(allGazeData, aoiMetrics);
+        ArrayList<List<String>> pairResults = generatePairResults(allFixations, aoiMetrics);
         /*for (int i = 0; i < pairResults.size(); i++) { //Write values to all rows
             for (String s : perAoiHeaders) {
                 metrics.get(0).add(s + "_" + i); //Adds headersfor each pair.
@@ -137,7 +137,7 @@ public class AreaOfInterests {
             nextAoi = nextAoi.equals("") ? "No AOI" : nextAoi;
             int nextId = Integer.valueOf(fixations.getValue(FIXATIONID_INDEX, i+1));
             boolean isValidAOI = (validAOIs.containsKey(curAoi) && validAOIs.containsKey(nextAoi));
-            if (isValidAOI && nextId == curId + 1) { //Check if fixations are subsequent
+            if (isValidAOI && nextId <= curId + 1) { //Check if fixations are subsequent
                 if (!totalTransitions.containsKey(curAoi)) { //Ensure AOI is initialized in map.
                     ArrayList<Integer> counts = new ArrayList<Integer>();
                     counts.add(0);
