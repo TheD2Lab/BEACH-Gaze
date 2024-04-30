@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 public class AreaOfInterests {
-    final static String FIXATIONID_INDEX = "FPOGID";
+    final static String FIXATIONID_INDEX = "CNT"; //FPOGID
     final static String DURATION_INDEX = "FPOGD";
     final static String AOI_INDEX = "AOI";
 
@@ -88,7 +88,7 @@ public class AreaOfInterests {
                 row++;
             // }
         }
-        ArrayList<List<String>> pairResults = generatePairResults(allFixations, aoiMetrics);
+        ArrayList<List<String>> pairResults = generatePairResults(allGazeData, aoiMetrics);
         /*for (int i = 0; i < pairResults.size(); i++) { //Write values to all rows
             for (String s : perAoiHeaders) {
                 metrics.get(0).add(s + "_" + i); //Adds headersfor each pair.
@@ -138,23 +138,23 @@ public class AreaOfInterests {
             int nextId = Integer.valueOf(fixations.getValue(FIXATIONID_INDEX, i+1));
             boolean isValidAOI = (validAOIs.containsKey(curAoi) && validAOIs.containsKey(nextAoi));
             if (isValidAOI && nextId == curId + 1) { //Check if fixations are subsequent
-                if (!totalTransitions.containsKey(nextAoi)) { //Ensure AOI is initialized in map.
+                if (!totalTransitions.containsKey(curAoi)) { //Ensure AOI is initialized in map.
                     ArrayList<Integer> counts = new ArrayList<Integer>();
                     counts.add(0);
                     counts.add(0);
-                    totalTransitions.put(nextAoi, counts);
+                    totalTransitions.put(curAoi, counts);
 
-                    transitionCounts.put(nextAoi, new LinkedHashMap<String, Integer>());
+                    transitionCounts.put(curAoi, new LinkedHashMap<String, Integer>());
                 }
-                if (!transitionCounts.get(nextAoi).containsKey(curAoi)) { //Ensure pair is initialized
-                    transitionCounts.get(nextAoi).put(curAoi,0);
+                if (!transitionCounts.get(curAoi).containsKey(nextAoi)) { //Ensure pair is initialized
+                    transitionCounts.get(curAoi).put(nextAoi,0);
                 }
-                ArrayList<Integer> transition = totalTransitions.get(nextAoi);
+                ArrayList<Integer> transition = totalTransitions.get(curAoi);
                 transition.set(0, transition.get(0)+ 1); //Inclusive counter
+                LinkedHashMap<String,Integer>aoiTransitions = transitionCounts.get(curAoi); //Data for current AOI's transitions
+                aoiTransitions.put(nextAoi,aoiTransitions.get(nextAoi)+1); //Increment count of curAoi->nextAoi
                 if (!curAoi.equals(nextAoi)) {
                     transition.set(1, transition.get(1)+ 1); //Exclusive counter
-                    LinkedHashMap<String,Integer>aoiTransitions = transitionCounts.get(nextAoi); //Transition to next Aoi, from current Aoi
-                    aoiTransitions.put(curAoi,aoiTransitions.get(curAoi)+1); //Increment transition to next Aoi, from current Aoi
                 }
             }
         }
@@ -174,10 +174,11 @@ public class AreaOfInterests {
                 }
                  //Number of transtions from other AOI to current AOI
                 results.add(new ArrayList<>());
-                results.get(i).add(otherKey + " -> " + key);
+                results.get(i).add(key + " -> " + otherKey);
                 results.get(i).add(String.valueOf(transitions));
                 results.get(i).add(String.valueOf((double)transitions/(double)transitionsInclusive));
-                results.get(i).add(String.valueOf((double)transitions/(double)transitionsExclusive));
+                if (key != otherKey) results.get(i).add(String.valueOf((double)transitions/(double)transitionsExclusive)); //Only count exclusive transitions for transitions that arent from the AOI to itself (transitions exclusive from A->A is set to be 0)
+                else results.get(i).add(String.valueOf(0.0));
                 i++;
             }
         }
