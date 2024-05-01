@@ -29,7 +29,8 @@ public class Windows {
         Arrays.asList(
         "LPMM",
         "RPMM",
-        "BKPMIN"
+        "BKPMIN",
+        "LPMM + RPMM"
     ));
 
     public static void generateWindows(DataEntry allGaze, String outputDirectory, WindowSettings settings) {
@@ -145,7 +146,7 @@ public class Windows {
 
             for (int i = 0; i < allGaze.rowCount(); i++) {
                 Double t = Double.valueOf(allGaze.getValue(TIME_INDEX, i));
-                Double windowValue =  Double.parseDouble(allGaze.getValue(event, i));
+                Double windowValue =  getEventWindowValue(allGaze, event, i);
 
                 if (windowValue > baselineValue) {
                     if (!isEventWindow) maxDuration = t + settings.eventMaxDuration;
@@ -170,13 +171,22 @@ public class Windows {
 
     public static void outputWindowFiles(ArrayList<DataEntry> windows, String outputDirectory) {
         int windowCount = 1;
+        List<List<String>> allWindowDGMs = new ArrayList<List<String>>();
         for (DataEntry w : windows) {
             String fileName = "window" + windowCount;
             w.writeToCSV(outputDirectory, fileName);
-            ArrayList<List<String>> results = Analysis.generateResults(w, DataFilter.filterByFixations(w)); // windows are continuous and raw, therefore fixation filtering will be valid
+            // windows are continuous and raw, therefore fixation filtering will be valid
+            ArrayList<List<String>> results = Analysis.generateResults(w, DataFilter.filterByFixations(w));
+
+            if (allWindowDGMs.size() == 0)
+                allWindowDGMs.add(results.get(0));
+
+            allWindowDGMs.add(results.get(1));
             FileHandler.writeToCSV(results, outputDirectory, fileName + "_DGMs");
             windowCount++;
         }
+
+        FileHandler.writeToCSV(allWindowDGMs, outputDirectory, "all_window_DGMs");
     }
 
     public static void generateBaselineFile(DataEntry allGaze, String outputDirectory) {
@@ -199,7 +209,7 @@ public class Windows {
         FileHandler.writeToCSV(Analysis.generateResults(baseline, DataFilter.filterByFixations(baseline)), outputDirectory, "baseline_DGMs");
     }
 
-    public static double getEventBaselineValue(String fileDirectory, String event) {
+    public static double getRawEventBaselineValue(String fileDirectory, String event) {
         double eventValue = 0;
 
         File baselineFile = new File(fileDirectory + "/baseline/baseline.csv");
@@ -214,5 +224,43 @@ public class Windows {
         eventValue /= baseline.rowCount();
         
         return eventValue;
+    }
+
+    public static double getAveragePupilDilationBaseline(String fileDirectory) {
+        double eventValue = 0;
+
+        File baselineFile = new File(fileDirectory + "/baseline/baseline.csv");
+        DataEntry baseline = FileHandler.buildDataEntry(baselineFile);
+        baseline = DataFilter.filterByValidity(baseline); // Filter by validity
+        
+        for (int i = 0; i < baseline.rowCount(); i++) {
+            double left = Double.parseDouble(baseline.getValue("LPMM", i));
+            double right = Double.parseDouble(baseline.getValue("RPMM", i));
+            eventValue += ((left + right) / 2);
+        }
+
+        eventValue /= baseline.rowCount();
+        
+        return eventValue;
+    }
+
+    public static double getEventBaselineValue(String fileDirectory, String event) {
+        switch(event) {
+            case "LPMM + RPMM":
+                return getAveragePupilDilationBaseline(fileDirectory);
+            default:
+                return getRawEventBaselineValue(fileDirectory, event);
+        }
+    }
+
+    public static double getEventWindowValue(DataEntry d, String event, int row) {
+        switch (event) {
+            case "LPMM + RPMM":
+                double left = Double.parseDouble(d.getValue("LPMM", row));
+                double right = Double.parseDouble(d.getValue("RPMM", row));
+                return (left + right) / 2;
+            default:
+                return Double.parseDouble(d.getValue(event, row));
+        }
     }
 }
