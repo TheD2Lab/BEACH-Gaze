@@ -2,6 +2,7 @@ package analysis;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,12 +46,12 @@ public class Analysis {
                 DataEntry fixations = DataFilter.filterByFixations(allGaze);
                 DataEntry validFixations = DataFilter.filterByValidity(fixations);
                 
-                // Write validated DataEntrys to file
+                // Write DataEntrys to file
                 validGaze.writeToCSV(pDirectory, pName + "_valid_all_gaze");
                 validFixations.writeToCSV(pDirectory, pName + "_valid_fixations");
-                
                 fixations.writeToCSV(pDirectory, pName + "_fixations");
-
+                
+                // Generate DGMs
                 ArrayList<List<String>> descriptiveGazeMeasures = generateResults(allGaze, fixations);
                 FileHandler.writeToCSV(descriptiveGazeMeasures, pDirectory, pName + "_DGMs");
 
@@ -66,10 +67,34 @@ public class Analysis {
                 dgms.add(0, pName);
                 allParticipantDGMs.add(dgms);
 
-                // File generators
-                Windows.generateWindows(allGaze, pDirectory, settings);
+                // Generate AOIs
                 AreaOfInterests.generateAOIs(allGaze, pDirectory, pName);
+
+                // Generate windows
+                Windows.generateWindows(allGaze, pDirectory, settings);
+
+                // Generate sequence files
                 Sequences.generateSequenceFiles(validFixations, pDirectory, sequences);
+                
+                // Generate patterns
+                ArrayList<List<String>> expandedPatterns = Patterns.discoverPatterns(
+                    Arrays.asList(sequences.get(i)), 
+                    MIN_PATTERN_LENGTH, 
+                    MAX_PATTERN_LENGTH, 
+                    1, 
+                    1
+                );
+                
+                ArrayList<List<String>> collapsedPatterns = Patterns.discoverPatterns(
+                    Arrays.asList(Sequences.getCollapsedSequence(sequences.get(i))), 
+                    MIN_PATTERN_LENGTH,
+                    MAX_PATTERN_LENGTH,
+                    1,
+                    1
+                );
+
+                FileHandler.writeToCSV(expandedPatterns, pDirectory, pName + "_expandedPatterns");
+                FileHandler.writeToCSV(collapsedPatterns, pDirectory, pName + "_collapsedPatterns");
             }
 
             // Batch analysis

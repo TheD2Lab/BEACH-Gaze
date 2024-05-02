@@ -61,14 +61,14 @@ public class Parameters {
     } */
 
     public File[] getInputFiles() {
-        return inputFiles.clone();
+        return this.inputFiles.clone();
     }
 
     public String getOutputDirectory() {
-        return outputDirectory;
+        return this.outputDirectory;
     }    
 
     public WindowSettings getWindowSettings() {
-        return windowSettings;
+        return this.windowSettings;
     }
 }
