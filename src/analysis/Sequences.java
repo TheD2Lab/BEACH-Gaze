@@ -12,6 +12,16 @@ public class Sequences {
         String sequence = "";
         int ascii = 65;
 
+        System.out.println(map);
+
+        // Build aoiDescriptions string 
+        for (String s: map.keySet()) {
+            int asciiValue = map.get(s);
+            aoiDescriptions += s + ", " + (char)asciiValue + "\n";
+            System.out.println(aoiDescriptions);
+        }
+
+        // Generate sequence
         for (int i = 0; i < data.rowCount(); i++) {
             String aoi = data.getValue(AOI_INDEX, i);
 

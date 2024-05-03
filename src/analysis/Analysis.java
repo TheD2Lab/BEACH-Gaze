@@ -29,7 +29,7 @@ public class Analysis {
             File[] inputFiles = params.getInputFiles();
             List<String> sequences = new ArrayList<String>();
             List<List<String>> allParticipantDGMs = new ArrayList<List<String>>();
-            HashMap<String, Integer> aoiMap = new HashMap<String, Integer>();
+            LinkedHashMap<String, Integer> aoiMap = new LinkedHashMap<String, Integer>();
 
             WindowSettings settings = params.getWindowSettings();
 
