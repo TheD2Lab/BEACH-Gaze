@@ -18,7 +18,6 @@ public class Sequences {
         for (String s: map.keySet()) {
             int asciiValue = map.get(s);
             aoiDescriptions += s + ", " + (char)asciiValue + "\n";
-            System.out.println(aoiDescriptions);
         }
 
         // Generate sequence
