@@ -31,6 +31,15 @@ public class Analysis {
             List<List<String>> allParticipantDGMs = new ArrayList<List<String>>();
             LinkedHashMap<String, Integer> aoiMap = new LinkedHashMap<String, Integer>();
 
+            // aoiMap.put("", 65);
+            // aoiMap.put("Alt_VSI", 66);
+            // aoiMap.put("AI", 67);
+            // aoiMap.put("TI_HSI", 68);
+            // aoiMap.put("SSI", 69);
+            // aoiMap.put("ASI", 70);
+            // aoiMap.put("RPM", 71);
+            // aoiMap.put("Window", 72);
+
             WindowSettings settings = params.getWindowSettings();
 
             for (int i = 0; i < inputFiles.length; i++) {
