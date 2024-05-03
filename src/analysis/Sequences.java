@@ -7,8 +7,7 @@ public class Sequences {
     
     final static String AOI_INDEX = "AOI";
 
-    public static void generateSequenceFiles(DataEntry data, String outputDirectory, List<String> sequences) {
-        HashMap<String, Integer> map = new HashMap<String, Integer>();
+    public static void generateSequenceFiles(DataEntry data, String outputDirectory, List<String> sequences, HashMap<String, Integer> map) {
         String aoiDescriptions = "";
         String sequence = "";
         int ascii = 65;

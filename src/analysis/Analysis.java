@@ -29,6 +29,7 @@ public class Analysis {
             File[] inputFiles = params.getInputFiles();
             List<String> sequences = new ArrayList<String>();
             List<List<String>> allParticipantDGMs = new ArrayList<List<String>>();
+            HashMap<String, Integer> aoiMap = new HashMap<String, Integer>();
 
             WindowSettings settings = params.getWindowSettings();
 
@@ -74,7 +75,7 @@ public class Analysis {
                 Windows.generateWindows(allGaze, pDirectory, settings);
 
                 // Generate sequence files
-                Sequences.generateSequenceFiles(validFixations, pDirectory, sequences);
+                Sequences.generateSequenceFiles(validFixations, pDirectory, sequences, aoiMap);
                 
                 // Generate patterns
                 ArrayList<List<String>> expandedPatterns = Patterns.discoverPatterns(
