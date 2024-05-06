@@ -35,10 +35,18 @@ public class GazeEntropy {
                         relationMatrix.put(aoi, 1.0);
                     }
                 }
-                
             } else {
                 aoiProbability.put(aoi, 1.0);
                 transitionProbability.put(aoi, new HashMap<String,Double>());
+                if (!lastAoi.equals("")) {
+                    HashMap<String, Double> relationMatrix = transitionProbability.get(lastAoi);
+                    if (relationMatrix.containsKey(aoi)) {
+                        double count = relationMatrix.get(aoi);
+                        relationMatrix.put(aoi, count + 1);
+                    } else {
+                        relationMatrix.put(aoi, 1.0);
+                    }
+                }
             }
             lastAoi = aoi;
         }
