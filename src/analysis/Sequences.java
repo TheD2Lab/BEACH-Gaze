@@ -7,12 +7,19 @@ public class Sequences {
     
     final static String AOI_INDEX = "AOI";
 
-    public static void generateSequenceFiles(DataEntry data, String outputDirectory, List<String> sequences) {
-        HashMap<String, Integer> map = new HashMap<String, Integer>();
+    public static void generateSequenceFiles(DataEntry data, String outputDirectory, List<String> sequences, HashMap<String, Integer> map) {
         String aoiDescriptions = "";
         String sequence = "";
         int ascii = 65;
 
+        // Build aoiDescriptions string 
+        for (String s: map.keySet()) {
+            int asciiValue = map.get(s);
+            String description = s == "" ? "No AOI" : s;
+            aoiDescriptions += (char)asciiValue + ", " + description + "\n";
+        }
+
+        // Generate sequence
         for (int i = 0; i < data.rowCount(); i++) {
             String aoi = data.getValue(AOI_INDEX, i);
 

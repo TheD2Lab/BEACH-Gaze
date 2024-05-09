@@ -35,7 +35,6 @@ public class UserInterface {
     private JTabbedPane tabs;
     private JPanel analysisPanel;
     private JPanel helpPanel;
-    private JCheckBox batchAnalysisCheckBox;
     private JButton selectFilesButton;
     private JLabel fileCountLabel;
     private JButton browseDirectoryButton;
@@ -96,6 +95,7 @@ public class UserInterface {
         // Constraints dictate location of UI components
         GridBagConstraints panelGBC = new GridBagConstraints();
         panelGBC.anchor = GridBagConstraints.FIRST_LINE_START;
+        panelGBC.insets = new Insets(0, 0, 0, 150);
         panelGBC.gridx = 0;
         panelGBC.gridy = 0;
         panelGBC.gridwidth = 1;
@@ -118,42 +118,36 @@ public class UserInterface {
         componentGBC.gridwidth = 8;
         gazePanel.add(gazeLabel, componentGBC);
 
-        batchAnalysisCheckBox = new JCheckBox("Batch Analysis (Select to analyze multiple participants)");
-        componentGBC.gridx = 0;
-        componentGBC.gridy = 1;
-        componentGBC.gridwidth = 6;
-        gazePanel.add(batchAnalysisCheckBox, componentGBC);
-
         selectFilesButton = new JButton("Select File(s)");
         selectFilesButton.setToolTipText("Select all_gaze.csv files only");
         componentGBC.gridx = GridBagConstraints.REMAINDER;
-        componentGBC.gridy = 2;
+        componentGBC.gridy = 1;
         componentGBC.gridwidth = 3;
         gazePanel.add(selectFilesButton, componentGBC);
 
         fileCountLabel = new JLabel(inputFiles.length + " files selected");
         componentGBC.gridx = GridBagConstraints.REMAINDER;
-        componentGBC.gridy = 3;
+        componentGBC.gridy = 2;
         componentGBC.gridwidth = 2;
         gazePanel.add(fileCountLabel, componentGBC);
 
         JLabel directoryLabel = new JLabel("Output Directory");
         componentGBC.insets = new Insets(10, 0, 0, 0);
         componentGBC.gridx = GridBagConstraints.REMAINDER;
-        componentGBC.gridy = 4;
+        componentGBC.gridy = 3;
         gazePanel.add(directoryLabel, componentGBC);
 
         browseDirectoryButton = new JButton("Browse");
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 2;
-        componentGBC.gridy = 5;
-        componentGBC.gridwidth = 2;
+        componentGBC.gridy = 4;
+        componentGBC.gridwidth = 10;
         gazePanel.add(browseDirectoryButton, componentGBC);
 
         directoryField = new JTextField(outputDirectory, 20);
         directoryField.setEditable(false);
         componentGBC.gridx = 0;
-        componentGBC.gridy = 5;
+        componentGBC.gridy = 4;
         componentGBC.gridwidth = 2;
         gazePanel.add(directoryField, componentGBC);
 
@@ -643,17 +637,16 @@ public class UserInterface {
     }
 
     private void selectInputFiles() {
-        boolean batchAnalysis = batchAnalysisCheckBox.isSelected();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(("CSV Files"), "csv");
         JFileChooser chooser = new JFileChooser();
 
-        chooser.setMultiSelectionEnabled(batchAnalysis);
+        chooser.setMultiSelectionEnabled(true);
         chooser.setAcceptAllFileFilterUsed(false);
         chooser.setFileFilter(filter);
 
         int returnVal = chooser.showOpenDialog(frame);
         if(returnVal == JFileChooser.APPROVE_OPTION) {
-            inputFiles = batchAnalysis ? chooser.getSelectedFiles() : new File[] {chooser.getSelectedFile()};
+            inputFiles = chooser.getSelectedFiles();
         }
 
         fileCountLabel.setText(inputFiles.length + " files selected");
