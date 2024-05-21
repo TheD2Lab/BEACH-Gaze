@@ -174,15 +174,22 @@ public class Windows {
         List<List<String>> allWindowDGMs = new ArrayList<List<String>>();
         for (DataEntry w : windows) {
             String fileName = "window" + windowCount;
-            w.writeToCSV(outputDirectory, fileName);
+            String windowDirectory = outputDirectory + "/" + fileName;
+
+            w.writeToCSV(windowDirectory, fileName);
+
             // windows are continuous and raw, therefore fixation filtering will be valid
             ArrayList<List<String>> results = Analysis.generateResults(w, DataFilter.filterByFixations(w));
 
+            // In the combined window folder, add headers if there are none
             if (allWindowDGMs.size() == 0)
                 allWindowDGMs.add(results.get(0));
-
+            
             allWindowDGMs.add(results.get(1));
-            FileHandler.writeToCSV(results, outputDirectory, fileName + "_DGMs");
+            
+            FileHandler.writeToCSV(results, windowDirectory, fileName + "_DGMs");
+            AreaOfInterests.generateAOIs(w, windowDirectory, fileName);
+            
             windowCount++;
         }
 
