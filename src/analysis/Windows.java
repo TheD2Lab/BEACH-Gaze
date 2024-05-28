@@ -21,7 +21,7 @@ public class Windows {
         Arrays.asList(
         "FPOGD",
         "SACCADE_MAG",
-        "SACCADE_DUR" 
+        "SACCADE_DIR" 
     ));
 
     // Set of supported events that utilize the allGaze file
