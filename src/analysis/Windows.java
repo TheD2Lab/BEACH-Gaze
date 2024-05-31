@@ -35,6 +35,7 @@ public class Windows {
 
     public static void generateWindows(DataEntry allGaze, String outputDirectory, WindowSettings settings) {
         List<String> headers = allGaze.getHeaders();
+        double t0 = Double.valueOf(allGaze.getValue(TIME_INDEX, 0));
 
         // Generate baseline file
         generateBaselineFile(allGaze, outputDirectory + "/baseline");
@@ -44,7 +45,7 @@ public class Windows {
             ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
             DataEntry window = new DataEntry(headers);
             double windowSize = settings.tumblingWindowSize;
-            double start = Double.valueOf(allGaze.getValue(TIME_INDEX, 0));
+            double start = t0;
             double end = start + windowSize;
 
             for (int i = 0; i < allGaze.rowCount(); i++) {
@@ -64,7 +65,7 @@ public class Windows {
                 }
             }
 
-            outputWindowFiles(windows, outputDirectory + "/tumbling");
+            outputWindowFiles(windows, t0, outputDirectory + "/tumbling");
         }
 
         // Expanding Window
@@ -72,7 +73,7 @@ public class Windows {
             ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
             DataEntry window = new DataEntry(headers);
             double windowSize = settings.expandingWindowSize;
-            double start = Double.valueOf(allGaze.getValue(TIME_INDEX, 0));
+            double start = t0;
             double end = start + windowSize;
 
             for (int i = 0; i < allGaze.rowCount(); i++) {
@@ -92,7 +93,7 @@ public class Windows {
                 }
             }
 
-            outputWindowFiles(windows, outputDirectory + "/expanding");
+            outputWindowFiles(windows, t0, outputDirectory + "/expanding");
         }
 
         // Hopping Window
@@ -101,7 +102,7 @@ public class Windows {
             DataEntry window = new DataEntry(headers);
             double windowSize = settings.hoppingWindowSize;
             double hopSize = settings.hoppingHopSize;
-            double start = Double.valueOf(allGaze.getValue(TIME_INDEX, 0));
+            double start = t0;
             double end = start + windowSize;
 
             for (int i = 0; i < allGaze.rowCount(); i++) {
@@ -128,7 +129,7 @@ public class Windows {
                 }
             }
 
-            outputWindowFiles(windows, outputDirectory + "/hopping");
+            outputWindowFiles(windows, t0, outputDirectory + "/hopping");
         }
 
         // Event Window
@@ -148,6 +149,11 @@ public class Windows {
                 Double t = Double.valueOf(allGaze.getValue(TIME_INDEX, i));
                 Double windowValue =  getEventWindowValue(allGaze, event, i);
 
+                // Get the initial timestamp
+                if (i == 0) {
+                    t0 = t;
+                }
+
                 if (windowValue > baselineValue) {
                     if (!isEventWindow) maxDuration = t + settings.eventMaxDuration;
                     isEventWindow = true;
@@ -165,11 +171,11 @@ public class Windows {
                 }
             }
 
-            outputWindowFiles(windows, outputDirectory + "/event");
+            outputWindowFiles(windows, t0, outputDirectory + "/event");
         }
     }
 
-    public static void outputWindowFiles(ArrayList<DataEntry> windows, String outputDirectory) {
+    public static void outputWindowFiles(ArrayList<DataEntry> windows, double t0, String outputDirectory) {
         int windowCount = 1;
         List<List<String>> allWindowDGMs = new ArrayList<List<String>>();
         for (DataEntry w : windows) {
@@ -181,11 +187,32 @@ public class Windows {
             // windows are continuous and raw, therefore fixation filtering will be valid
             ArrayList<List<String>> results = Analysis.generateResults(w, DataFilter.filterByFixations(w));
 
-            // In the combined window folder, add headers if there are none
-            if (allWindowDGMs.size() == 0)
-                allWindowDGMs.add(results.get(0));
+            // Calculate beginning time stamp, ending timestamp, window duration, initial/final seconds elapsed since window start
+            double t1 = Double.parseDouble(w.getValue(TIME_INDEX, 0));
+            double t2 = Double.parseDouble(w.getValue(TIME_INDEX, w.rowCount() - 1));
+            double windowDuration = t2 - t1;
+            double initialDuration = t1 - t0;
+            double finalDuration = t2 - t0;
+
+            List<String> headers = results.get(0);
+            headers.add("Beginning Timestamp");
+            headers.add("Ending Timestamp");
+            headers.add("Window Duration");
+            headers.add("Initial Seconds Elapsed Since Start");
+            headers.add("Final Seconds Elapsed Since Start");
             
-            allWindowDGMs.add(results.get(1));
+            List<String> dgms = results.get(1);
+            dgms.add(String.valueOf(t1));
+            dgms.add(String.valueOf(t2));
+            dgms.add(String.valueOf(windowDuration));
+            dgms.add(String.valueOf(initialDuration));
+            dgms.add(String.valueOf(finalDuration));
+            allWindowDGMs.add(dgms);
+
+            // In the combined window folder, add headers if there are none
+            if (allWindowDGMs.size() == 0) {
+                allWindowDGMs.add(headers);
+            }
             
             FileHandler.writeToCSV(results, windowDirectory, fileName + "_DGMs");
             AreaOfInterests.generateAOIs(w, windowDirectory, fileName);
