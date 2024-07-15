@@ -10,7 +10,7 @@ public class Angles {
 	
 	static public LinkedHashMap<String,String> analyze(DataEntry data) {
 		LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
-		ArrayList<Object> allCoordinates = new ArrayList<>();
+		ArrayList<Double[]> allCoordinates = new ArrayList<>();
 
 		for (int row = 0; row < data.rowCount(); row++) {
 			Double[] eachCoordinate = new Double[3];
@@ -18,7 +18,6 @@ public class Angles {
 			eachCoordinate[1] = Double.valueOf(data.getValue(FIXATIONY_INDEX, row));
 			eachCoordinate[2] = Double.valueOf(data.getValue(FIXATIONID_INDEX, row));
 			allCoordinates.add(eachCoordinate);
-
 		}
 
 		ArrayList<Double> allAbsoluteDegrees = getAllAbsoluteAngles(allCoordinates);
@@ -93,7 +92,7 @@ public class Angles {
 	//in the rare cases where the fixation B is a straight vertical line to fixation A,
 	//in other words, A and B have the same X value,
 	//90 degrees is returned as the absolute angle (with respect to X axis) since we cannot divide numbers by zero.
-	public static ArrayList<Double> getAllAbsoluteAngles(ArrayList<Object> allCoordinates){
+	public static ArrayList<Double> getAllAbsoluteAngles(ArrayList<Double[]> allCoordinates){
 
 		ArrayList<Double> allAbsoluteDegrees = new ArrayList<>();
 		double absoluteDegree = 0.0;
@@ -134,7 +133,7 @@ public class Angles {
 	//given three points A, B and C with (X1, Y1) (X2, Y2) and (X3, Y3) respectively
 	//the relative saccade angle = 180 degrees - ( arctan(|(Y2-Y1)/(X2-X1)|).toDegrees + arctan(|(Y3-Y2)/(X3-X2)|).toDegrees )
 	//in cases where X1=X2=X3, the relative angle is 0 degree
-	public static ArrayList<Double> getAllRelativeAngles(ArrayList<Object> allCoordinates){
+	public static ArrayList<Double> getAllRelativeAngles(ArrayList<Double[]> allCoordinates){
 
 		ArrayList<Double> allRelativeDegrees = new ArrayList<>();
 		double relativeDegree = 0.0;
@@ -142,9 +141,9 @@ public class Angles {
 		double secondDegree = 0.0;
 
 		for(int i=1; (i+1)<allCoordinates.size(); i++){
-			Double[] previousCoordinate = (Double[]) allCoordinates.get(i-1);
-			Double[] currentCoordinate = (Double[]) allCoordinates.get(i);
-			Double[] nextCoordinate = (Double[]) allCoordinates.get(i+1);
+			Double[] previousCoordinate = allCoordinates.get(i-1);
+			Double[] currentCoordinate = allCoordinates.get(i);
+			Double[] nextCoordinate = allCoordinates.get(i+1);
 
 			//System.out.println("i=" + i + "; previous X: " + previousCoordinate[0] + "; current X: " + currentCoordinate[0] + "; next X: " + nextCoordinate[0]);
 
