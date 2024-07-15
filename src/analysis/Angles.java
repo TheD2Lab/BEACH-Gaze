@@ -4,87 +4,87 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 public class Angles {
-    final static String FIXATIONID_INDEX = "FPOGID";
-    final static String FIXATIONX_INDEX = "FPOGX";
-    final static String FIXATIONY_INDEX = "FPOGY";
-    
-    static public LinkedHashMap<String,String> analyze(DataEntry data) {
-        LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
-        ArrayList<Object> allCoordinates = new ArrayList<>();
+	final static String FIXATIONID_INDEX = "FPOGID";
+	final static String FIXATIONX_INDEX = "FPOGX";
+	final static String FIXATIONY_INDEX = "FPOGY";
+	
+	static public LinkedHashMap<String,String> analyze(DataEntry data) {
+		LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
+		ArrayList<Object> allCoordinates = new ArrayList<>();
 
-        for (int row = 0; row < data.rowCount(); row++) {
-            Double[] eachCoordinate = new Double[3];
-            eachCoordinate[0] = Double.valueOf(data.getValue(FIXATIONX_INDEX, row));
-            eachCoordinate[1] = Double.valueOf(data.getValue(FIXATIONY_INDEX, row));
-            eachCoordinate[2] = Double.valueOf(data.getValue(FIXATIONID_INDEX, row));
-            allCoordinates.add(eachCoordinate);
+		for (int row = 0; row < data.rowCount(); row++) {
+			Double[] eachCoordinate = new Double[3];
+			eachCoordinate[0] = Double.valueOf(data.getValue(FIXATIONX_INDEX, row));
+			eachCoordinate[1] = Double.valueOf(data.getValue(FIXATIONY_INDEX, row));
+			eachCoordinate[2] = Double.valueOf(data.getValue(FIXATIONID_INDEX, row));
+			allCoordinates.add(eachCoordinate);
 
-        }
+		}
 
-        ArrayList<Double> allAbsoluteDegrees = getAllAbsoluteAngles(allCoordinates);
-        ArrayList<Double> allRelativeDegrees = getAllRelativeAngles(allCoordinates);
-        //Absolute Degrees
-        results.put(
-            "sum of all absolute degrees", //Output Header
-            String.valueOf(DescriptiveStats.getSumOfDoubles(allAbsoluteDegrees))
-            );
+		ArrayList<Double> allAbsoluteDegrees = getAllAbsoluteAngles(allCoordinates);
+		ArrayList<Double> allRelativeDegrees = getAllRelativeAngles(allCoordinates);
+		//Absolute Degrees
+		results.put(
+			"sum of all absolute degrees", //Output Header
+			String.valueOf(DescriptiveStats.getSumOfDoubles(allAbsoluteDegrees))
+			);
 
-        results.put(
-            "mean absolute degree", //Output Header
-            String.valueOf(DescriptiveStats.getMeanOfDoubles(allAbsoluteDegrees))
-            );
+		results.put(
+			"mean absolute degree", //Output Header
+			String.valueOf(DescriptiveStats.getMeanOfDoubles(allAbsoluteDegrees))
+			);
 
-        results.put(
-            "median absolute degree", //Output Header
-            String.valueOf(DescriptiveStats.getMedianOfDoubles(allAbsoluteDegrees))
-            );
+		results.put(
+			"median absolute degree", //Output Header
+			String.valueOf(DescriptiveStats.getMedianOfDoubles(allAbsoluteDegrees))
+			);
 
-        results.put(
-            "StDev of absolute degrees", //Output Header
-            String.valueOf(DescriptiveStats.getStDevOfDoubles(allAbsoluteDegrees))
-            );
+		results.put(
+			"StDev of absolute degrees", //Output Header
+			String.valueOf(DescriptiveStats.getStDevOfDoubles(allAbsoluteDegrees))
+			);
 
-        results.put(
-            "min absolute degree", //Output Header
-            String.valueOf(DescriptiveStats.getMinOfDoubles(allAbsoluteDegrees))
-            );            
+		results.put(
+			"min absolute degree", //Output Header
+			String.valueOf(DescriptiveStats.getMinOfDoubles(allAbsoluteDegrees))
+			);            
 
-        results.put(
-            "max absolute degree", //Output Header
-            String.valueOf(DescriptiveStats.getMaxOfDoubles(allAbsoluteDegrees)) 
-            );   
-        //Relative Degrees
-        results.put(
-            "sum of all relative degrees", 
-            String.valueOf(DescriptiveStats.getSumOfDoubles(allRelativeDegrees))
-            );  
+		results.put(
+			"max absolute degree", //Output Header
+			String.valueOf(DescriptiveStats.getMaxOfDoubles(allAbsoluteDegrees)) 
+			);   
+		//Relative Degrees
+		results.put(
+			"sum of all relative degrees", 
+			String.valueOf(DescriptiveStats.getSumOfDoubles(allRelativeDegrees))
+			);  
 
-        results.put(
-            "mean relative degree", //Output Header
-            String.valueOf(DescriptiveStats.getMeanOfDoubles(allRelativeDegrees))
-            );
+		results.put(
+			"mean relative degree", //Output Header
+			String.valueOf(DescriptiveStats.getMeanOfDoubles(allRelativeDegrees))
+			);
 
-        results.put(
-            "median relative degree", //Output Header
-            String.valueOf(DescriptiveStats.getMedianOfDoubles(allRelativeDegrees))
-            );
+		results.put(
+			"median relative degree", //Output Header
+			String.valueOf(DescriptiveStats.getMedianOfDoubles(allRelativeDegrees))
+			);
 
-        results.put(
-            "StDev of relative degrees", //Output Header
-            String.valueOf(DescriptiveStats.getStDevOfDoubles(allRelativeDegrees))
-            );
+		results.put(
+			"StDev of relative degrees", //Output Header
+			String.valueOf(DescriptiveStats.getStDevOfDoubles(allRelativeDegrees))
+			);
 
-        results.put(
-            "min relative degree", //Output Header
-            String.valueOf(DescriptiveStats.getMinOfDoubles(allRelativeDegrees))
-            );            
+		results.put(
+			"min relative degree", //Output Header
+			String.valueOf(DescriptiveStats.getMinOfDoubles(allRelativeDegrees))
+			);            
 
-        results.put(
-            "max relative degree", //Output Header
-            String.valueOf(DescriptiveStats.getMaxOfDoubles(allRelativeDegrees)) 
-            );   
-        return results;
-    }
+		results.put(
+			"max relative degree", //Output Header
+			String.valueOf(DescriptiveStats.getMaxOfDoubles(allRelativeDegrees)) 
+			);   
+		return results;
+	}
 
 	//given two points A & B on the screen with (X1, Y1) and (X2, Y2) respectively
 	//the absolute saccade slope = |(Y2-Y1)|/|(X2-X1)|
