@@ -15,7 +15,7 @@ public class Saccades {
 
         ArrayList<Double> allFixationDurations = new ArrayList<>();
         ArrayList<Double[]> saccadeDetails = new ArrayList<>();
-        ArrayList<Object> allCoordinates = new ArrayList<>();
+        ArrayList<Coordinate> allCoordinates = new ArrayList<>();
         
         for (int row = 0; row < data.rowCount(); row++) {
             Double fixationDurationSeconds = Double.valueOf(data.getValue(DURATION_INDEX, row));;
@@ -26,10 +26,11 @@ public class Saccades {
             eachSaccadeDetail[2] = Double.valueOf(data.getValue(FIXATIONID_INDEX, row));
             saccadeDetails.add(eachSaccadeDetail);
 
-            Double[] eachCoordinate = new Double[3];
-            eachCoordinate[0] = Double.valueOf(data.getValue(FIXATIONX_INDEX, row));
-            eachCoordinate[1] = Double.valueOf(data.getValue(FIXATIONY_INDEX, row));
-            eachCoordinate[2] = Double.valueOf(data.getValue(FIXATIONID_INDEX, row));
+            Coordinate eachCoordinate = new Coordinate(
+                Double.valueOf(data.getValue(FIXATIONX_INDEX, row)),
+                Double.valueOf(data.getValue(FIXATIONY_INDEX, row)),
+                Integer.valueOf(data.getValue(FIXATIONID_INDEX, row))
+            );
             allCoordinates.add(eachCoordinate);
             allFixationDurations.add(fixationDurationSeconds);
         }
@@ -113,34 +114,28 @@ public class Saccades {
             String.valueOf(getFixationToSaccadeRatio(allFixationDurations, allSaccadeDurations))
             );
 
-        /*
-         *  headers.add("Average Peak Saccade Velocity");
-            data.add(avgPeakSaccadeVelocity(inputFile, outputFile));
-         */
-
         return results;
     } 
     
 
-    public static Double[] getAllSaccadeLength(ArrayList<Object> allCoordinates) {
+    public static Double[] getAllSaccadeLength(ArrayList<Coordinate> allCoordinates) {
         if (allCoordinates.size() == 0) return new Double[0];
 
 		ArrayList<Double> allSaccadeLengths = new ArrayList<Double>();
 		int objectSize = allCoordinates.size();
 		Double[] allLengths = new Double[(objectSize-1)];
 		for(int i=0; i<objectSize; i++){
-			Double[] earlyCoordinate = (Double[]) allCoordinates.get(i);
+			Coordinate earlyCoordinate = allCoordinates.get(i);
 
 			if(i+1<objectSize){
-				Double[] laterCoordinate = (Double[]) allCoordinates.get(i+1);
-				if (earlyCoordinate[2] == laterCoordinate[2] - 1)
-					allSaccadeLengths.add(Math.sqrt(Math.pow((laterCoordinate[0] - earlyCoordinate[0]), 2) + Math.pow((laterCoordinate[1] - earlyCoordinate[1]), 2)));
+				Coordinate laterCoordinate = allCoordinates.get(i+1);
+				if (earlyCoordinate.fid == laterCoordinate.fid - 1)
+					allSaccadeLengths.add(Math.sqrt(Math.pow((laterCoordinate.x - earlyCoordinate.x), 2) + Math.pow((laterCoordinate.y - earlyCoordinate.y), 2)));
 			}
 		}
 		
 		allLengths = new Double[allSaccadeLengths.size()];
 		return allSaccadeLengths.toArray(allLengths);
-		//return allLengths;
 	}
 
     public static ArrayList<Double> getAllSaccadeDurations(ArrayList<Double[]> saccadeDetails){
