@@ -31,6 +31,9 @@ public class AnglesTest {
       add(new Coordinate(0., 0, 100));
       add(new Coordinate(0., -3, 101));
       add(new Coordinate(4., 0, 102));
+      add(new Coordinate(0., 1, 200));
+      add(new Coordinate(1., 1, 201));
+      add(new Coordinate(4., 1, 202));
    }};
 
    final double PRECISION = 0.0000001;
@@ -50,7 +53,9 @@ public class AnglesTest {
          90.0,
          36.86989764584,
          90.0,
-         36.86989764584
+         36.86989764584,
+         0,
+         0
       };
 
       ArrayList<Double> actual = Angles.getAllAbsoluteAngles(TEST_COORDINATES);
@@ -83,6 +88,7 @@ public class AnglesTest {
          0.0,
          126.869897645844,
          53.130102354156,
+         180
       };
       ArrayList<Double> actual = Angles.getAllRelativeAngles(TEST_COORDINATES);
       assertEquals(
@@ -102,4 +108,5 @@ public class AnglesTest {
          }
       }
    }
+
 }
