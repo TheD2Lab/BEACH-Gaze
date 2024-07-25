@@ -173,6 +173,10 @@ public class Analysis {
         results.get(0).addAll(entropy.keySet());
         results.get(1).addAll(entropy.values());
 
+        LinkedHashMap<String, String> blinks = Blinks.analyze(allGaze);
+        results.get(0).addAll(blinks.keySet());
+        results.get(1).addAll(blinks.values());
+
         LinkedHashMap<String,String> gaze = Gaze.analyze(validGaze);
         results.get(0).addAll(gaze.keySet());
         results.get(1).addAll(gaze.values());

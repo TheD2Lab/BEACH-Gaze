@@ -34,11 +34,6 @@ public class Gaze {
         double rightAverage = rightSum / count;
         double bothAverage = bothSum / count;
 
-        results.put(
-            "Average Blink Rate per Minute", //Output Header
-            String.valueOf(totalBlinks / minutes)
-            );   
-
         //Absolute Degrees
         results.put(
             "total number of valid recordings", //Output Header
