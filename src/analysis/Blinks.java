@@ -36,13 +36,23 @@ public class Blinks {
          prevBlinkId = curBlinkId;
       }
 
+      /*
+         Note: Blink rate can be NaN while blinkCnt can be a non-zero number
+         due to the time window calculations. This is unlikely at 150 Hz because
+         blinks last 0.1-0.4 seconds and a sample is taken every 0.006 seconds. 
+       */
       double blinkRate = timeTotal > 0 ? (blinkCnt / timeTotal) * 60 : Double.NaN;
+
+      results.put(
+         "Total Number of Blinks",
+         String.valueOf(blinkCnt)
+      );
 
       results.put(
          "Average Blink Rate per Minute", //Output Header
          String.valueOf(blinkRate)
       );  
 
-      return results;   // return LinkedHashMap for consistency even though only 1 result
+      return results;
    }
 }

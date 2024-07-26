@@ -21,16 +21,16 @@ public class BlinksTest {
    static final List<String> HEADERS = Collections.unmodifiableList(
       Arrays.asList(new String[]{"TIME", "CNT", "BKID"})
    );
-   static final String KEY = "Average Blink Rate per Minute";
+   static final String RATE_KEY = "Average Blink Rate per Minute";
+   static final String TOTAL_KEY = "Total Number of Blinks";
 
    @Test
    public void testBlinksAnalyze_emptyData_BlinkRateOfNaN() {
       DataEntry emptyData = new DataEntry(HEADERS);
-      Map<String, String> actual = Blinks.analyze(emptyData);
-      if (!actual.containsKey(KEY)) {
-         fail(String.format("Does not contain \"%s\"", KEY));
-      }
-      assertTrue(actual.get(KEY).equals("NaN"));
+      Map<String, String> actualMap = Blinks.analyze(emptyData);
+      this.checkKeys(actualMap);
+      assertTrue("Unexpected blink rate.", actualMap.get(RATE_KEY).equals("NaN"));
+      assertTrue("Unexpected number of blinks.", actualMap.get(TOTAL_KEY).equals("0"));
    }
 
    @Test
@@ -42,11 +42,10 @@ public class BlinksTest {
          process(Arrays.asList(new String[]{"0.3", "3", "0"}));
       }};
       Map<String, String> actualMap = Blinks.analyze(emptyData);
-      if (!actualMap.containsKey(KEY)) {
-         fail(String.format("Does not contain \"%s\"", KEY));
-      }
-      double actualBlinkRate = Double.parseDouble(actualMap.get(KEY));
-      assertEquals(0.0, actualBlinkRate, PRECISION);
+      this.checkKeys(actualMap);
+      double actualBlinkRate = Double.parseDouble(actualMap.get(RATE_KEY));
+      assertEquals("Unexpected blink rate.", 0.0, actualBlinkRate, PRECISION);
+      assertTrue("Unexpected number of blinks.", actualMap.get(TOTAL_KEY).equals("0"));
    }
 
    @Test
@@ -58,10 +57,9 @@ public class BlinksTest {
          process(Arrays.asList(new String[]{"0.6", "6", "0"}));
       }};
       Map<String, String> actualMap = Blinks.analyze(data);
-      if (!actualMap.containsKey(KEY)) {
-         fail(String.format("Does not contain \"%s\"", KEY));
-      }
-      assertTrue(actualMap.get(KEY).equals("NaN"));
+      this.checkKeys(actualMap);
+      assertTrue("Unexpected blink rate.", actualMap.get(RATE_KEY).equals("NaN"));
+      assertTrue("Unexpected number of blinks.", actualMap.get(TOTAL_KEY).equals("1"));
    }
    
    @Test
@@ -82,11 +80,10 @@ public class BlinksTest {
          process(Arrays.asList(new String[]{"1.0", "10", "0"}));
       }};
       Map<String, String> actualMap = Blinks.analyze(data);
-      if (!actualMap.containsKey(KEY)) {
-         fail(String.format("Does not contain \"%s\"", KEY));
-      }
-      double actualBlinkRate = Double.parseDouble(actualMap.get(KEY));
-      assertEquals(EXPECTED_BLINK_RATE, actualBlinkRate, PRECISION);
+      this.checkKeys(actualMap);
+      double actualBlinkRate = Double.parseDouble(actualMap.get(RATE_KEY));
+      assertEquals("Unexpected blink rate.",EXPECTED_BLINK_RATE, actualBlinkRate, PRECISION);
+      assertTrue("Unexpected number of blinks.", actualMap.get(TOTAL_KEY).equals("2"));
    }
 
    @Test
@@ -105,10 +102,18 @@ public class BlinksTest {
          process(Arrays.asList(new String[]{"1.0", "10", "0"}));
       }};
       Map<String, String> actualMap = Blinks.analyze(data);
-      if (!actualMap.containsKey(KEY)) {
-         fail(String.format("Does not contain \"%s\"", KEY));
+      this.checkKeys(actualMap);
+      double actualBlinkRate = Double.parseDouble(actualMap.get(RATE_KEY));
+      assertEquals("Unexpected blink rate.", EXPECTED_BLINK_RATE, actualBlinkRate, PRECISION);
+      assertTrue("Unexpected number of blinks.", actualMap.get(TOTAL_KEY).equals("2"));
+   }
+
+   private void checkKeys(Map<String, String> map) {
+      if (!map.containsKey(RATE_KEY)) {
+         fail(String.format("Does not contain \"%s\"", RATE_KEY));
       }
-      double actualBlinkRate = Double.parseDouble(actualMap.get(KEY));
-      assertEquals(EXPECTED_BLINK_RATE, actualBlinkRate, PRECISION);
+      if (!map.containsKey(TOTAL_KEY)) {
+         fail(String.format("Does not contain \"%s\"", TOTAL_KEY));
+      }
    }
 }
