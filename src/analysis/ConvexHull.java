@@ -26,7 +26,7 @@ public class ConvexHull {
         List<Point2D.Double> boundingPoints = getConvexHull(allPoints);
 
         results.put(
-            "convex hull area", //Output Header
+            "convex_hull_area", //Output Header
             String.valueOf(getPolygonArea(boundingPoints))
             );
 

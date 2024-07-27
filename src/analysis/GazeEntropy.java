@@ -61,12 +61,12 @@ public class GazeEntropy {
         }
 
         results.put(
-            "stationary entropy", //Output Header
+            "stationary_entropy", //Output Header
             String.valueOf(getStationaryEntropy(aoiProbability)) //Output Value
             );
 
         results.put(
-            "transition entropy", //Output Header
+            "transition_entropy", //Output Header
             String.valueOf(getTransitionEntropy(aoiProbability, transitionProbability)) //Output Value
             );
     

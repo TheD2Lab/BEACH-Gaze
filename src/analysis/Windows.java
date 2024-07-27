@@ -191,11 +191,11 @@ public class Windows {
             double finalDuration = t2 - t0;
 
             List<String> headers = results.get(0);
-            headers.add("Beginning Timestamp");
-            headers.add("Ending Timestamp");
-            headers.add("Window Duration");
-            headers.add("Initial Seconds Elapsed Since Start");
-            headers.add("Final Seconds Elapsed Since Start");
+            headers.add("beginning_timestamp");
+            headers.add("ending_timestamp");
+            headers.add("window_duration");
+            headers.add("initial_seconds_elapsed_since_start");
+            headers.add("final_seconds_elapsed_since_start");
             
             List<String> dgms = results.get(1);
             dgms.add(String.valueOf(t1));
