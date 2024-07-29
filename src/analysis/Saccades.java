@@ -35,7 +35,7 @@ public class Saccades {
             allFixationDurations.add(fixationDurationSeconds);
         }
         
-        Double[] allSaccadeLengths = getAllSaccadeLength(allCoordinates);
+        Double[] allSaccadeLengths = getAllSaccadeLengths(allCoordinates);
         ArrayList<Double> allSaccadeDurations = getAllSaccadeDurations(saccadeDetails);
 
         
@@ -45,7 +45,7 @@ public class Saccades {
             );
 
         results.put(
-            "sum_of_all_saccade_length", 
+            "sum_of_all_saccade_lengths", 
             String.valueOf(DescriptiveStats.getSum(allSaccadeLengths))
             );
         
@@ -118,7 +118,7 @@ public class Saccades {
     } 
     
 
-    public static Double[] getAllSaccadeLength(ArrayList<Coordinate> allCoordinates) {
+    public static Double[] getAllSaccadeLengths(ArrayList<Coordinate> allCoordinates) {
         if (allCoordinates.size() == 0) return new Double[0];
 
 		ArrayList<Double> allSaccadeLengths = new ArrayList<Double>();
