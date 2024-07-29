@@ -22,7 +22,7 @@ public class GazeTest {
          put("average_pupil_size_of_right_eye", "4.476186");
          put("average_pupil_size_of_both_eyes", "4.52390975");
       }});
-      final String FIXATION_PATH = "./src/test/test_files/valid_fixations.csv";
+      final String FIXATION_PATH = "./src/test/resources/valid_fixations.csv";
       DataEntry fixationData = FileHandler.buildDataEntry(new File(FIXATION_PATH));
       Map<String, String> actualResults = Gaze.analyze(fixationData);
 

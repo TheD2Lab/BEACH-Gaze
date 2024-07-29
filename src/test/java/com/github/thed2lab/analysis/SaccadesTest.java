@@ -212,7 +212,7 @@ public class SaccadesTest {
 
    @Test
    public void testSaccadeAnalyze_validFixations_returnHeadersAndValues() {
-      final String DATA_PATH = "./src/test/test_files/valid_fixations.csv";
+      final String DATA_PATH = "./src/test/resources/valid_fixations.csv";
       final Map<String, String> EXPECTED_RESULTS = Collections.unmodifiableMap(new HashMap<String, String>() {{
          put("total_number_of_saccades", "16");
 

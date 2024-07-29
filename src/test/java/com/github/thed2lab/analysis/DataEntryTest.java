@@ -75,7 +75,7 @@ public class DataEntryTest {
       }
    };
 
-   final static String TEST_FILE_DIR = "./src/test/test_files/";
+   final static String TEST_FILE_DIR = "./src/test/resources/";
 
    @Rule
    public TemporaryFolder tempFolder = new TemporaryFolder();

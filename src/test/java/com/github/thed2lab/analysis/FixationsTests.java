@@ -70,7 +70,7 @@ public class FixationsTests {
          put("min_fixation_duration_s", "0.03382");
          put("max_fixation_duration_s", "0.66125");
       }});
-      final String FIXATION_PATH = "src/test/test_files/filtered_by_fixation.csv";
+      final String FIXATION_PATH = "./src/test/resources/filtered_by_fixation.csv";
       DataEntry actual_data = FileHandler.buildDataEntry(new File(FIXATION_PATH));
       final Map<String, String> ACTUAL_RESULTS = Collections.unmodifiableMap(Fixations.analyze(actual_data));
 

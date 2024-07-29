@@ -10,7 +10,7 @@ import org.junit.Test;
 
 public class DataFilterTest {
    // Note: final only prevents reassigning variables, not modifying objects.
-   final String TEST_DIR = "./src/test/test_files/";
+   final String TEST_DIR = "./src/test/resources/";
 
    final String ALL_GAZE_PATH = TEST_DIR + "test_all_gaze.csv";
    final DataEntry ALL_GAZE_DATA = FileHandler.buildDataEntry(new File(ALL_GAZE_PATH));
