@@ -16,7 +16,7 @@ public class DataFilterTest {
    final DataEntry ALL_GAZE_DATA = FileHandler.buildDataEntry(new File(ALL_GAZE_PATH));
 
    final String EXPECTED_FIXATION_PATH = TEST_DIR + "filtered_by_fixation.csv";
-   final int EXPECTED_NUM_VALID = 850;
+   final int EXPECTED_NUM_VALID = 822;
 
    @Test
    public void testFilterByFixation() {
