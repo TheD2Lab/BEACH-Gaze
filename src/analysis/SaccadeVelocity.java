@@ -48,7 +48,7 @@ public class SaccadeVelocity {
         }
 
         results.put(
-            "Average Peak Saccade Velocity",
+            "average_peak_saccade_velocity",
             String.valueOf(DescriptiveStats.getMeanOfDoubles(peakSaccadeVelocities))
         );
 

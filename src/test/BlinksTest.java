@@ -21,8 +21,8 @@ public class BlinksTest {
    static final List<String> HEADERS = Collections.unmodifiableList(
       Arrays.asList(new String[]{"TIME", "CNT", "BKID"})
    );
-   static final String RATE_KEY = "Average Blink Rate per Minute";
-   static final String TOTAL_KEY = "Total Number of Blinks";
+   static final String RATE_KEY = "average_blink_rate_per_minute";
+   static final String TOTAL_KEY = "total_number_of_blinks";
 
    @Test
    public void testBlinksAnalyze_emptyData_BlinkRateOfNaN() {

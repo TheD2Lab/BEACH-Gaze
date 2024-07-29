@@ -26,22 +26,22 @@ public class Gaze {
         double bothAverage = bothSum / count;
 
         results.put(
-            "total number of valid recordings", //Output Header
+            "total_number_of_valid_recordings", //Output Header
             String.valueOf(data.rowCount())
             );
 
         results.put(
-            "average pupil size of left eye", //Output Header
+            "average_pupil_size_of_left_eye", //Output Header
             String.valueOf(leftAverage)
             );    
 
         results.put(
-            "average pupil size of right eye", //Output Header
+            "average_pupil_size_of_right_eye", //Output Header
             String.valueOf(rightAverage)
             );    
 
         results.put(
-            "average pupil size of both eyes", //Output Header
+            "average_pupil_size_of_both_eyes", //Output Header
             String.valueOf(bothAverage)
             );    
         return results;

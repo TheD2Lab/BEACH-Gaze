@@ -40,77 +40,77 @@ public class Saccades {
 
         
         results.put(
-            "Total Number of Saccades", //Output Header
+            "total_number_of_saccades", //Output Header
             String.valueOf(allSaccadeLengths.length) //Output Value
             );
 
         results.put(
-            "Sum of all Saccade Lengths", 
+            "sum_of_all_saccade_length", 
             String.valueOf(DescriptiveStats.getSum(allSaccadeLengths))
             );
         
         results.put(
-            "Mean Saccade Length", 
+            "mean_saccade_length", 
             String.valueOf(DescriptiveStats.getMean(allSaccadeLengths))
             );
         
         results.put(
-            "Median Saccade Length", 
+            "median_saccade_length", 
             String.valueOf(DescriptiveStats.getMedian(allSaccadeLengths))
             );
         
         results.put(
-            "StDev of Saccade Lengths", 
+            "stdev_of_saccade_lengths", 
             String.valueOf(DescriptiveStats.getStDev(allSaccadeLengths))
             );
         
         results.put(
-            "Min Saccade Length", 
+            "min_saccade_length", 
             String.valueOf(DescriptiveStats.getMin(allSaccadeLengths))
             );
         
         results.put(
-            "Max Saccade Length", 
+            "max_saccade_length", 
             String.valueOf(DescriptiveStats.getMax(allSaccadeLengths))
             );
 
         results.put(
-            "Sum of All Saccade Durations", 
+            "sum_of_all_saccade_durations", 
             String.valueOf(DescriptiveStats.getSumOfDoubles(allSaccadeDurations))
             );
         
         results.put(
-            "Mean Saccade Duration", 
+            "mean_saccade_duration", 
             String.valueOf(DescriptiveStats.getMeanOfDoubles(allSaccadeDurations))
             );
         
         results.put(
-            "Median Saccade Duration", 
+            "median_saccade_duration", 
             String.valueOf(DescriptiveStats.getMedianOfDoubles(allSaccadeDurations))
             );
 
         results.put(
-            "StDev of Saccade Durations", 
+            "stdev_of_saccade_durations", 
             String.valueOf(DescriptiveStats.getStDevOfDoubles(allSaccadeDurations))
             );
                 
         results.put(
-            "Min Saccade Duration", 
+            "min_saccade_duration", 
             String.valueOf(DescriptiveStats.getMinOfDoubles(allSaccadeDurations))
             );
 
         results.put(
-            "Max Saccade Duration", 
+            "max_saccade_duration", 
             String.valueOf(DescriptiveStats.getMaxOfDoubles(allSaccadeDurations))
             );
             
         results.put(
-            "Scanpath Duration", 
+            "scanpath_duration", 
             String.valueOf(getScanpathDuration(allFixationDurations, allSaccadeDurations))
             );
 
         results.put(
-            "Fixation to Saccade Ratio", 
+            "fixation_to_saccade_ratio", 
             String.valueOf(getFixationToSaccadeRatio(allFixationDurations, allSaccadeDurations))
             );
 
