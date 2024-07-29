@@ -44,12 +44,12 @@ public class Blinks {
       double blinkRate = timeTotal > 0 ? (blinkCnt / timeTotal) * 60 : Double.NaN;
 
       results.put(
-         "Total Number of Blinks",
+         "total_number_of_blinks",
          String.valueOf(blinkCnt)
       );
 
       results.put(
-         "Average Blink Rate per Minute", //Output Header
+         "average_blink_rate_per_minute", //Output Header
          String.valueOf(blinkRate)
       );  
 

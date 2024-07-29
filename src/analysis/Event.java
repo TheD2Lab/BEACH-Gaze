@@ -16,7 +16,7 @@ public class Event {
         }
         //Absolute Degrees
         results.put(
-            "total number of L mouse clicks", //Output Header
+            "total_number_of_l_mouse_clicks", //Output Header
             String.valueOf(leftMouseClicks)
             );    
         return results;

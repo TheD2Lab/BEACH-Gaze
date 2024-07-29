@@ -12,8 +12,8 @@ public class AreaOfInterests {
     final static String AOI_INDEX = "AOI";
 
 
-    private static final String[] additionalHeaders = {"AOI", "Proportion of fixations spent in AOI","Proportion of fixations durations spent in AOI"};
-    private static final String[] perAoiHeaders = {"AOI Pair", "Transition Count", "Proportion including self-transitions", "Proportion excluding self-transitions"};
+    private static final String[] additionalHeaders = {"aoi", "proportion_of_fixations_spent_in_aoi","proportion_of_fixations_durations_spent_in_aoi"};
+    private static final String[] perAoiHeaders = {"aoi_pair", "transition_count", "proportion_including_self_transitions", "proportion_excluding_self_transitions"};
     
     
     public static void generateAOIs(DataEntry allGazeData, String outputDirectory, String fileName) {

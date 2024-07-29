@@ -8,7 +8,7 @@ import java.util.List;
 public class Patterns {
     public static ArrayList<List<String>> discoverPatterns(List<String> sequences, int minPatternLength, int maxPatternLength, int minFrequency, int minSequenceSize) {
         ArrayList<List<String>> results = new ArrayList<List<String>>();
-        results.add(Arrays.asList(new String[] {"Pattern String", "Frequency", "Sequence Support", "Average Pattern Frequency", "Proportional Pattern Frequency"})); 
+        results.add(Arrays.asList(new String[] {"pattern_string", "frequency", "sequence_support", "average_pattern_frequency", "proportional_pattern_frequency"})); 
 
         for (int patternLength = minPatternLength; patternLength <= maxPatternLength; patternLength++) {
             int totalPatternCount = 0;

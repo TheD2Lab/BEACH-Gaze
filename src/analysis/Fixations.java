@@ -18,37 +18,37 @@ public class Fixations {
         }
         
         results.put(
-            "Total Number of Fixations", //Output Header
+            "total_number_of_fixations", //Output Header
             String.valueOf(fixationCount) //Output Value
             );
 
         results.put(
-            "Sum of all fixation duration (s)",
+            "sum_of_all_fixation_duration_s",
             String.valueOf(DescriptiveStats.getSumOfDoubles(allFixationDurations))
             );
 
         results.put(
-            "Mean fixation duration (s)",
+            "mean_fixation_duration_s",
             String.valueOf(DescriptiveStats.getMeanOfDoubles(allFixationDurations))
             );
 
         results.put(
-            "Median fixation duration (s)",
+            "median_fixation_duration_s",
             String.valueOf(DescriptiveStats.getMedianOfDoubles(allFixationDurations))
             );
 
         results.put(
-            "St.Dev. of fixation durations (s)",
+            "stdev_of_fixation_durations_s",
             String.valueOf(DescriptiveStats.getStDevOfDoubles(allFixationDurations))
             );
 
         results.put(
-            "Min. fixation duration (s)",
+            "min_fixation_duration_s",
             String.valueOf(DescriptiveStats.getMinOfDoubles(allFixationDurations))
             );
 
         results.put(
-            "Max. fixation duration (s)",
+            "max_fixation_duration_s",
             String.valueOf(DescriptiveStats.getMaxOfDoubles(allFixationDurations))
             );
 

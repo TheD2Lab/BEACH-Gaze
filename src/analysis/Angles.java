@@ -25,62 +25,62 @@ public class Angles {
 		ArrayList<Double> allRelativeDegrees = getAllRelativeAngles(allCoordinates);
 		//Absolute Degrees
 		results.put(
-			"sum of all absolute degrees", //Output Header
+			"sum_of_all_absolute_degrees", //Output Header
 			String.valueOf(DescriptiveStats.getSumOfDoubles(allAbsoluteDegrees))
 			);
 
 		results.put(
-			"mean absolute degree", //Output Header
+			"mean_absolute_degree", //Output Header
 			String.valueOf(DescriptiveStats.getMeanOfDoubles(allAbsoluteDegrees))
 			);
 
 		results.put(
-			"median absolute degree", //Output Header
+			"median_absolute_degree", //Output Header
 			String.valueOf(DescriptiveStats.getMedianOfDoubles(allAbsoluteDegrees))
 			);
 
 		results.put(
-			"StDev of absolute degrees", //Output Header
+			"stdev_of_absolute_degrees", //Output Header
 			String.valueOf(DescriptiveStats.getStDevOfDoubles(allAbsoluteDegrees))
 			);
 
 		results.put(
-			"min absolute degree", //Output Header
+			"min_absolute_degree", //Output Header
 			String.valueOf(DescriptiveStats.getMinOfDoubles(allAbsoluteDegrees))
 			);            
 
 		results.put(
-			"max absolute degree", //Output Header
+			"max_absolute_degree", //Output Header
 			String.valueOf(DescriptiveStats.getMaxOfDoubles(allAbsoluteDegrees)) 
 			);   
 		//Relative Degrees
 		results.put(
-			"sum of all relative degrees", 
+			"sum_of_all_relative_degrees", 
 			String.valueOf(DescriptiveStats.getSumOfDoubles(allRelativeDegrees))
 			);  
 
 		results.put(
-			"mean relative degree", //Output Header
+			"mean_relative_degree", //Output Header
 			String.valueOf(DescriptiveStats.getMeanOfDoubles(allRelativeDegrees))
 			);
 
 		results.put(
-			"median relative degree", //Output Header
+			"median_relative_degree", //Output Header
 			String.valueOf(DescriptiveStats.getMedianOfDoubles(allRelativeDegrees))
 			);
 
 		results.put(
-			"StDev of relative degrees", //Output Header
+			"stdev_of_relative_degrees", //Output Header
 			String.valueOf(DescriptiveStats.getStDevOfDoubles(allRelativeDegrees))
 			);
 
 		results.put(
-			"min relative degree", //Output Header
+			"min_relative_degree", //Output Header
 			String.valueOf(DescriptiveStats.getMinOfDoubles(allRelativeDegrees))
 			);            
 
 		results.put(
-			"max relative degree", //Output Header
+			"max_relative_degree", //Output Header
 			String.valueOf(DescriptiveStats.getMaxOfDoubles(allRelativeDegrees)) 
 			);   
 		return results;
