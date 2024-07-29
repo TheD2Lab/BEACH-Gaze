@@ -24,6 +24,10 @@ public class DataFilter {
                 lastValidFixation = data.getRow(row);
             }
         }
+        // Edge case: check last valid fixation is the last line of file or followed by only saccades
+        if (lastValidFixation != filtered.getRow(filtered.rowCount()-1)) {
+            filtered.process(lastValidFixation);    // add fixation if it wasn't already added
+        }
         
         return filtered;
     }
