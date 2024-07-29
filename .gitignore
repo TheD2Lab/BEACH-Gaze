@@ -11,3 +11,8 @@ bin/
 desktop.ini
 .DS_Store
 */DS_Store
+
+# Maven stuff
+target/
+
+
