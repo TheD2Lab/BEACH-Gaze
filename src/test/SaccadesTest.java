@@ -219,24 +219,24 @@ public class SaccadesTest {
    public void testSaccadeAnalyze_validFixations_returnHeadersAndValues() {
       final String DATA_PATH = "./src/test/test_files/valid_fixations.csv";
       final Map<String, String> EXPECTED_RESULTS = Collections.unmodifiableMap(new HashMap<String, String>() {{
-         put("Total Number of Saccades", "16");
+         put("total_number_of_saccades", "16");
 
-         put("Sum of all Saccade Lengths", "1.4804786014");
-         put("Mean Saccade Length", "0.0925299126");
-         put("Median Saccade Length", "0.0761603796");
-         put("StDev of Saccade Lengths", "0.0572082421");
-         put("Min Saccade Length", "0.0167247123");
-         put("Max Saccade Length", "0.2016258416");
+         put("sum_of_all_saccade_lengths", "1.4804786014");
+         put("mean_saccade_length", "0.0925299126");
+         put("median_saccade_length", "0.0761603796");
+         put("stdev_of_saccade_lengths", "0.0572082421");
+         put("min_saccade_length", "0.0167247123");
+         put("max_saccade_length", "0.2016258416");
 
-         put("Sum of All Saccade Durations", "0.19091");
-         put("Mean Saccade Duration", "0.0119318750");
-         put("Median Saccade Duration", "0.0067100000");
-         put("StDev of Saccade Durations", "0.0094964149");
-         put("Min Saccade Duration", "0.0059800000");
-         put("Max Saccade Duration", "0.0302800000");
+         put("sum_of_all_saccade_durations", "0.19091");
+         put("mean_saccade_duration", "0.0119318750");
+         put("median_saccade_duration", "0.0067100000");
+         put("stdev_of_saccade_durations", "0.0094964149");
+         put("min_saccade_duration", "0.0059800000");
+         put("max_saccade_duration", "0.0302800000");
 
-         put("Scanpath Duration", "4.95373");
-         put("Fixation to Saccade Ratio", "24.9479859620");
+         put("scanpath_duration", "4.95373");
+         put("fixation_to_saccade_ratio", "24.9479859620");
       }});
       DataEntry dEntry = FileHandler.buildDataEntry(new File(DATA_PATH));
       Map<String, String> actualResults = Saccades.analyze(dEntry);

@@ -16,7 +16,7 @@ public class Gaze {
         for (int row = 0; row < data.rowCount(); row++) {
             double leftSize = Double.valueOf(data.getValue(PUPIL_LEFT_DIAMETER_INDEX, row));
             double rightSize = Double.valueOf(data.getValue(PUPIL_RIGHT_DIAMETER_INDEX, row));
-
+            String id = data.getValue("FPOGID", row);
             leftSum += leftSize;
             rightSum += rightSize;
             bothSum += (leftSize + rightSize) / 2.0;

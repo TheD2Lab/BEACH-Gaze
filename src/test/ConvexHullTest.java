@@ -18,7 +18,7 @@ public class ConvexHullTest {
    final double PRECISION = 0.000000001; // allowable floating point error
 
    @Test
-   public void testGetConvexHull_LessThan3() {
+   public void testGetConvexHull_lessThan3() {
       final List<Point2D.Double> POINTS = new ArrayList<>() {{
          add(new Point2D.Double(0, 0));
          add(new Point2D.Double(1,1));
@@ -29,7 +29,7 @@ public class ConvexHullTest {
    }
 
    @Test
-   public void testGetConvexHull_AllColinear() {
+   public void testGetConvexHull_allColinear() {
       final List<Point2D.Double> POINTS = new ArrayList<>() {{
          add(new Point2D.Double(0, 0));
          add(new Point2D.Double(0,1));
@@ -44,7 +44,7 @@ public class ConvexHullTest {
    }
 
    @Test
-   public void testGetPolygonArea_NormalCase() {
+   public void testGetPolygonArea_normalCase() {
       final List<Point2D.Double> CONVEX_HULL = Collections.unmodifiableList(new ArrayList<>() {{
          add(new Point2D.Double(1, -1));
          add(new Point2D.Double(3,0));
@@ -58,7 +58,7 @@ public class ConvexHullTest {
    }
 
    @Test
-   public void testGetConvexHull_RemoveClockwise() {
+   public void testGetConvexHull_removeClockwise() {
       final List<Point2D.Double> POINTS = new ArrayList<>() {{
          add(new Point2D.Double(1, 1)); // removed; clockwise
          add(new Point2D.Double(1,4));
@@ -89,7 +89,7 @@ public class ConvexHullTest {
    }
 
    @Test
-   public void testGetConvexHull_RemoveCollinear() {
+   public void testGetConvexHull_removeCollinear() {
       final List<Point2D.Double> POINTS = new ArrayList<>() {{
          add(new Point2D.Double(1,4));
          add(new Point2D.Double(1, 4));
@@ -111,7 +111,7 @@ public class ConvexHullTest {
 
       Iterator<Point2D.Double> expectedIter = EXPECTED_CONVEX_HULL.iterator();
 
-      for(Point2D.Double actualPoint: ACTUAL_CONVEX_HULL) {
+      for (Point2D.Double actualPoint: ACTUAL_CONVEX_HULL) {
          Point2D.Double expectedPoint = expectedIter.next();
          if (!expectedPoint.equals(actualPoint)) {
             fail("Actual convex hull does not match expected.");

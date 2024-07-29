@@ -45,7 +45,7 @@ public class Saccades {
             );
 
         results.put(
-            "sum_of_all_saccade_length", 
+            "sum_of_all_saccade_lengths", 
             String.valueOf(DescriptiveStats.getSum(allSaccadeLengths))
             );
         

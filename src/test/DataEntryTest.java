@@ -83,7 +83,7 @@ public class DataEntryTest {
    public TemporaryFolder tempFolder = new TemporaryFolder();
 
    @Test
-   public void testMissingHeader() {
+   public void testProcess_missingHeader() {
       DataEntry dEntry = new DataEntry(BAD_HEADERS);
       for (List<String> line : GOOD_DATA) {
          dEntry.process(line);
@@ -117,8 +117,8 @@ public class DataEntryTest {
 
    // Leaving this test here to point out that DataEntry relies that the the data passed in
    // does not have missing values.
-   @Test
-   public void testGetValueOutOfBounds() {
+   @Test(expected = IndexOutOfBoundsException.class)
+   public void testGetValue_missingValue_throwsIndexOutOfBounds() {
       DataEntry dEntry = new DataEntry(GOOD_HEADERS);
       for (List<String> line : BAD_DATA) {
          dEntry.process(line);

@@ -21,7 +21,7 @@ public class FixationsTests {
    final double PRECISION = 0.000000001; // allowable floating point error
    
    @Test(expected = NullPointerException.class)
-   public void testAnalyze_MissingFixationDurationHeader_ThrowsNullPointerException() {
+   public void testFixationsAnalyze_missingFixationDurationHeader_throwsNullPointerException() {
       final ArrayList<String> HEADERS = new ArrayList<>() {{
          add("CNT");
          add("TIME(2023/02/22 14:26:24.897)");
@@ -64,15 +64,15 @@ public class FixationsTests {
    }
 
    @Test
-   public void testAnalyze_RealData() {
+   public void testFixationsAnalyze_realData_returnHeadersAndValues() {
       final Map<String, String> EXPECTED_RESULTS = Collections.unmodifiableMap(new HashMap<String, String>() {{
-         put("Total Number of Fixations", "24");
-         put("Sum of all fixation duration (s)", "5.63392");
-         put("Mean fixation duration (s)", "0.234746667");
-         put("Median fixation duration (s)", "0.16748");
-         put("St.Dev. of fixation durations (s)", "0.154818618");
-         put("Min. fixation duration (s)", "0.03382");
-         put("Max. fixation duration (s)", "0.66125");
+         put("total_number_of_fixations", "24");
+         put("sum_of_all_fixation_duration_s", "5.63392");
+         put("mean_fixation_duration_s", "0.234746667");
+         put("median_fixation_duration_s", "0.16748");
+         put("stdev_of_fixation_durations_s", "0.154818618");
+         put("min_fixation_duration_s", "0.03382");
+         put("max_fixation_duration_s", "0.66125");
       }});
       final String FIXATION_PATH = "src/test/test_files/filtered_by_fixation.csv";
       DataEntry actual_data = FileHandler.buildDataEntry(new File(FIXATION_PATH));
