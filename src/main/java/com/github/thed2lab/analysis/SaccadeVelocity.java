@@ -27,18 +27,24 @@ public class SaccadeVelocity {
                 if (!prevID.equals(currID) && positionProfile.size() != 0) {
                     positionProfiles.add(positionProfile);
                     positionProfile = new ArrayList<Double[]>();
-                    prevID = currID;
                 }
 
                 Double x = Double.parseDouble(data.getValue(FIXATIONX_INDEX, i));
                 Double y = Double.parseDouble(data.getValue(FIXATIONY_INDEX, i));
                 Double t = Double.parseDouble(data.getValue(TIME_INDEX, i));
                 positionProfile.add(new Double[] {x, y, t});
+                prevID = currID;
                 
             } else if (positionProfile.size() != 0) {
                 positionProfiles.add(positionProfile);
                 positionProfile = new ArrayList<Double[]>();
             }
+        } 
+
+        // add the last saccade profile if it isn't already added
+        // see issue #39 and #40 for explanation
+        if (positionProfile.size() > 0) {
+            positionProfiles.add(positionProfile); 
         }
 
         for (int i = 0; i < positionProfiles.size(); i++) {
@@ -56,7 +62,7 @@ public class SaccadeVelocity {
     }
 
 
-    /*
+    /**
 	 * Returns the peak velocity of a given saccade calculated using a two point central difference algorithm.
 	 * 
 	 * @param	saccadePoints	A list of saccade data points, where each data point is a double array. 
