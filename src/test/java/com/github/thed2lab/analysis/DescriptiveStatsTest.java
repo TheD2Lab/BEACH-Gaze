@@ -10,28 +10,28 @@ import java.util.Collections;
  */
 public class DescriptiveStatsTest {
 
-   final double PRECISION = 0.000000001; // allowable floating point error
-   final ArrayList<Integer> INTEGERS = new ArrayList<>() {
+   private final double PRECISION = 0.000000001; // allowable floating point error
+   private final ArrayList<Integer> INTEGERS = new ArrayList<>() {
       {
          add(5);
          add(6);
          add(7);
       }
    };
-   final double INTEGERS_SUM = 18.0;
-   final double INTEGERS_MEAN = 6.0;
-   final double INTEGERS_MEDIAN = 6.0;
-   final double INTEGERS_ST_DEV = 1.0;
-   final double INTEGERS_MIN = 5.0;
-   final double INTEGERS_MAX = 7.0;
+   private final double INTEGERS_SUM = 18.0;
+   private final double INTEGERS_MEAN = 6.0;
+   private final double INTEGERS_MEDIAN = 6.0;
+   private final double INTEGERS_ST_DEV = 1.0;
+   private final double INTEGERS_MIN = 5.0;
+   private final double INTEGERS_MAX = 7.0;
 
-   final Double[] DOUBLES = {5.5, 5.678, 0.014578, 101.0578972};
-   final double DOUBLES_SUM = 112.2504752;
-   final double DOUBLES_MEAN = 28.0626188;
-   final double DOUBLES_MEDIAN = 5.589;
-   final double DOUBLES_ST_DEV = 48.7344716716597;
-   final double DOUBLES_MAX = 101.0578972;
-   final double DOUBLES_MIN = 0.014578;
+   private final Double[] DOUBLES = {5.5, 5.678, 0.014578, 101.0578972};
+   private final double DOUBLES_SUM = 112.2504752;
+   private final double DOUBLES_MEAN = 28.0626188;
+   private final double DOUBLES_MEDIAN = 5.589;
+   private final double DOUBLES_ST_DEV = 48.7344716716597;
+   private final double DOUBLES_MAX = 101.0578972;
+   private final double DOUBLES_MIN = 0.014578;
 
    @Test
    public void testGetSumOfIntegers() {

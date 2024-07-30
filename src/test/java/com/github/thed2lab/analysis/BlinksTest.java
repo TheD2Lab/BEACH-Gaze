@@ -14,12 +14,12 @@ import org.junit.Test;
 public class BlinksTest {
    // Note: test values are picked for easy hand calculations, not from from real data.
 
-   final double PRECISION = 0.000000001; // allowable floating point error
-   static final List<String> HEADERS = Collections.unmodifiableList(
+   private final double PRECISION = 0.000000001; // allowable floating point error
+   private static final List<String> HEADERS = Collections.unmodifiableList(
       Arrays.asList(new String[]{"TIME", "CNT", "BKID"})
    );
-   static final String RATE_KEY = "average_blink_rate_per_minute";
-   static final String TOTAL_KEY = "total_number_of_blinks";
+   private static final String RATE_KEY = "average_blink_rate_per_minute";
+   private static final String TOTAL_KEY = "total_number_of_blinks";
 
    @Test
    public void testBlinksAnalyze_emptyData_BlinkRateOfNaN() {

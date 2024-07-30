@@ -14,7 +14,7 @@ import org.junit.Test;
 
 public class FixationsTests {
 
-   final double PRECISION = 0.000000001; // allowable floating point error
+   private final double PRECISION = 0.000000001; // allowable floating point error
    
    @Test(expected = NullPointerException.class)
    public void testFixationsAnalyze_missingFixationDurationHeader_throwsNullPointerException() {

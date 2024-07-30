@@ -13,7 +13,7 @@ import org.junit.Test;
 
 public class ConvexHullTest {
    
-   final double PRECISION = 0.000000001; // allowable floating point error
+   private final double PRECISION = 0.000000001; // allowable floating point error
 
    @Test
    public void testGetConvexHull_lessThan3() {

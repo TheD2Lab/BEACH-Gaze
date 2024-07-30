@@ -16,7 +16,7 @@ import org.junit.Test;
 
 public class SaccadesTest {
 
-   final double PRECISION = 0.000000001; // allowable floating point error
+   private final double PRECISION = 0.000000001; // allowable floating point error
    
    @Test
    public void testGetAllSaccadeLengths_emptyCoordinates_returnEmptyArray() {

@@ -10,13 +10,13 @@ import org.junit.Test;
 
 public class DataFilterTest {
    // Note: final only prevents reassigning variables, not modifying objects.
-   final String TEST_DIR = "./src/test/resources/";
+   private final String TEST_DIR = "./src/test/resources/";
 
-   final String ALL_GAZE_PATH = TEST_DIR + "test_all_gaze.csv";
-   final DataEntry ALL_GAZE_DATA = FileHandler.buildDataEntry(new File(ALL_GAZE_PATH));
+   private final String ALL_GAZE_PATH = TEST_DIR + "test_all_gaze.csv";
+   private final DataEntry ALL_GAZE_DATA = FileHandler.buildDataEntry(new File(ALL_GAZE_PATH));
 
-   final String EXPECTED_FIXATION_PATH = TEST_DIR + "filtered_by_fixation.csv";
-   final int EXPECTED_NUM_VALID = 822;
+   private final String EXPECTED_FIXATION_PATH = TEST_DIR + "filtered_by_fixation.csv";
+   private final int EXPECTED_NUM_VALID = 822;
 
    @Test
    public void testFilterByFixation() {

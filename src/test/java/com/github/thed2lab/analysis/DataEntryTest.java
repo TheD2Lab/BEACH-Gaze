@@ -18,21 +18,21 @@ import org.junit.rules.TemporaryFolder;
  * Unit Tests for the DataEntry class. Honestly, DataEntry's design is hard to test.
  */
 public class DataEntryTest {
-   final static List<String> GOOD_HEADERS = Collections.unmodifiableList(new ArrayList<>() {
+   private final static List<String> GOOD_HEADERS = Collections.unmodifiableList(new ArrayList<>() {
       {
          add("CNT");
          add("TIME(2023/02/22 14:26:24.897)");
          add("FPOGID");
       }
    });
-   final static List<String> BAD_HEADERS = Collections.unmodifiableList(new ArrayList<>() {
+   private final static List<String> BAD_HEADERS = Collections.unmodifiableList(new ArrayList<>() {
       {
          add("CNT");
          add("TIME(2023/02/22 14:26:24.897)");
       }
    });
 
-   final static ArrayList<List<String>> GOOD_DATA = new ArrayList<>() {
+   private final static ArrayList<List<String>> GOOD_DATA = new ArrayList<>() {
       {
          add(Collections.unmodifiableList(new ArrayList<>() {
             {
@@ -58,7 +58,7 @@ public class DataEntryTest {
       }
    };
 
-   final static ArrayList<List<String>> BAD_DATA = new ArrayList<>() {
+   private final static ArrayList<List<String>> BAD_DATA = new ArrayList<>() {
       {
          add(Collections.unmodifiableList(new ArrayList<>() {
             {
@@ -75,7 +75,7 @@ public class DataEntryTest {
       }
    };
 
-   final static String TEST_FILE_DIR = "./src/test/resources/";
+   private final static String TEST_FILE_DIR = "./src/test/resources/";
 
    @Rule
    public TemporaryFolder tempFolder = new TemporaryFolder();

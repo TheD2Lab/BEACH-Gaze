@@ -9,7 +9,7 @@ import org.junit.Test;
 
 public class AnglesTest {
    
-   final ArrayList<Coordinate> TEST_COORDINATES = new ArrayList<>() {{
+   private final ArrayList<Coordinate> TEST_COORDINATES = new ArrayList<>() {{
       add(new Coordinate(0.515, 0.33556, 1));
       add(new Coordinate(0.55532, 0.37966, 2));
       add(new Coordinate(0.60302, 0.47807, 4));
@@ -33,7 +33,7 @@ public class AnglesTest {
       add(new Coordinate(4., 1, 202));
    }};
 
-   final double PRECISION = 0.0000001;
+   private final double PRECISION = 0.0000001;
 
    @Test
    public void testGetAbsoluteAngles() {
