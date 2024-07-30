@@ -86,4 +86,41 @@ public class DataEntry {
         }
         return clone;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof DataEntry)) { return false; }
+
+        var other = (DataEntry) obj;
+        var otherHeaders = other.getHeaders();
+        if (
+            this.headers.size() != otherHeaders.size() ||
+            this.rowCount() != other.rowCount()
+        ) { return false; } // different sizes
+
+        for (int i = 0; i < this.headers.size(); i++) {
+            if (!this.headers.get(i).equals(otherHeaders.get(i))) {
+                return false; // mismatch headers
+            }
+        }
+
+        var otherRowIter = other.getAllData().iterator();
+        var thisRowIter = this.data.iterator();
+        
+        while(thisRowIter.hasNext()) {
+            var otherLine = otherRowIter.next();
+            var thisLine = thisRowIter.next();
+            if (otherLine.size() != thisLine.size()) {
+                return false;
+            }
+            var otherLineIter = otherLine.iterator();
+            var thisLineIter = thisLine.iterator();
+            while(thisLineIter.hasNext()) {
+                if (!thisLineIter.next().equals(otherLineIter.next())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
