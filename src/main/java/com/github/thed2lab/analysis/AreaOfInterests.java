@@ -161,7 +161,7 @@ public class AreaOfInterests {
                 results.get(i).add(key + " -> " + otherKey);
                 results.get(i).add(String.valueOf(transitions));
                 results.get(i).add(String.valueOf((double)transitions/(double)transitionsInclusive));
-                if (key != otherKey) results.get(i).add(String.valueOf((double)transitions/(double)transitionsExclusive)); //Only count exclusive transitions for transitions that arent from the AOI to itself (transitions exclusive from A->A is set to be 0)
+                if (key != otherKey) results.get(i).add(String.valueOf((double)transitions/(double)transitionsExclusive)); //Only count exclusive transitions for transitions that aren't from the AOI to itself (transitions exclusive from A->A is set to be 0)
                 else results.get(i).add(String.valueOf(0.0));
                 i++;
             }
