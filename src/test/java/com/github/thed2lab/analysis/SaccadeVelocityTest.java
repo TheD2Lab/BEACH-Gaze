@@ -5,17 +5,15 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 
 public class SaccadeVelocityTest {
 
-   final double PRECISION = 0.000000001; // allowable floating point error
-   final static int SCREEN_WIDTH = 1920;
-	final static int SCREEN_HEIGHT = 1080;
+   private final double PRECISION = 0.000000001; // allowable floating point error
+   private final static int SCREEN_WIDTH = 1920;
+	private final static int SCREEN_HEIGHT = 1080;
    
    @Test
    public void testGetPeakVelocity_emptyPoints_returnNaN() {
@@ -46,40 +44,39 @@ public class SaccadeVelocityTest {
 
    @Test
    public void testGetPeakVelocity_normalUseCase_returnVelocityValue() {
-      
+      final double EXPECTED_VELOCITY = 78.3228634680;
+      List<Double[]> saccadePoints = new ArrayList<>() {{
+         add(new Double[]{1027.2576, 431.892, 0.70996});
+         add(new Double[]{1014.1824, 412.5168, 0.71692});
+         add(new Double[]{1008.096, 391.2408, 0.72363});
+      }};
+
+      double actualVelocity = SaccadeVelocity.getPeakVelocity(saccadePoints);
+      assertEquals(EXPECTED_VELOCITY, actualVelocity, PRECISION);
    }
 
    @Test
-   public void testSaccadeVelocityAnalyze_nonContinuousEndsWithSaccadeData() {
+   public void testSaccadeVelocityAnalyze_nonContinuousWholeScreen() {
       final String GAZE_PATH = "./src/test/resources/filtered_by_validity.csv";
-      final double EXPECTED_AVG_PEAK = 169.15239533934;
+      final String FIXATION_PATH = "./src/test/resources/valid_fixations.csv";
+      final double EXPECTED_AVG_PEAK = 179.96919273273;
       final String KEY = "average_peak_saccade_velocity";
       DataEntry gazeData = DataFilter.applyScreenSize(FileHandler.buildDataEntry(new File(GAZE_PATH)), SCREEN_WIDTH, SCREEN_HEIGHT);
+      DataEntry fixationData = DataFilter.applyScreenSize(FileHandler.buildDataEntry(new File(FIXATION_PATH)), SCREEN_WIDTH, SCREEN_HEIGHT);
 
-      Map<String, String> actualMap = SaccadeVelocity.analyze(gazeData);
-      assertEquals(1, actualMap.size());
-      assertEquals(EXPECTED_AVG_PEAK, Double.parseDouble(actualMap.get(KEY)), PRECISION);
-
+      double actualAvgPeak = Double.parseDouble(SaccadeVelocity.analyze(gazeData, fixationData).get(KEY));
+      assertEquals(EXPECTED_AVG_PEAK, actualAvgPeak, PRECISION);
    }
 
    @Test
-   public void testSaccadeVelocityAnalyze_nonContinuousEndsWithFixationData() {
+   public void testSaccadeVelocityAnalyze_nonContinuousAoiA() {
       final String GAZE_PATH = "./src/test/resources/filtered_by_validity.csv";
-      final double EXPECTED_AVG_PEAK = 169.15239533934;
+      final String FIXATION_PATH = "./src/test/resources/aoi_a_fixation.csv";
+      final double EXPECTED_AVG_PEAK = 133.30276061352;
       final String KEY = "average_peak_saccade_velocity";
       DataEntry gazeData = DataFilter.applyScreenSize(FileHandler.buildDataEntry(new File(GAZE_PATH)), SCREEN_WIDTH, SCREEN_HEIGHT);
-      gazeData.process(Arrays.asList(
-         "0","X-Plane","971","6.53005","5.88E+12","0.47815","0.45335",
-         "6.53005","0.14856","25","1","0.46056","0.45713","1","0.60729",
-         "0.47315","0"," ","0","","0.41066","0.36362","16.25439","1.08789",
-         "1","0.61855","0.37037","15.69818","1.08789","1","0","0","11",
-         "4.43149","1","4.03482","1","0","0","0","0","0","0","0","0","1",
-         "1","1","1","1","1","1","0","0","0","AOI_A","0","0","0"
-      ));
-
-      Map<String, String> actualMap = SaccadeVelocity.analyze(gazeData);
-      assertEquals(1, actualMap.size());
-      assertEquals(EXPECTED_AVG_PEAK, Double.parseDouble(actualMap.get(KEY)), PRECISION);
-
+      DataEntry fixationData = FileHandler.buildDataEntry(new File(FIXATION_PATH));
+      double actualAvgPeak = Double.parseDouble(SaccadeVelocity.analyze(gazeData, fixationData).get(KEY));
+      assertEquals(EXPECTED_AVG_PEAK, actualAvgPeak, PRECISION);
    }
 }
