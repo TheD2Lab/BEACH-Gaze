@@ -1,12 +1,13 @@
 package com.github.thed2lab.analysis;
 
+import static com.github.thed2lab.analysis.Constants.FIXATION_ID;
+import static com.github.thed2lab.analysis.Constants.FIXATION_X;
+import static com.github.thed2lab.analysis.Constants.FIXATION_Y;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 public class Angles {
-	final static String FIXATIONID_INDEX = "FPOGID";
-	final static String FIXATIONX_INDEX = "FPOGX";
-	final static String FIXATIONY_INDEX = "FPOGY";
 	
 	static public LinkedHashMap<String,String> analyze(DataEntry data) {
 		LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
@@ -14,9 +15,9 @@ public class Angles {
 
 		for (int row = 0; row < data.rowCount(); row++) {
 			Coordinate eachCoordinate = new Coordinate(
-				Double.valueOf(data.getValue(FIXATIONX_INDEX, row)),
-				Double.valueOf(data.getValue(FIXATIONY_INDEX, row)),
-				Integer.valueOf(data.getValue(FIXATIONID_INDEX, row))
+				Double.valueOf(data.getValue(FIXATION_X, row)),
+				Double.valueOf(data.getValue(FIXATION_Y, row)),
+				Integer.valueOf(data.getValue(FIXATION_ID, row))
 			);
 			allCoordinates.add(eachCoordinate);
 		}

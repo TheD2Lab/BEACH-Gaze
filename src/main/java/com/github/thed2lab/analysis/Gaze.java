@@ -1,10 +1,10 @@
 package com.github.thed2lab.analysis;
 
+import static com.github.thed2lab.analysis.Constants.*;
+
 import java.util.LinkedHashMap;
 
 public class Gaze {
-    final static String PUPIL_LEFT_DIAMETER_INDEX = "LPMM";
-    final static String PUPIL_RIGHT_DIAMETER_INDEX = "RPMM";
 
     static public LinkedHashMap<String,String> analyze(DataEntry data) {
         LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
@@ -14,8 +14,8 @@ public class Gaze {
         int count = data.rowCount();
 
         for (int row = 0; row < data.rowCount(); row++) {
-            double leftSize = Double.valueOf(data.getValue(PUPIL_LEFT_DIAMETER_INDEX, row));
-            double rightSize = Double.valueOf(data.getValue(PUPIL_RIGHT_DIAMETER_INDEX, row));
+            double leftSize = Double.valueOf(data.getValue(LEFT_PUPIL_DIAMETER, row));
+            double rightSize = Double.valueOf(data.getValue(RIGHT_PUPIL_DIAMETER, row));
             leftSum += leftSize;
             rightSum += rightSize;
             bothSum += (leftSize + rightSize) / 2.0;

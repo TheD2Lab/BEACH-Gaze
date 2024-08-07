@@ -1,24 +1,24 @@
 package com.github.thed2lab.analysis;
 
+import static com.github.thed2lab.analysis.Constants.FIXATION_ID;
+import static com.github.thed2lab.analysis.Constants.FIXATION_VALIDITY;
+import static com.github.thed2lab.analysis.Constants.FIXATION_X;
+import static com.github.thed2lab.analysis.Constants.FIXATION_Y;
+import static com.github.thed2lab.analysis.Constants.TIMESTAMP;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 public class SaccadeVelocity {
-    final static String TIME_INDEX = "TIME";
-    final static String FIXATIONID_INDEX = "FPOGID";
-    final static String FIXATIONX_INDEX = "FPOGX";
-    final static String FIXATIONY_INDEX = "FPOGY";
-    final static String FIXATION_VALIDITY_INDEX = "FPOGV";
-    final static String FIXATION_DURATION_INDEX = "FPOGD";
 
     /**
      * Calculates the average peak saccade velocity. Iterates over all rows of a participant’s gaze.
      * If the current row’s fixation ID (“FID”) and the next consecutive fixation ID both appear in
      * the fixation data as well as if the fixation validity (“FPOGV”) is set to 0, then the row is
      * considered part of a saccade.
-     * @param allGazeData all gaze data, filtered by validity with screen size applied. When calculating
-     * for AOIs, use all gaze data, not just the AOI specific gaze data.
+     * @param allGazeData all gaze data, with screen size applied. When calculating for AOIs, use all
+     * gaze data, not just the AOI specific gaze data.
      * @param fixationData the gaze data, filtered by fixation and validity with screen size applied.
      * When calculating for AOIs, use only fixation data that occurs within the AOI.
      * @return average peak saccade velocity’s header mapped to the calculated value as a {@code String}.
@@ -36,8 +36,8 @@ public class SaccadeVelocity {
         while ((fixDataIndex < fixationData.rowCount() - 1) && (gazeDataIndex < allGazeData.rowCount())) {
             // Get the fixation Id of the next saccade that occurs completely within portion of screen (whole or AOI)
             while (fixDataIndex < fixationData.rowCount() - 1) {
-                int curFixId = Integer.parseInt(fixationData.getValue(FIXATIONID_INDEX, fixDataIndex));
-                int nextFixId = Integer.parseInt(fixationData.getValue(FIXATIONID_INDEX, fixDataIndex + 1));
+                int curFixId = Integer.parseInt(fixationData.getValue(FIXATION_ID, fixDataIndex));
+                int nextFixId = Integer.parseInt(fixationData.getValue(FIXATION_ID, fixDataIndex + 1));
                 fixDataIndex++;
                 if (nextFixId == curFixId + 1) {
                     targetFixId = curFixId;
@@ -46,7 +46,7 @@ public class SaccadeVelocity {
             }
 
             while (gazeDataIndex < allGazeData.rowCount()) {
-                int curId = Integer.parseInt(allGazeData.getValue(FIXATIONID_INDEX, gazeDataIndex));
+                int curId = Integer.parseInt(allGazeData.getValue(FIXATION_ID, gazeDataIndex));
                 if (curId < targetFixId) {
                     gazeDataIndex++;
                     continue;
@@ -54,16 +54,16 @@ public class SaccadeVelocity {
                     break; // could not find target, look for next fixation
                 }
 
-                boolean saccade = Integer.parseInt(allGazeData.getValue(FIXATION_VALIDITY_INDEX, gazeDataIndex)) == 0 ? true : false;
+                boolean saccade = Integer.parseInt(allGazeData.getValue(FIXATION_VALIDITY, gazeDataIndex)) == 0 ? true : false;
                 // Check if not a saccade
                 if (!saccade) {
                     gazeDataIndex++;
                     continue; // go to next data point
                 }
 
-                Double x = Double.parseDouble(allGazeData.getValue(FIXATIONX_INDEX, gazeDataIndex));
-                Double y = Double.parseDouble(allGazeData.getValue(FIXATIONY_INDEX, gazeDataIndex));
-                Double t = Double.parseDouble(allGazeData.getValue(TIME_INDEX, gazeDataIndex));
+                Double x = Double.parseDouble(allGazeData.getValue(FIXATION_X, gazeDataIndex));
+                Double y = Double.parseDouble(allGazeData.getValue(FIXATION_Y, gazeDataIndex));
+                Double t = Double.parseDouble(allGazeData.getValue(TIMESTAMP, gazeDataIndex));
                 positionProfile.add(new Double[] {x, y, t});
                 gazeDataIndex++;
             }

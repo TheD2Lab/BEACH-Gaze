@@ -1,12 +1,13 @@
 package com.github.thed2lab.analysis;
 
+import static com.github.thed2lab.analysis.Constants.AOI_LABEL;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class GazeEntropy {
-    private final static String AOI_INDEX = "AOI";
 
     /**
      * Calculates the stationary entropy and transition entropy measures. The method iterates over the participant’s
@@ -25,7 +26,7 @@ public class GazeEntropy {
         int fixationCount = fixations.rowCount();
         
         for (int row = 0; row < fixations.rowCount(); row++) {
-            String aoi = fixations.getValue(AOI_INDEX, row);
+            String aoi = fixations.getValue(AOI_LABEL, row);
             aoiSequence.add(aoi);
             aoiProbability.put(aoi, aoiProbability.getOrDefault(aoi, 0.0) + 1);
             if (lastAoi != null) {  // skips the first loop

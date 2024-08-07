@@ -1,13 +1,15 @@
 package com.github.thed2lab.analysis;
 
+import static com.github.thed2lab.analysis.Constants.BLINK_ID;
+import static com.github.thed2lab.analysis.Constants.DATA_ID;
+import static com.github.thed2lab.analysis.Constants.TIMESTAMP;
+
 import java.util.LinkedHashMap;
 
 public class Blinks {
    
-   final static String BLINK_ID_INDEX = "BKID";
-   final static String TIME_INDEX = "TIME";
-   final static String DATA_ID_INDEX = "CNT"; // unique for each line of raw data
-   final static String DEFAULT_BKID = "0"; // BKID when no blink is detected
+   /** Blink id when no blink is being detected. */
+   final static String DEFAULT_BKID = "0";
 
    static public LinkedHashMap<String,String> analyze(DataEntry allGazeData) {
 
@@ -18,14 +20,14 @@ public class Blinks {
       double prevTimestamp = 0;
       int prevDataId = -10; // IDs are always non-negative
       for (int i = 0; i < allGazeData.rowCount(); i++) {
-         int curDataId = Integer.parseInt(allGazeData.getValue(DATA_ID_INDEX, i));
-         double curTimestamp = Double.parseDouble(allGazeData.getValue(TIME_INDEX, i));
+         int curDataId = Integer.parseInt(allGazeData.getValue(DATA_ID, i));
+         double curTimestamp = Double.parseDouble(allGazeData.getValue(TIMESTAMP, i));
          // calculate time window between data records if they are consecutive
          if (curDataId == prevDataId + 1) {                    
             timeTotal += curTimestamp - prevTimestamp; 
          }
 
-         String curBlinkId = allGazeData.getValue(BLINK_ID_INDEX, i);
+         String curBlinkId = allGazeData.getValue(BLINK_ID, i);
          if (!curBlinkId.equals(DEFAULT_BKID) && !curBlinkId.equals(prevBlinkId)) {
             blinkCnt++; // new blink occurred
          }

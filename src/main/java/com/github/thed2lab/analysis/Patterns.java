@@ -34,12 +34,6 @@ public class Patterns {
                 double averagePatternFrequency = (double) frequencyMap.get(pattern)/sequences.size();
                 double proportionalPatternFrequency = (double) frequencyMap.get(pattern)/totalPatternCount;
                 
-                // System.out.print(pattern + " ");
-                // System.out.print(frequency + " ");
-                // System.out.print(sequenceSupport + " ");
-                // System.out.print(averagePatternFrequency + " ");
-                // System.out.println(proportionalPatternFrequency + " ");
-                
                 if (frequency >= minFrequency && sequenceMap.get(pattern).size() >= minSequenceSize) {
                     List<String> patternData = new ArrayList<String>();
                     patternData.add(pattern);

@@ -1,16 +1,17 @@
 package com.github.thed2lab.analysis;
 
+import static com.github.thed2lab.analysis.Constants.CURSOR_EVENT;
+
 import java.util.LinkedHashMap;
 
 public class Event {
-    final static String INPUT_INDEX = "CS";
     
     static public LinkedHashMap<String,String> analyze(DataEntry data) {
         LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
         int leftMouseClicks = 0;
 
         for (int row = 0; row < data.rowCount(); row++) {
-            if (data.getValue(INPUT_INDEX, row).equals("1")) {
+            if (data.getValue(CURSOR_EVENT, row).equals("1")) {
                 leftMouseClicks += 1;
             }
         }
