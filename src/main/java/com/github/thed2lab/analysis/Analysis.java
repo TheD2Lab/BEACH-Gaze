@@ -7,37 +7,41 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public class Analysis {
-    final static int SCREEN_WIDTH = 1920;
-	final static int SCREEN_HEIGHT = 1080;
+    /**
+     * The analysis class drives the entire analysis on one or multiple files of gaze data.
+     * Its role is to iterate over each file, and process it into DataEntry objects for gaze,
+     * validity, and fixations.
+     */
+    private final static int SCREEN_WIDTH = 1920;
+	private final static int SCREEN_HEIGHT = 1080;
 
-    final static int MIN_PATTERN_LENGTH = 3;
-    final static int MAX_PATTERN_LENGTH = 7;
-    final static int MIN_PATTERN_FREQUENCY = 2;
-    final static int MIN_SEQUENCE_SIZE = 3;
-
-    final static String TIME_INDEX = "TIME";
+    private final static int MIN_PATTERN_LENGTH = 3;
+    private final static int MAX_PATTERN_LENGTH = 7;
+    private final static int MIN_PATTERN_FREQUENCY = 2;
+    private final static int MIN_SEQUENCE_SIZE = 3;
 
     private Parameters params;
     
+    /**
+     * Used to construct a single Analysis object.
+     * @param params information about the files to analyze and the types of analysis run.
+     */
     public Analysis(Parameters params) {
         this.params = params;
     }
 
+    /**
+     * Runs all data analysis and writes the results to files. The method iterates over all the provided files,
+     * create DataEntry objects to represent them, and call methods to analyze those DataEntry objects.
+     * Finally, the results of these methods are output to CSV files.
+     * @return {@code Boolean} indicating if the run was successful.
+     */
     public boolean run() {
         try {
             File[] inputFiles = params.getInputFiles();
             List<String> sequences = new ArrayList<String>();
             List<List<String>> allParticipantDGMs = new ArrayList<List<String>>();
             LinkedHashMap<String, Integer> aoiMap = new LinkedHashMap<String, Integer>();
-
-            // aoiMap.put("", 65);
-            // aoiMap.put("Alt_VSI", 66);
-            // aoiMap.put("AI", 67);
-            // aoiMap.put("TI_HSI", 68);
-            // aoiMap.put("SSI", 69);
-            // aoiMap.put("ASI", 70);
-            // aoiMap.put("RPM", 71);
-            // aoiMap.put("Window", 72);
 
             WindowSettings settings = params.getWindowSettings();
 
@@ -61,7 +65,7 @@ public class Analysis {
                 fixations.writeToCSV(pDirectory, pName + "_fixations");
                 
                 // Generate DGMs
-                ArrayList<List<String>> descriptiveGazeMeasures = generateResults(allGaze, fixations);
+                List<List<String>> descriptiveGazeMeasures = generateResults(allGaze, fixations);
                 FileHandler.writeToCSV(descriptiveGazeMeasures, pDirectory, pName + "_DGMs");
 
                 // If empty, add header row
@@ -138,53 +142,60 @@ public class Analysis {
     }
 
     // This function should only take in raw gaze data as a parameter, otherwise derived DataEntrys will be produced with incorrect data
-    public static ArrayList<List<String>> generateResults(DataEntry allGaze, DataEntry fixations) {
+    /**
+     * Generates descriptive gaze measures from a single participant’s raw gaze data for the whole screen.
+     * @param allGaze all the participant's gaze data.
+     * @param fixations the participant gaze data, filtered by fixations.
+     * @return a {@code List<List<String>} where the first inner-list is the measure names, and second inner-list is the calculated values.
+     */
+    static List<List<String>> generateResults(DataEntry allGaze, DataEntry fixations) {
         DataEntry validGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(allGaze), SCREEN_WIDTH, SCREEN_HEIGHT);
-        DataEntry validFixations = DataFilter.applyScreenSize(DataFilter.filterByValidity(fixations), SCREEN_WIDTH, SCREEN_HEIGHT);
-
-        // DataEntry validGaze = DataFilter.applyScreenSize(allGaze, SCREEN_WIDTH, SCREEN_HEIGHT);
-        // DataEntry validFixations = DataFilter.applyScreenSize(fixations, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-        ArrayList<List<String>> results = new ArrayList<List<String>>();
-        results.add(new ArrayList<String>()); //Headers
-        results.add(new ArrayList<String>()); //Values
-
-        LinkedHashMap<String,String> fixation = Fixations.analyze(validFixations);
-        results.get(0).addAll(fixation.keySet());
-        results.get(1).addAll(fixation.values());
-
-        LinkedHashMap<String,String> saccades = Saccades.analyze(validFixations);
-        results.get(0).addAll(saccades.keySet());
-        results.get(1).addAll(saccades.values());
-
-        LinkedHashMap<String, String> saccadeVelocity = SaccadeVelocity.analyze(validGaze);
-        results.get(0).addAll(saccadeVelocity.keySet());
-        results.get(1).addAll(saccadeVelocity.values());
-    
-        LinkedHashMap<String,String> angles = Angles.analyze(validFixations);
-        results.get(0).addAll(angles.keySet());
-        results.get(1).addAll(angles.values());
-
-        LinkedHashMap<String,String> convexHull = ConvexHull.analyze(validFixations);
-        results.get(0).addAll(convexHull.keySet());
-        results.get(1).addAll(convexHull.values());
-
-        LinkedHashMap<String,String> entropy = GazeEntropy.analyze(validFixations);
-        results.get(0).addAll(entropy.keySet());
-        results.get(1).addAll(entropy.values());
-
-        LinkedHashMap<String, String> blinks = Blinks.analyze(allGaze);
-        results.get(0).addAll(blinks.keySet());
-        results.get(1).addAll(blinks.values());
-
-        LinkedHashMap<String,String> gaze = Gaze.analyze(validGaze);
-        results.get(0).addAll(gaze.keySet());
-        results.get(1).addAll(gaze.values());
-
-        LinkedHashMap<String,String> event = Event.analyze(validGaze);
-        results.get(0).addAll(event.keySet());
-        results.get(1).addAll(event.values());
-
+        DataEntry validAoiFixations = DataFilter.applyScreenSize(DataFilter.filterByValidity(fixations), SCREEN_WIDTH, SCREEN_HEIGHT);
+        var results = generateResultsHelper(validGaze, validGaze, validAoiFixations);
         return results;
+    }
+
+    // This function should only take in raw gaze data as a parameter, otherwise derived DataEntrys will be produced with incorrect data
+    /**
+     * Generates descriptive gaze measures from a single participant’s raw gaze data for a single AOI.
+     * @param allGaze all the of participant gaze data.
+     * @param aoiGaze the participant gaze data that occurred inside the target AOI.
+     * @param aoiFixations the participant gaze data, filtered by fixations that occurred inside the target AOI.
+     * @return a {@code List<List<String>} where the first inner-list is the measure names, and second inner-list is the calculated values.
+     */
+    static List<List<String>> generateResults(DataEntry allGaze, DataEntry aoiGaze, DataEntry aoiFixations) {
+        DataEntry validAllGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(allGaze), SCREEN_WIDTH, SCREEN_HEIGHT);
+        DataEntry validAoiGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(allGaze), SCREEN_WIDTH, SCREEN_HEIGHT);
+        DataEntry validAoiFixations = DataFilter.applyScreenSize(DataFilter.filterByValidity(aoiFixations), SCREEN_WIDTH, SCREEN_HEIGHT);
+        var results = generateResultsHelper(validAllGaze, validAoiGaze, validAoiFixations);
+        return results;
+    }
+
+    /**
+     * Helper methods that generates the descriptive gaze measures.
+     * @param validAllGaze all gaze data, filtered by validity.
+     * @param validAoiGaze the gaze data that ocurred within an aoi, filtered by validity. For the whole screen, this is the same
+     * data as validAllGaze.
+     * @param validAoiFixation the gaze data that ocurred within an aoi, filtered by fixation and validity.
+     * @return a list the descriptive gaze measures where the first row is the headers and the second row is the values.
+     */
+    private static List<List<String>> generateResultsHelper(DataEntry validAllGaze, DataEntry validAoiGaze, DataEntry validAoiFixation) {
+        
+        LinkedHashMap<String,String> resultsMap = new LinkedHashMap<String, String>();
+        resultsMap.putAll(Fixations.analyze(validAoiFixation));
+        resultsMap.putAll(Saccades.analyze(validAoiFixation));
+        resultsMap.putAll(SaccadeVelocity.analyze(validAllGaze, validAoiFixation));
+        resultsMap.putAll(Angles.analyze(validAoiFixation));
+        resultsMap.putAll(ConvexHull.analyze(validAoiFixation));
+        resultsMap.putAll(GazeEntropy.analyze(validAoiFixation));
+        resultsMap.putAll(Blinks.analyze(validAoiGaze));
+        resultsMap.putAll(Gaze.analyze(validAoiGaze));
+        resultsMap.putAll(Event.analyze(validAoiGaze));
+
+        var resultsList = new ArrayList<List<String>>(2);
+        resultsList.add(new ArrayList<>(resultsMap.keySet()));
+        resultsList.add(new ArrayList<>(resultsMap.values()));
+
+        return resultsList;
     }
 }
