@@ -15,7 +15,7 @@ public class Sequences {
         // Build aoiDescriptions string 
         for (String s: map.keySet()) {
             int asciiValue = map.get(s);
-            String description = s == "" ? "No AOI" : s;
+            String description = s == "" ? "Undefined Area" : s;
             aoiDescriptions += (char)asciiValue + ", " + description + "\n";
         }
 
@@ -26,7 +26,7 @@ public class Sequences {
             if (!map.containsKey(aoi)) {
                 map.put(aoi, map.size() + ascii);
 
-                String description = aoi == "" ? "No AOI" : aoi;
+                String description = aoi == "" ? "Undefined Area" : aoi;
                 aoiDescriptions += (char)(map.size() + ascii - 1) + ", " +  description  + "\n";
             }
             

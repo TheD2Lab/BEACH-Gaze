@@ -20,7 +20,7 @@ public class AreaOfInterests {
         LinkedHashMap<String, DataEntry> aoiMetrics = new LinkedHashMap<>();
         for (int i = 0; i < allGazeData.rowCount(); i++) {
             String aoi = allGazeData.getValue(AOI_INDEX, i);
-            String aoiKey = aoi.equals("") ? "No AOI" : aoi;
+            String aoiKey = aoi.equals("") ? "Undefined Area" : aoi;
             if (!aoiMetrics.containsKey(aoiKey)) {
                 DataEntry d = new DataEntry(allGazeData.getHeaders());
                 aoiMetrics.put(aoiKey, d);
@@ -34,7 +34,7 @@ public class AreaOfInterests {
         //System.out.println(allFixations.rowCount());
         for (int i = 0; i < allFixations.rowCount(); i++) {
             String aoi = allFixations.getValue(AOI_INDEX, i);
-            String aoiKey = aoi.equals("") ? "No AOI" : aoi;
+            String aoiKey = aoi.equals("") ? "Undefined Area" : aoi;
             if (!aoiFixationMetrics.containsKey(aoiKey)) {
                 DataEntry d = new DataEntry(allFixations.getHeaders());
                 aoiFixationMetrics.put(aoiKey, d);
@@ -113,10 +113,10 @@ public class AreaOfInterests {
         LinkedHashMap<String,LinkedHashMap<String, Integer>> transitionCounts = new LinkedHashMap<>();
         for (int i = 0; i < fixations.rowCount()-1; i++) {
             String curAoi = fixations.getValue(AOI_INDEX, i);
-            curAoi = curAoi.equals("") ? "No AOI" : curAoi;
+            curAoi = curAoi.equals("") ? "Undefined Area" : curAoi;
             int curId = Integer.valueOf(fixations.getValue(FIXATIONID_INDEX, i));
             String nextAoi = fixations.getValue(AOI_INDEX, i+1);
-            nextAoi = nextAoi.equals("") ? "No AOI" : nextAoi;
+            nextAoi = nextAoi.equals("") ? "Undefined Area" : nextAoi;
             int nextId = Integer.valueOf(fixations.getValue(FIXATIONID_INDEX, i+1));
             boolean isValidAOI = (validAOIs.containsKey(curAoi) && validAOIs.containsKey(nextAoi));
             if (isValidAOI && nextId == curId + 1) { //Check if fixations are subsequent
