@@ -1,14 +1,15 @@
 package com.github.thed2lab.analysis;
 
+import static com.github.thed2lab.analysis.Constants.FIXATION_DURATION;
+import static com.github.thed2lab.analysis.Constants.FIXATION_ID;
+import static com.github.thed2lab.analysis.Constants.FIXATION_X;
+import static com.github.thed2lab.analysis.Constants.FIXATION_Y;
+import static com.github.thed2lab.analysis.Constants.FIXATION_START;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 public class Saccades {
-    final static String DURATION_INDEX = "FPOGD";
-    final static String TIMESTAMP_INDEX = "FPOGS";
-    final static String FIXATIONID_INDEX = "FPOGID";
-    final static String FIXATIONX_INDEX = "FPOGX";
-    final static String FIXATIONY_INDEX = "FPOGY";
     
     static public LinkedHashMap<String,String> analyze(DataEntry data) {
         LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
@@ -18,18 +19,18 @@ public class Saccades {
         ArrayList<Coordinate> allCoordinates = new ArrayList<>();
         
         for (int row = 0; row < data.rowCount(); row++) {
-            Double fixationDurationSeconds = Double.valueOf(data.getValue(DURATION_INDEX, row));;
+            Double fixationDurationSeconds = Double.valueOf(data.getValue(FIXATION_DURATION, row));;
 
             Double[] eachSaccadeDetail = new Double[3];
-            eachSaccadeDetail[0] = Double.valueOf(data.getValue(TIMESTAMP_INDEX, row));
-            eachSaccadeDetail[1] = Double.valueOf(data.getValue(DURATION_INDEX, row));
-            eachSaccadeDetail[2] = Double.valueOf(data.getValue(FIXATIONID_INDEX, row));
+            eachSaccadeDetail[0] = Double.valueOf(data.getValue(FIXATION_START, row));
+            eachSaccadeDetail[1] = Double.valueOf(data.getValue(FIXATION_DURATION, row));
+            eachSaccadeDetail[2] = Double.valueOf(data.getValue(FIXATION_ID, row));
             saccadeDetails.add(eachSaccadeDetail);
 
             Coordinate eachCoordinate = new Coordinate(
-                Double.valueOf(data.getValue(FIXATIONX_INDEX, row)),
-                Double.valueOf(data.getValue(FIXATIONY_INDEX, row)),
-                Integer.valueOf(data.getValue(FIXATIONID_INDEX, row))
+                Double.valueOf(data.getValue(FIXATION_X, row)),
+                Double.valueOf(data.getValue(FIXATION_Y, row)),
+                Integer.valueOf(data.getValue(FIXATION_ID, row))
             );
             allCoordinates.add(eachCoordinate);
             allFixationDurations.add(fixationDurationSeconds);

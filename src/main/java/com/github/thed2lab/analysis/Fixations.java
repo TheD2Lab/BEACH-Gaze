@@ -1,10 +1,11 @@
 package com.github.thed2lab.analysis;
 
+import static com.github.thed2lab.analysis.Constants.FIXATION_DURATION;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 public class Fixations {
-    final static String DURATION_INDEX = "FPOGD";
 
     static public LinkedHashMap<String,String> analyze(DataEntry data) {
         LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
@@ -13,7 +14,7 @@ public class Fixations {
         int fixationCount = data.rowCount();
         
         for (int row = 0; row < data.rowCount(); row++) {    
-            Double fixationDurationSeconds = Double.valueOf(data.getValue(DURATION_INDEX, row));
+            Double fixationDurationSeconds = Double.valueOf(data.getValue(FIXATION_DURATION, row));
             allFixationDurations.add(fixationDurationSeconds);
         }
         

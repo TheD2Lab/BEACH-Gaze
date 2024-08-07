@@ -1,5 +1,13 @@
 package com.github.thed2lab.analysis;
 
+import static com.github.thed2lab.analysis.Constants.TIMESTAMP;
+import static com.github.thed2lab.analysis.Constants.BLINK_RATE;
+import static com.github.thed2lab.analysis.Constants.FIXATION_DURATION;
+import static com.github.thed2lab.analysis.Constants.LEFT_PUPIL_DIAMETER;
+import static com.github.thed2lab.analysis.Constants.RIGHT_PUPIL_DIAMETER;
+import static com.github.thed2lab.analysis.Constants.SACCADE_DIR;
+import static com.github.thed2lab.analysis.Constants.SACCADE_MAGNITUDE;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,29 +17,29 @@ import java.util.Set;
 
 public class Windows {
 
-    private final static String TIME_INDEX = "TIME";
     private final static int BASELINE_LENGTH = 120;
+    private final static String LEFT_RIGHT_DIAMETER = LEFT_PUPIL_DIAMETER + " + " + RIGHT_PUPIL_DIAMETER;
 
     // Set of supported events that utilize the fixation file
     final static Set<String> fixationEvents = new HashSet<String>(
         Arrays.asList(
-        "FPOGD",
-        "SACCADE_MAG",
-        "SACCADE_DIR" 
+        FIXATION_DURATION,
+        SACCADE_MAGNITUDE,
+        SACCADE_DIR
     ));
 
     // Set of supported events that utilize the allGaze file
     final static Set<String> allGazeEvents = new HashSet<String>(
         Arrays.asList(
-        "LPMM",
-        "RPMM",
-        "BKPMIN",
-        "LPMM + RPMM"
+        LEFT_PUPIL_DIAMETER,
+        RIGHT_PUPIL_DIAMETER,
+        BLINK_RATE,
+        LEFT_RIGHT_DIAMETER
     ));
 
     public static void generateWindows(DataEntry allGaze, String outputDirectory, WindowSettings settings) {
         List<String> headers = allGaze.getHeaders();
-        double t0 = Double.valueOf(allGaze.getValue(TIME_INDEX, 0));
+        double t0 = Double.valueOf(allGaze.getValue(TIMESTAMP, 0));
 
         // Generate baseline file
         generateBaselineFile(allGaze, outputDirectory + "/baseline");
@@ -46,7 +54,7 @@ public class Windows {
 
             for (int i = 0; i < allGaze.rowCount(); i++) {
                 List<String> currRow = allGaze.getRow(i);
-                Double t = Double.valueOf(allGaze.getValue(TIME_INDEX, i));
+                Double t = Double.valueOf(allGaze.getValue(TIMESTAMP, i));
                 
                 if (t > end) { 
                     end += windowSize;
@@ -74,7 +82,7 @@ public class Windows {
 
             for (int i = 0; i < allGaze.rowCount(); i++) {
                 List<String> currRow = allGaze.getRow(i);
-                Double t = Double.valueOf(allGaze.getValue(TIME_INDEX, i));
+                Double t = Double.valueOf(allGaze.getValue(TIMESTAMP, i));
 
                 if (t > end) { 
                     end += windowSize;
@@ -102,12 +110,12 @@ public class Windows {
             double end = start + windowSize;
 
             for (int i = 0; i < allGaze.rowCount(); i++) {
-                double t1 = Double.parseDouble(allGaze.getValue(TIME_INDEX, i));
+                double t1 = Double.parseDouble(allGaze.getValue(TIMESTAMP, i));
                 
                 if (t1 >= start) {
                     for (int j = i; j < allGaze.rowCount(); j++) {
                         List<String> row2 = allGaze.getRow(j);
-                        double t2 = Double.parseDouble(allGaze.getValue(TIME_INDEX, j));
+                        double t2 = Double.parseDouble(allGaze.getValue(TIMESTAMP, j));
 
                         if (t2 >= end || j == allGaze.rowCount() - 1) {
                             window.process(row2);
@@ -142,7 +150,7 @@ public class Windows {
             double baselineValue = getEventBaselineValue(outputDirectory, event);
 
             for (int i = 0; i < allGaze.rowCount(); i++) {
-                Double t = Double.valueOf(allGaze.getValue(TIME_INDEX, i));
+                Double t = Double.valueOf(allGaze.getValue(TIMESTAMP, i));
                 Double windowValue =  getEventWindowValue(allGaze, event, i);
 
                 // Get the initial timestamp
@@ -174,18 +182,19 @@ public class Windows {
     static void outputWindowFiles(ArrayList<DataEntry> windows, double t0, String outputDirectory) {
         int windowCount = 1;
         List<List<String>> allWindowDGMs = new ArrayList<List<String>>();
-        for (DataEntry w : windows) {
+        for (DataEntry windowGaze : windows) {
             String fileName = "window" + windowCount;
             String windowDirectory = outputDirectory + "/" + fileName;
 
-            w.writeToCSV(windowDirectory, fileName);
+            windowGaze.writeToCSV(windowDirectory, fileName);
 
             // windows are continuous and raw, therefore fixation filtering will be valid
-            List<List<String>> results = Analysis.generateResults(w, DataFilter.filterByFixations(w));
+            DataEntry windowFixations = DataFilter.filterByFixations(windowGaze);
+            List<List<String>> results = Analysis.generateResults(windowGaze, windowFixations);
 
             // Calculate beginning time stamp, ending timestamp, window duration, initial/final seconds elapsed since window start
-            double t1 = Double.parseDouble(w.getValue(TIME_INDEX, 0));
-            double t2 = Double.parseDouble(w.getValue(TIME_INDEX, w.rowCount() - 1));
+            double t1 = Double.parseDouble(windowGaze.getValue(TIMESTAMP, 0));
+            double t2 = Double.parseDouble(windowGaze.getValue(TIMESTAMP, windowGaze.rowCount() - 1));
             double windowDuration = t2 - t1;
             double initialDuration = t1 - t0;
             double finalDuration = t2 - t0;
@@ -211,8 +220,7 @@ public class Windows {
             }
             
             FileHandler.writeToCSV(results, windowDirectory, fileName + "_DGMs");
-            AreaOfInterests.generateAOIs(w, windowDirectory, fileName);
-            
+            AreaOfInterests.generateAOIs(windowGaze, windowFixations, windowDirectory, fileName);
             windowCount++;
         }
 
@@ -221,11 +229,11 @@ public class Windows {
 
     static void generateBaselineFile(DataEntry allGaze, String outputDirectory) {
         DataEntry baseline = new DataEntry(allGaze.getHeaders());
-        double startTime = Double.valueOf(allGaze.getValue(TIME_INDEX, 0));
+        double startTime = Double.valueOf(allGaze.getValue(TIMESTAMP, 0));
         double endTime = startTime + BASELINE_LENGTH;
 
         for (int i = 0; i < allGaze.rowCount(); i++) {
-            Double t = Double.parseDouble(allGaze.getValue(TIME_INDEX, i));
+            Double t = Double.parseDouble(allGaze.getValue(TIMESTAMP, i));
 
             if (t >= endTime) {
                 break;
@@ -264,8 +272,8 @@ public class Windows {
         baseline = DataFilter.filterByValidity(baseline); // Filter by validity
         
         for (int i = 0; i < baseline.rowCount(); i++) {
-            double left = Double.parseDouble(baseline.getValue("LPMM", i));
-            double right = Double.parseDouble(baseline.getValue("RPMM", i));
+            double left = Double.parseDouble(baseline.getValue(LEFT_PUPIL_DIAMETER, i));
+            double right = Double.parseDouble(baseline.getValue(RIGHT_PUPIL_DIAMETER, i));
             eventValue += ((left + right) / 2);
         }
 
@@ -276,7 +284,7 @@ public class Windows {
 
     static double getEventBaselineValue(String fileDirectory, String event) {
         switch(event) {
-            case "LPMM + RPMM":
+            case LEFT_RIGHT_DIAMETER:
                 return getAveragePupilDilationBaseline(fileDirectory);
             default:
                 return getRawEventBaselineValue(fileDirectory, event);
@@ -285,9 +293,9 @@ public class Windows {
 
     static double getEventWindowValue(DataEntry d, String event, int row) {
         switch (event) {
-            case "LPMM + RPMM":
-                double left = Double.parseDouble(d.getValue("LPMM", row));
-                double right = Double.parseDouble(d.getValue("RPMM", row));
+            case LEFT_RIGHT_DIAMETER:
+                double left = Double.parseDouble(d.getValue(LEFT_PUPIL_DIAMETER, row));
+                double right = Double.parseDouble(d.getValue(RIGHT_PUPIL_DIAMETER, row));
                 return (left + right) / 2;
             default:
                 return Double.parseDouble(d.getValue(event, row));

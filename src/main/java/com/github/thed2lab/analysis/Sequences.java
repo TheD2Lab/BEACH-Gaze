@@ -1,11 +1,11 @@
 package com.github.thed2lab.analysis;
 
+import static com.github.thed2lab.analysis.Constants.AOI_LABEL;
+
 import java.util.HashMap;
 import java.util.List;
 
 public class Sequences {
-    
-    final static String AOI_INDEX = "AOI";
 
     public static void generateSequenceFiles(DataEntry data, String outputDirectory, List<String> sequences, HashMap<String, Integer> map) {
         String aoiDescriptions = "";
@@ -15,18 +15,18 @@ public class Sequences {
         // Build aoiDescriptions string 
         for (String s: map.keySet()) {
             int asciiValue = map.get(s);
-            String description = s == "" ? "No AOI" : s;
+            String description = s == "" ? "Undefined Area" : s;
             aoiDescriptions += (char)asciiValue + ", " + description + "\n";
         }
 
         // Generate sequence
         for (int i = 0; i < data.rowCount(); i++) {
-            String aoi = data.getValue(AOI_INDEX, i);
+            String aoi = data.getValue(AOI_LABEL, i);
 
             if (!map.containsKey(aoi)) {
                 map.put(aoi, map.size() + ascii);
 
-                String description = aoi == "" ? "No AOI" : aoi;
+                String description = aoi == "" ? "Undefined Area" : aoi;
                 aoiDescriptions += (char)(map.size() + ascii - 1) + ", " +  description  + "\n";
             }
             

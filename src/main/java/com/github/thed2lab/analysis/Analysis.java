@@ -1,5 +1,8 @@
 package com.github.thed2lab.analysis;
 
+import static com.github.thed2lab.analysis.Constants.SCREEN_HEIGHT;
+import static com.github.thed2lab.analysis.Constants.SCREEN_WIDTH;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,8 +15,6 @@ public class Analysis {
      * Its role is to iterate over each file, and process it into DataEntry objects for gaze,
      * validity, and fixations.
      */
-    private final static int SCREEN_WIDTH = 1920;
-	private final static int SCREEN_HEIGHT = 1080;
 
     private final static int MIN_PATTERN_LENGTH = 3;
     private final static int MAX_PATTERN_LENGTH = 7;
@@ -54,10 +55,10 @@ public class Analysis {
                 System.out.println("Analyzing " + pName);
 
                 // Build DataEntrys
-                DataEntry allGaze = FileHandler.buildDataEntry(f);
-                DataEntry validGaze = DataFilter.filterByValidity(allGaze);
+                DataEntry allGaze = DataFilter.applyScreenSize(FileHandler.buildDataEntry(f), SCREEN_WIDTH, SCREEN_HEIGHT);
+                DataEntry validGaze = DataFilter.filterByValidity(allGaze, SCREEN_WIDTH, SCREEN_HEIGHT);
                 DataEntry fixations = DataFilter.filterByFixations(allGaze);
-                DataEntry validFixations = DataFilter.filterByValidity(fixations);
+                DataEntry validFixations = DataFilter.filterByValidity(fixations, SCREEN_HEIGHT, SCREEN_WIDTH);
                 
                 // Write DataEntrys to file
                 validGaze.writeToCSV(pDirectory, pName + "_valid_all_gaze");
@@ -81,7 +82,7 @@ public class Analysis {
                 allParticipantDGMs.add(dgms);
 
                 // Generate AOIs
-                AreaOfInterests.generateAOIs(allGaze, pDirectory, pName);
+                AreaOfInterests.generateAOIs(allGaze, fixations, pDirectory, pName);
 
                 // Generate windows
                 Windows.generateWindows(allGaze, pDirectory, settings);
@@ -149,9 +150,7 @@ public class Analysis {
      * @return a {@code List<List<String>} where the first inner-list is the measure names, and second inner-list is the calculated values.
      */
     static List<List<String>> generateResults(DataEntry allGaze, DataEntry fixations) {
-        DataEntry validGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(allGaze), SCREEN_WIDTH, SCREEN_HEIGHT);
-        DataEntry validAoiFixations = DataFilter.applyScreenSize(DataFilter.filterByValidity(fixations), SCREEN_WIDTH, SCREEN_HEIGHT);
-        var results = generateResultsHelper(validGaze, validGaze, validAoiFixations);
+        var results = generateResultsHelper(allGaze, allGaze, fixations);
         return results;
     }
 
@@ -164,33 +163,35 @@ public class Analysis {
      * @return a {@code List<List<String>} where the first inner-list is the measure names, and second inner-list is the calculated values.
      */
     static List<List<String>> generateResults(DataEntry allGaze, DataEntry aoiGaze, DataEntry aoiFixations) {
-        DataEntry validAllGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(allGaze), SCREEN_WIDTH, SCREEN_HEIGHT);
-        DataEntry validAoiGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(allGaze), SCREEN_WIDTH, SCREEN_HEIGHT);
-        DataEntry validAoiFixations = DataFilter.applyScreenSize(DataFilter.filterByValidity(aoiFixations), SCREEN_WIDTH, SCREEN_HEIGHT);
-        var results = generateResultsHelper(validAllGaze, validAoiGaze, validAoiFixations);
+        var results = generateResultsHelper(allGaze, aoiGaze, aoiFixations);
         return results;
     }
 
     /**
      * Helper methods that generates the descriptive gaze measures.
-     * @param validAllGaze all gaze data, filtered by validity.
-     * @param validAoiGaze the gaze data that ocurred within an aoi, filtered by validity. For the whole screen, this is the same
-     * data as validAllGaze.
-     * @param validAoiFixation the gaze data that ocurred within an aoi, filtered by fixation and validity.
-     * @return a list the descriptive gaze measures where the first row is the headers and the second row is the values.
+     * @param allGaze all gaze data for the whole screen, with screen size applied.
+     * @param areaGaze the gaze data that ocurred within a target portion of screen, i.e., either the whole screen or an AOI, with screen
+     * size applied.
+     * @param areaFixations the gaze data that ocurred within a target portion of screen, i.e., either the whole screen or an AOI,
+     * and filtered by fixation with screen size applied.
+     * @return a {@code List<List<String>} where the first inner-list is the measure names, and second inner-list is the calculated values.
      */
-    private static List<List<String>> generateResultsHelper(DataEntry validAllGaze, DataEntry validAoiGaze, DataEntry validAoiFixation) {
+    private static List<List<String>> generateResultsHelper(DataEntry allGaze, DataEntry areaGaze, DataEntry areaFixations) {
+        // an argument could be made to filter before entering this function; there is a code smell due to blink rate and saccadeV changing
+        DataEntry validAllGaze = DataFilter.filterByValidity(allGaze, SCREEN_WIDTH, SCREEN_HEIGHT); 
+        DataEntry validAreaGaze = DataFilter.filterByValidity(areaGaze, SCREEN_WIDTH, SCREEN_HEIGHT);
+        DataEntry validAreaFixations = DataFilter.filterByValidity(areaFixations, SCREEN_WIDTH, SCREEN_HEIGHT);
         
         LinkedHashMap<String,String> resultsMap = new LinkedHashMap<String, String>();
-        resultsMap.putAll(Fixations.analyze(validAoiFixation));
-        resultsMap.putAll(Saccades.analyze(validAoiFixation));
-        resultsMap.putAll(SaccadeVelocity.analyze(validAllGaze, validAoiFixation));
-        resultsMap.putAll(Angles.analyze(validAoiFixation));
-        resultsMap.putAll(ConvexHull.analyze(validAoiFixation));
-        resultsMap.putAll(GazeEntropy.analyze(validAoiFixation));
-        resultsMap.putAll(Blinks.analyze(validAoiGaze));
-        resultsMap.putAll(Gaze.analyze(validAoiGaze));
-        resultsMap.putAll(Event.analyze(validAoiGaze));
+        resultsMap.putAll(Fixations.analyze(validAreaFixations));
+        resultsMap.putAll(Saccades.analyze(validAreaFixations));
+        resultsMap.putAll(SaccadeVelocity.analyze(validAllGaze, validAreaFixations));
+        resultsMap.putAll(Angles.analyze(validAreaFixations));
+        resultsMap.putAll(ConvexHull.analyze(validAreaFixations));
+        resultsMap.putAll(GazeEntropy.analyze(validAreaFixations));
+        resultsMap.putAll(Blinks.analyze(areaGaze));
+        resultsMap.putAll(Gaze.analyze(validAreaGaze));
+        resultsMap.putAll(Event.analyze(validAreaGaze));
 
         var resultsList = new ArrayList<List<String>>(2);
         resultsList.add(new ArrayList<>(resultsMap.keySet()));

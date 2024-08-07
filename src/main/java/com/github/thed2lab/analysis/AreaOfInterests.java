@@ -1,26 +1,28 @@
 package com.github.thed2lab.analysis;
 
-import java.util.Arrays;
+import static com.github.thed2lab.analysis.Constants.AOI_LABEL;
+import static com.github.thed2lab.analysis.Constants.FIXATION_DURATION;
+import static com.github.thed2lab.analysis.Constants.FIXATION_ID;
+import static com.github.thed2lab.analysis.Constants.SCREEN_HEIGHT;
+import static com.github.thed2lab.analysis.Constants.SCREEN_WIDTH;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
 public class AreaOfInterests {
-    final static String FIXATIONID_INDEX = "FPOGID"; //CNT
-    final static String DURATION_INDEX = "FPOGD";
-    final static String AOI_INDEX = "AOI";
-
 
     private static final String[] additionalHeaders = {"aoi", "proportion_of_fixations_spent_in_aoi","proportion_of_fixations_durations_spent_in_aoi"};
     private static final String[] perAoiHeaders = {"aoi_pair", "transition_count", "proportion_including_self_transitions", "proportion_excluding_self_transitions"};
     
     
-    public static void generateAOIs(DataEntry allGazeData, String outputDirectory, String fileName) {
+    public static void generateAOIs(DataEntry allGazeData, DataEntry fixationData, String outputDirectory, String fileName) {
         LinkedHashMap<String, DataEntry> aoiMetrics = new LinkedHashMap<>();
         for (int i = 0; i < allGazeData.rowCount(); i++) {
-            String aoi = allGazeData.getValue(AOI_INDEX, i);
-            String aoiKey = aoi.equals("") ? "No AOI" : aoi;
+            String aoi = allGazeData.getValue(AOI_LABEL, i);
+            String aoiKey = aoi.equals("") ? "Undefined Area" : aoi;
             if (!aoiMetrics.containsKey(aoiKey)) {
                 DataEntry d = new DataEntry(allGazeData.getHeaders());
                 aoiMetrics.put(aoiKey, d);
@@ -28,18 +30,17 @@ public class AreaOfInterests {
             aoiMetrics.get(aoiKey).process(allGazeData.getRow(i));
         }
 
-        
+        DataEntry filteredFixations = DataFilter.filterByValidity(fixationData, SCREEN_WIDTH, SCREEN_HEIGHT);
         LinkedHashMap<String, DataEntry> aoiFixationMetrics = new LinkedHashMap<>();
-        DataEntry allFixations = DataFilter.filterByValidity(DataFilter.filterByFixations(allGazeData));
         //System.out.println(allFixations.rowCount());
-        for (int i = 0; i < allFixations.rowCount(); i++) {
-            String aoi = allFixations.getValue(AOI_INDEX, i);
-            String aoiKey = aoi.equals("") ? "No AOI" : aoi;
+        for (int i = 0; i < filteredFixations.rowCount(); i++) {
+            String aoi = filteredFixations.getValue(AOI_LABEL, i);
+            String aoiKey = aoi.equals("") ? "Undefined Area" : aoi;
             if (!aoiFixationMetrics.containsKey(aoiKey)) {
-                DataEntry d = new DataEntry(allFixations.getHeaders());
+                DataEntry d = new DataEntry(filteredFixations.getHeaders());
                 aoiFixationMetrics.put(aoiKey, d);
             }
-            aoiFixationMetrics.get(aoiKey).process(allFixations.getRow(i));
+            aoiFixationMetrics.get(aoiKey).process(filteredFixations.getRow(i));
         }
 
         // For any AOIs not in aoiFixationMetrics, add an empty DataEntry
@@ -59,7 +60,7 @@ public class AreaOfInterests {
         ArrayList<List<String>> metrics = new ArrayList<>();
         metrics.add(new ArrayList<String>());
         
-        double totalDuration = getDuration(allFixations);
+        double totalDuration = getDuration(filteredFixations);
         LinkedHashMap<String, DataEntry> validAOIs = new LinkedHashMap<>();
         boolean isFirst = true;
         Set<String> aoiKeySet = aoiMetrics.keySet();
@@ -80,11 +81,11 @@ public class AreaOfInterests {
             }
             results.get(1).add(aoiKey);
             metrics.add(results.get(1));
-            metrics.get(row).addAll(getProportions(allFixations, singleAoiFixations, totalDuration));
+            metrics.get(row).addAll(getProportions(filteredFixations, singleAoiFixations, totalDuration));
             validAOIs.put(aoiKey, singleAoiFixations);
             row++;
         }
-        ArrayList<List<String>> pairResults = generatePairResults(allFixations, aoiMetrics);
+        ArrayList<List<String>> pairResults = generatePairResults(filteredFixations, aoiMetrics);
         FileHandler.writeToCSV(metrics, outputDirectory, fileName + "_AOI_DGMs");
         FileHandler.writeToCSV(pairResults, outputDirectory, fileName+"_AOI_Transitions");
     }
@@ -102,7 +103,7 @@ public class AreaOfInterests {
     public static double getDuration(DataEntry fixations) {
         double durationSum = 0.0;
         for (int i = 0; i < fixations.rowCount(); i++) {
-            durationSum += Double.valueOf(fixations.getValue(DURATION_INDEX, i));
+            durationSum += Double.valueOf(fixations.getValue(FIXATION_DURATION, i));
         }
 
         return durationSum;
@@ -112,12 +113,12 @@ public class AreaOfInterests {
         LinkedHashMap<String, ArrayList<Integer>> totalTransitions = new LinkedHashMap<>(); // ArrayList<Integer>(Transtions, Inclusive, Exlusive);
         LinkedHashMap<String,LinkedHashMap<String, Integer>> transitionCounts = new LinkedHashMap<>();
         for (int i = 0; i < fixations.rowCount()-1; i++) {
-            String curAoi = fixations.getValue(AOI_INDEX, i);
-            curAoi = curAoi.equals("") ? "No AOI" : curAoi;
-            int curId = Integer.valueOf(fixations.getValue(FIXATIONID_INDEX, i));
-            String nextAoi = fixations.getValue(AOI_INDEX, i+1);
-            nextAoi = nextAoi.equals("") ? "No AOI" : nextAoi;
-            int nextId = Integer.valueOf(fixations.getValue(FIXATIONID_INDEX, i+1));
+            String curAoi = fixations.getValue(AOI_LABEL, i);
+            curAoi = curAoi.equals("") ? "Undefined Area" : curAoi;
+            int curId = Integer.valueOf(fixations.getValue(FIXATION_ID, i));
+            String nextAoi = fixations.getValue(AOI_LABEL, i+1);
+            nextAoi = nextAoi.equals("") ? "Undefined Area" : nextAoi;
+            int nextId = Integer.valueOf(fixations.getValue(FIXATION_ID, i+1));
             boolean isValidAOI = (validAOIs.containsKey(curAoi) && validAOIs.containsKey(nextAoi));
             if (isValidAOI && nextId == curId + 1) { //Check if fixations are subsequent
                 if (!totalTransitions.containsKey(curAoi)) { //Ensure AOI is initialized in map.

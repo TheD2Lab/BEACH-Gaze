@@ -1,5 +1,8 @@
 package com.github.thed2lab.analysis;
 
+import static com.github.thed2lab.analysis.Constants.FIXATION_X;
+import static com.github.thed2lab.analysis.Constants.FIXATION_Y;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -11,16 +14,14 @@ import java.awt.geom.Point2D;
 import java.awt.Point;
 
 public class ConvexHull {
-    final static String FIXATIONX_INDEX = "FPOGX";
-    final static String FIXATIONY_INDEX = "FPOGY";
     
     static public LinkedHashMap<String,String> analyze(DataEntry data) {
         LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
         List<Point2D.Double> allPoints = new ArrayList<>();
 
         for (int row = 0; row < data.rowCount(); row++) {
-            double x = Double.valueOf(data.getValue(FIXATIONX_INDEX, row));
-            double y = Double.valueOf(data.getValue(FIXATIONY_INDEX, row));
+            double x = Double.valueOf(data.getValue(FIXATION_X, row));
+            double y = Double.valueOf(data.getValue(FIXATION_Y, row));
             allPoints.add(new Point2D.Double(x, y));
         }  
         List<Point2D.Double> boundingPoints = getConvexHull(allPoints);
