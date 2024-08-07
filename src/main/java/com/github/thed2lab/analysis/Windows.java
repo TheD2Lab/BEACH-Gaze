@@ -9,8 +9,8 @@ import java.util.Set;
 
 public class Windows {
 
-    final static String TIME_INDEX = "TIME";
-    final static int BASELINE_LENGTH = 120;
+    private final static String TIME_INDEX = "TIME";
+    private final static int BASELINE_LENGTH = 120;
 
     // Set of supported events that utilize the fixation file
     final static Set<String> fixationEvents = new HashSet<String>(
@@ -171,7 +171,7 @@ public class Windows {
         }
     }
 
-    public static void outputWindowFiles(ArrayList<DataEntry> windows, double t0, String outputDirectory) {
+    static void outputWindowFiles(ArrayList<DataEntry> windows, double t0, String outputDirectory) {
         int windowCount = 1;
         List<List<String>> allWindowDGMs = new ArrayList<List<String>>();
         for (DataEntry w : windows) {
@@ -181,7 +181,7 @@ public class Windows {
             w.writeToCSV(windowDirectory, fileName);
 
             // windows are continuous and raw, therefore fixation filtering will be valid
-            ArrayList<List<String>> results = Analysis.generateResults(w, DataFilter.filterByFixations(w));
+            List<List<String>> results = Analysis.generateResults(w, DataFilter.filterByFixations(w));
 
             // Calculate beginning time stamp, ending timestamp, window duration, initial/final seconds elapsed since window start
             double t1 = Double.parseDouble(w.getValue(TIME_INDEX, 0));
@@ -219,7 +219,7 @@ public class Windows {
         FileHandler.writeToCSV(allWindowDGMs, outputDirectory, "all_window_DGMs");
     }
 
-    public static void generateBaselineFile(DataEntry allGaze, String outputDirectory) {
+    static void generateBaselineFile(DataEntry allGaze, String outputDirectory) {
         DataEntry baseline = new DataEntry(allGaze.getHeaders());
         double startTime = Double.valueOf(allGaze.getValue(TIME_INDEX, 0));
         double endTime = startTime + BASELINE_LENGTH;
@@ -239,7 +239,7 @@ public class Windows {
         FileHandler.writeToCSV(Analysis.generateResults(baseline, DataFilter.filterByFixations(baseline)), outputDirectory, "baseline_DGMs");
     }
 
-    public static double getRawEventBaselineValue(String fileDirectory, String event) {
+    static double getRawEventBaselineValue(String fileDirectory, String event) {
         double eventValue = 0;
 
         File baselineFile = new File(fileDirectory + "/baseline/baseline.csv");
@@ -256,7 +256,7 @@ public class Windows {
         return eventValue;
     }
 
-    public static double getAveragePupilDilationBaseline(String fileDirectory) {
+    static double getAveragePupilDilationBaseline(String fileDirectory) {
         double eventValue = 0;
 
         File baselineFile = new File(fileDirectory + "/baseline/baseline.csv");
@@ -274,7 +274,7 @@ public class Windows {
         return eventValue;
     }
 
-    public static double getEventBaselineValue(String fileDirectory, String event) {
+    static double getEventBaselineValue(String fileDirectory, String event) {
         switch(event) {
             case "LPMM + RPMM":
                 return getAveragePupilDilationBaseline(fileDirectory);
@@ -283,7 +283,7 @@ public class Windows {
         }
     }
 
-    public static double getEventWindowValue(DataEntry d, String event, int row) {
+    static double getEventWindowValue(DataEntry d, String event, int row) {
         switch (event) {
             case "LPMM + RPMM":
                 double left = Double.parseDouble(d.getValue("LPMM", row));
