@@ -4,35 +4,35 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
 public class AnglesTest {
    
-   private final ArrayList<Coordinate> TEST_COORDINATES = new ArrayList<>() {{
-      add(new Coordinate(0.515, 0.33556, 1));
-      add(new Coordinate(0.55532, 0.37966, 2));
-      add(new Coordinate(0.60302, 0.47807, 4));
-      add(new Coordinate(0.5417, 0.50501, 5));
-      add(new Coordinate(0.6017, 0.49948, 6));
-      add(new Coordinate(0.59532, 0.48402, 7));
-      add(new Coordinate(0.51246, 0.50446, 8));
-      add(new Coordinate(0.48937, 0.55112, 9));
-      add(new Coordinate(0.43229, 0.57458, 10));
-      add(new Coordinate(0., 0.57458, 13));
-      add(new Coordinate(0., 0.57458, 14));
-      add(new Coordinate(0., 0.57458, 15));
-      add(new Coordinate(0., 0, 20));
-      add(new Coordinate(0., 3, 21));
-      add(new Coordinate(4., 0, 22));
-      add(new Coordinate(0., 0, 100));
-      add(new Coordinate(0., -3, 101));
-      add(new Coordinate(4., 0, 102));
-      add(new Coordinate(0., 1, 200));
-      add(new Coordinate(1., 1, 201));
-      add(new Coordinate(4., 1, 202));
-   }};
-
+   private final ArrayList<Coordinate> TEST_COORDINATES = new ArrayList<>(List.of(
+      new Coordinate(0.515, 0.33556, 1),
+      new Coordinate(0.55532, 0.37966, 2),
+      new Coordinate(0.60302, 0.47807, 4),
+      new Coordinate(0.5417, 0.50501, 5),
+      new Coordinate(0.6017, 0.49948, 6),
+      new Coordinate(0.59532, 0.48402, 7),
+      new Coordinate(0.51246, 0.50446, 8),
+      new Coordinate(0.48937, 0.55112, 9),
+      new Coordinate(0.43229, 0.57458, 10),
+      new Coordinate(0., 0.57458, 13),
+      new Coordinate(0., 0.57458, 14),
+      new Coordinate(0., 0.57458, 15),
+      new Coordinate(0., 0, 20),
+      new Coordinate(0., 3, 21),
+      new Coordinate(4., 0, 22),
+      new Coordinate(0., 0, 100),
+      new Coordinate(0., -3, 101),
+      new Coordinate(4., 0, 102),
+      new Coordinate(0., 1, 200),
+      new Coordinate(1., 1, 201),
+      new Coordinate(4., 1, 202)
+   ));
    private final double PRECISION = 0.0000001;
 
    @Test

@@ -24,19 +24,18 @@ public class SaccadeVelocityTest {
 
    @Test
    public void testGetPeakVelocity_onePoint_returnNaN() {
-      List<Double[]> onePoint = new ArrayList<>() {{
-         add(new Double[]{1., 1., 0.001});
-      }};
+      List<Double[]> onePoint = new ArrayList<>();
+      onePoint.add(new Double[]{1., 1., 0.001});
       boolean isNaN = Double.isNaN(SaccadeVelocity.getPeakVelocity(onePoint));
       assertTrue(isNaN);
    }
 
    @Test
    public void testGetPeakVelocity_aboveThreshold_return0() {
-      List<Double[]> saccadePoints = new ArrayList<>() {{
-         add(new Double[]{0., 0., 0.});
-         add(new Double[]{0., 10., 0.0001});
-      }};
+      List<Double[]> saccadePoints = List.of(
+         new Double[]{0., 0., 0.},
+         new Double[]{0., 10., 0.0001}
+      );
       // 2332.21914 > 700 => return 0
       boolean isZero = SaccadeVelocity.getPeakVelocity(saccadePoints) == 0;
       assertTrue(isZero);
@@ -45,11 +44,11 @@ public class SaccadeVelocityTest {
    @Test
    public void testGetPeakVelocity_normalUseCase_returnVelocityValue() {
       final double EXPECTED_VELOCITY = 78.3228634680;
-      List<Double[]> saccadePoints = new ArrayList<>() {{
-         add(new Double[]{1027.2576, 431.892, 0.70996});
-         add(new Double[]{1014.1824, 412.5168, 0.71692});
-         add(new Double[]{1008.096, 391.2408, 0.72363});
-      }};
+      List<Double[]> saccadePoints = List.of(
+         new Double[]{1027.2576, 431.892, 0.70996},
+         new Double[]{1014.1824, 412.5168, 0.71692},
+         new Double[]{1008.096, 391.2408, 0.72363}
+      );
 
       double actualVelocity = SaccadeVelocity.getPeakVelocity(saccadePoints);
       assertEquals(EXPECTED_VELOCITY, actualVelocity, PRECISION);

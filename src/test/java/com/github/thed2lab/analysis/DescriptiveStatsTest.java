@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Unit Tests for the DescriptiveStats Class.
@@ -11,13 +12,7 @@ import java.util.Collections;
 public class DescriptiveStatsTest {
 
    private final double PRECISION = 0.000000001; // allowable floating point error
-   private final ArrayList<Integer> INTEGERS = new ArrayList<>() {
-      {
-         add(5);
-         add(6);
-         add(7);
-      }
-   };
+   private final ArrayList<Integer> INTEGERS = new ArrayList<>(List.of(5, 6, 7));
    private final double INTEGERS_SUM = 18.0;
    private final double INTEGERS_MEAN = 6.0;
    private final double INTEGERS_MEDIAN = 6.0;

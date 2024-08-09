@@ -40,9 +40,8 @@ public class Analysis {
     public boolean run() {
         try {
             File[] inputFiles = params.getInputFiles();
-            List<String> sequences = new ArrayList<String>();
+            List<String> sequences = new ArrayList<>();
             List<List<String>> allParticipantDGMs = new ArrayList<List<String>>();
-            LinkedHashMap<String, Integer> aoiMap = new LinkedHashMap<String, Integer>();
 
             WindowSettings settings = params.getWindowSettings();
 
@@ -88,8 +87,9 @@ public class Analysis {
                 Windows.generateWindows(allGaze, pDirectory, settings);
 
                 // Generate sequence files
-                Sequences.generateSequenceFiles(validFixations, pDirectory, sequences, aoiMap);
-                
+                String expandedSequence = Sequences.generateSequenceFiles(validFixations, pDirectory);
+                sequences.add(expandedSequence);
+
                 // Generate patterns
                 ArrayList<List<String>> expandedPatterns = Patterns.discoverPatterns(
                     Arrays.asList(sequences.get(i)), 

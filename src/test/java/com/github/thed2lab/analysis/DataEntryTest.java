@@ -18,62 +18,20 @@ import org.junit.rules.TemporaryFolder;
  * Unit Tests for the DataEntry class. Honestly, DataEntry's design is hard to test.
  */
 public class DataEntryTest {
-   private final static List<String> GOOD_HEADERS = Collections.unmodifiableList(new ArrayList<>() {
-      {
-         add("CNT");
-         add("TIME(2023/02/22 14:26:24.897)");
-         add("FPOGID");
-      }
-   });
-   private final static List<String> BAD_HEADERS = Collections.unmodifiableList(new ArrayList<>() {
-      {
-         add("CNT");
-         add("TIME(2023/02/22 14:26:24.897)");
-      }
-   });
+   private final static List<String> GOOD_HEADERS = List.of("CNT", "TIME(2023/02/22 14:26:24.897)", "FPOGID");
 
-   private final static ArrayList<List<String>> GOOD_DATA = new ArrayList<>() {
-      {
-         add(Collections.unmodifiableList(new ArrayList<>() {
-            {
-               add("0");
-               add("0");
-               add("1");
-            }
-         }));
-         add(Collections.unmodifiableList(new ArrayList<>() {
-            {
-               add("1");
-               add("0.00696");
-               add("1");
-            }
-         }));
-         add(Collections.unmodifiableList(new ArrayList<>() {
-            {
-               add("2");
-               add("0.01331");
-               add("1");
-            }
-         }));
-      }
-   };
+   private final static List<String> BAD_HEADERS = List.of("CNT","TIME(2023/02/22 14:26:24.897)");
 
-   private final static ArrayList<List<String>> BAD_DATA = new ArrayList<>() {
-      {
-         add(Collections.unmodifiableList(new ArrayList<>() {
-            {
-               add("0");
-               add("0");
-               add("1");
-            }
-         }));
-         add(Collections.unmodifiableList(new ArrayList<>() {
-            {
-               add("1");
-            }
-         }));
-      }
-   };
+   private final static List<List<String>> GOOD_DATA = List.of(
+         List.of("0", "0", "1"),
+         List.of("1", "0.00696", "1"),
+         List.of("2", "0.01331", "1")
+   );
+
+   private final static List<List<String>> BAD_DATA = List.of(
+      List.of("0", "0", "1"),
+      List.of("1")
+   );
 
    private final static String TEST_FILE_DIR = "./src/test/resources/";
 
