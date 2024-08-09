@@ -30,7 +30,7 @@
     <dependency>
       <groupId>com.opencsv</groupId>
       <artifactId>opencsv</artifactId>
-      <version>5.8</version>
+      <version>5.9</version>
     </dependency>
   
     <dependency>
@@ -44,6 +44,7 @@
       <artifactId>json</artifactId>
       <version>20240303</version>
     </dependency>
+
   </dependencies>
 
   <build>
@@ -70,6 +71,14 @@
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.0.2</version>
+          <configuration>
+            <archive>
+              <manifest>
+                <addClasspath>true</addClasspath>
+                <mainClass>com.github.thed2lab.analysis.Main</mainClass>
+              </manifest>
+            </archive>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
