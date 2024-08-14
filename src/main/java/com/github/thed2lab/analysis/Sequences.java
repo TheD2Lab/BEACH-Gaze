@@ -48,7 +48,7 @@ public class Sequences {
      * Extracts the expanded sequence from the fixation data and creates a text string of the mappings
      * between AOIs and ascii character.
      * @param fixations a user’s gaze data, filtered by fixations, and validity. Screen size will not affect the output.
-     * @return (1) the full, expanded sequence and (2) a string with the ascii character and the AOI name in a comma separated list.
+     * @return (left) the full, expanded sequence and (right) a string with the ascii character and the AOI name in a comma separated list.
      */
     static Pair<String, String> getExpandedSequenceDetails(DataEntry fixations) {
         final int ASCII_OFFSET = 65; // Capital "A"
