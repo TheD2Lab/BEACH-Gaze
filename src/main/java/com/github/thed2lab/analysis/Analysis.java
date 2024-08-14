@@ -5,16 +5,15 @@ import static com.github.thed2lab.analysis.Constants.SCREEN_WIDTH;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+/**
+ * The Analysis class drives the entire analysis on one or multiple files of gaze data.
+ * Its role is to iterate over each file, and process it into DataEntry objects for gaze,
+ * validity, and fixations.
+ */
 public class Analysis {
-    /**
-     * The analysis class drives the entire analysis on one or multiple files of gaze data.
-     * Its role is to iterate over each file, and process it into DataEntry objects for gaze,
-     * validity, and fixations.
-     */
 
     private final static int MIN_PATTERN_LENGTH = 3;
     private final static int MAX_PATTERN_LENGTH = 7;
@@ -40,8 +39,8 @@ public class Analysis {
     public boolean run() {
         try {
             File[] inputFiles = params.getInputFiles();
-            List<String> sequences = new ArrayList<>();
-            List<List<String>> allParticipantDGMs = new ArrayList<List<String>>();
+            List<String> expandedSequences = new ArrayList<>();
+            List<List<String>> allParticipantDGMs = new ArrayList<>();
 
             WindowSettings settings = params.getWindowSettings();
 
@@ -87,20 +86,20 @@ public class Analysis {
                 Windows.generateWindows(allGaze, pDirectory, settings);
 
                 // Generate sequence files
-                String expandedSequence = Sequences.generateSequenceFiles(validFixations, pDirectory);
-                sequences.add(expandedSequence);
+                String expandedSeq = Sequences.generateSequenceFiles(validFixations, pDirectory);
+                expandedSequences.add(expandedSeq);
 
                 // Generate patterns
-                ArrayList<List<String>> expandedPatterns = Patterns.discoverPatterns(
-                    Arrays.asList(sequences.get(i)), 
+                List<List<String>> expandedPatterns = Patterns.discoverPatterns(
+                    List.of(expandedSeq), 
                     MIN_PATTERN_LENGTH, 
                     MAX_PATTERN_LENGTH, 
                     1, 
                     1
                 );
                 
-                ArrayList<List<String>> collapsedPatterns = Patterns.discoverPatterns(
-                    Arrays.asList(Sequences.getCollapsedSequence(sequences.get(i))), 
+                List<List<String>> collapsedPatterns = Patterns.discoverPatterns(
+                    List.of(Sequences.getCollapsedSequence(expandedSeq)), 
                     MIN_PATTERN_LENGTH,
                     MAX_PATTERN_LENGTH,
                     1,
@@ -114,7 +113,6 @@ public class Analysis {
             // Batch analysis
             if (inputFiles.length > 1) {
                 // Generate patterns
-                List<String> expandedSequences = sequences;
                 List<String> collapsedSequences = new ArrayList<String>();
 
                 for (String s : expandedSequences) {
@@ -122,8 +120,8 @@ public class Analysis {
                 }
 
                 System.out.println("Analyzing patterns");
-                ArrayList<List<String>> expandedPatterns = Patterns.discoverPatterns(expandedSequences, MIN_PATTERN_LENGTH, MAX_PATTERN_LENGTH, MIN_PATTERN_FREQUENCY, MIN_SEQUENCE_SIZE);
-                ArrayList<List<String>> collapsedPatterns = Patterns.discoverPatterns(collapsedSequences, MIN_PATTERN_LENGTH, MAX_PATTERN_LENGTH, MIN_PATTERN_FREQUENCY, MIN_SEQUENCE_SIZE);
+                List<List<String>> expandedPatterns = Patterns.discoverPatterns(expandedSequences, MIN_PATTERN_LENGTH, MAX_PATTERN_LENGTH, MIN_PATTERN_FREQUENCY, MIN_SEQUENCE_SIZE);
+                List<List<String>> collapsedPatterns = Patterns.discoverPatterns(collapsedSequences, MIN_PATTERN_LENGTH, MAX_PATTERN_LENGTH, MIN_PATTERN_FREQUENCY, MIN_SEQUENCE_SIZE);
                 
                 // Root directory
                 String directory = params.getOutputDirectory();

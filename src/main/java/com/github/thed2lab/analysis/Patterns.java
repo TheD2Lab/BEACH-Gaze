@@ -6,7 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Patterns {
-    public static ArrayList<List<String>> discoverPatterns(List<String> sequences, int minPatternLength, int maxPatternLength, int minFrequency, int minSequenceSize) {
+    public static List<List<String>> discoverPatterns(List<String> sequences, int minPatternLength, int maxPatternLength, int minFrequency, int minSequenceSize) {
+
+        // ensure minimums are at least 1
+        minFrequency = minFrequency > 0 ? minFrequency : 1;
+        minPatternLength = minPatternLength > 0 ? minPatternLength : 1;
+        minSequenceSize = minSequenceSize > 0 ? minSequenceSize : 1;
+
         ArrayList<List<String>> results = new ArrayList<List<String>>();
         results.add(Arrays.asList(new String[] {"pattern_string", "frequency", "sequence_support", "average_pattern_frequency", "proportional_pattern_frequency"})); 
 
@@ -15,16 +21,20 @@ public class Patterns {
             HashMap<String, Integer> frequencyMap = new HashMap<String, Integer>();
             HashMap<String, ArrayList<String>> sequenceMap = new HashMap<String, ArrayList<String>>();
             
-            for (String s: sequences) {
-                for (int i = 0; i < s.length() - patternLength; i++) {
-                    String patternString = s.substring(i, i + patternLength);
+            for (String seq: sequences) {
+                for (int i = 0; i <= seq.length() - patternLength; i++) {
+                    String patternString = seq.substring(i, i + patternLength);
                     totalPatternCount++;
     
-                    int count = frequencyMap.containsKey(patternString) ? frequencyMap.get(patternString) + 1 : 1;
+                    int count = frequencyMap.getOrDefault(patternString, 0) + 1;
                     frequencyMap.put(patternString, count);
     
-                    if (!sequenceMap.containsKey(patternString)) sequenceMap.put(patternString, new ArrayList<String>());
-                    if (!sequenceMap.get(patternString).contains(s)) sequenceMap.get(patternString).add(s);
+                    if (!sequenceMap.containsKey(patternString)) {
+                        sequenceMap.put(patternString, new ArrayList<String>());
+                    }
+                    if (!sequenceMap.get(patternString).contains(seq)) {
+                        sequenceMap.get(patternString).add(seq);
+                    }
                 }
             }
             
@@ -45,7 +55,6 @@ public class Patterns {
                 }
             }
         }
-        
         return results;
     }
 }
