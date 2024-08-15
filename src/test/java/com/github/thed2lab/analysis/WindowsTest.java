@@ -10,6 +10,7 @@ import org.junit.Test;
 
 public class WindowsTest {
 
+   private final double PRECISION = 0.000000001; // allowable floating point error
    final String GAZE_PATH = "src/test/resources/test_all_gaze.csv";
    final DataEntry GAZE_DATA = FileHandler.buildDataEntry(new File(GAZE_PATH));
 
@@ -77,13 +78,25 @@ public class WindowsTest {
       settings.event = Constants.LEFT_PUPIL_DIAMETER;
       settings.eventTimeout = 1;
       settings.eventMaxDuration = 3;
-      double baseline = 4.52356073;
+      double baseline = 4.523560729927;
 
-      
       List<DataEntry> windows = Windows.spliceEventWindow(GAZE_DATA, settings, baseline);
       assertTrue(windows.size() == 3);
       assertTrue(windows.get(0).getValue(Constants.DATA_ID, 0).equals("6"));
       assertTrue(windows.get(1).getValue(Constants.DATA_ID, 0).equals("453"));
       assertTrue(windows.get(2).getValue(Constants.DATA_ID, 0).equals("901"));
+   }
+
+   @Test
+   public void testGetBaselineValue_LPMM() {
+      double baselineValue = Windows.getEventBaselineValue(DataFilter.filterByValidity(GAZE_DATA), Constants.LEFT_PUPIL_DIAMETER);
+      assertEquals(4.523560729927, baselineValue, PRECISION);
+   }
+
+   @Test
+   public void testGetBaselineValue_BothPMM() {
+      final String EVENT = Constants.LEFT_PUPIL_DIAMETER + " + " + Constants.RIGHT_PUPIL_DIAMETER;
+      double baselineValue = Windows.getEventBaselineValue(DataFilter.filterByValidity(GAZE_DATA), EVENT);
+      assertEquals(4.456128552311, baselineValue, PRECISION);
    }
 }
