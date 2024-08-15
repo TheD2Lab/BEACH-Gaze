@@ -17,6 +17,7 @@ public class WindowSettings {
     public double eventTimeout;
     public double eventMaxDuration;
 
+    // TODO: delete unused variables if there is not plan to use them
     public boolean eventThresholdEnabled;
     public double eventWindowSize;
     public int eventThreshold;
