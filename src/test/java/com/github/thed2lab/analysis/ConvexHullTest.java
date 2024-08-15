@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,72 +11,72 @@ import org.junit.Test;
 
 public class ConvexHullTest {
    
-   final double PRECISION = 0.000000001; // allowable floating point error
+   private final double PRECISION = 0.000000001; // allowable floating point error
 
    @Test
    public void testGetConvexHull_lessThan3() {
-      final List<Point2D.Double> POINTS = new ArrayList<>() {{
-         add(new Point2D.Double(0, 0));
-         add(new Point2D.Double(1,1));
-      }};
+      List<Point2D.Double> points = List.of(
+         new Point2D.Double(0, 0),
+         new Point2D.Double(1,1)
+      );
 
-      int convexHullSize = ConvexHull.getConvexHull(POINTS).size();
+      int convexHullSize = ConvexHull.getConvexHull(points).size();
       assertEquals("Expected empty list, but got non-empty list instead.", 0, convexHullSize);
    }
 
    @Test
    public void testGetConvexHull_allColinear() {
-      final List<Point2D.Double> POINTS = new ArrayList<>() {{
-         add(new Point2D.Double(0, 0));
-         add(new Point2D.Double(0,1));
-         add(new Point2D.Double(0, 2));
-         add(new Point2D.Double(0,3));
-         add(new Point2D.Double(0, 4));
-         add(new Point2D.Double(0,5));
-      }};
+      List<Point2D.Double> points = List.of(
+         new Point2D.Double(0, 0),
+         new Point2D.Double(0,1),
+         new Point2D.Double(0, 2),
+         new Point2D.Double(0,3),
+         new Point2D.Double(0, 4),
+         new Point2D.Double(0,5)
+      );
 
-      int convexHullSize = ConvexHull.getConvexHull(POINTS).size();
+      int convexHullSize = ConvexHull.getConvexHull(points).size();
       assertEquals("Expected empty list, but got non-empty list instead.", 0, convexHullSize);
    }
 
    @Test
    public void testGetPolygonArea_normalCase() {
-      final List<Point2D.Double> CONVEX_HULL = Collections.unmodifiableList(new ArrayList<>() {{
-         add(new Point2D.Double(1, -1));
-         add(new Point2D.Double(3,0));
-         add(new Point2D.Double(1,4));
-         add(new Point2D.Double(-2,2));
-         add(new Point2D.Double(1, -1));
-      }});
+      List<Point2D.Double> convexHull = List.of(
+         new Point2D.Double(1, -1),
+         new Point2D.Double(3,0),
+         new Point2D.Double(1,4),
+         new Point2D.Double(-2,2),
+         new Point2D.Double(1, -1)
+      );
       final double EXPECTED_AREA = 12.5;
-      final double ACTUAL_AREA = ConvexHull.getPolygonArea(CONVEX_HULL);
+      final double ACTUAL_AREA = ConvexHull.getPolygonArea(convexHull);
       assertEquals(EXPECTED_AREA, ACTUAL_AREA, PRECISION);
    }
 
    @Test
    public void testGetConvexHull_removeClockwise() {
-      final List<Point2D.Double> POINTS = new ArrayList<>() {{
-         add(new Point2D.Double(1, 1)); // removed; clockwise
-         add(new Point2D.Double(1,4));
-         add(new Point2D.Double(1, 4));
-         add(new Point2D.Double(3,0));
-         add(new Point2D.Double(1, -1));
-         add(new Point2D.Double(-2,2));
-      }};
-      final List<Point2D.Double> EXPECTED_CONVEX_HULL = Collections.unmodifiableList(new ArrayList<>() {{
-         add(new Point2D.Double(1, -1));
-         add(new Point2D.Double(3,0));
-         add(new Point2D.Double(1,4));
-         add(new Point2D.Double(-2,2));
-         add(new Point2D.Double(1, -1));
-      }});
-      final List<Point2D.Double> ACTUAL_CONVEX_HULL = ConvexHull.getConvexHull(POINTS);
+      List<Point2D.Double> points = List.of(
+         new Point2D.Double(1, 1), // removed; clockwise
+         new Point2D.Double(1,4),
+         new Point2D.Double(1, 4),
+         new Point2D.Double(3,0),
+         new Point2D.Double(1, -1),
+         new Point2D.Double(-2,2)
+      );
+      List<Point2D.Double> expectedConvexHull = List.of(
+         new Point2D.Double(1, -1),
+         new Point2D.Double(3,0),
+         new Point2D.Double(1,4),
+         new Point2D.Double(-2,2),
+         new Point2D.Double(1, -1)
+      );
+      List<Point2D.Double> actualConvexHull = ConvexHull.getConvexHull(points);
 
-      assertEquals(EXPECTED_CONVEX_HULL.size(), ACTUAL_CONVEX_HULL.size());
+      assertEquals(expectedConvexHull.size(), actualConvexHull.size());
 
-      Iterator<Point2D.Double> expectedIter = EXPECTED_CONVEX_HULL.iterator();
+      Iterator<Point2D.Double> expectedIter = expectedConvexHull.iterator();
 
-      for(Point2D.Double actualPoint: ACTUAL_CONVEX_HULL) {
+      for(Point2D.Double actualPoint: actualConvexHull) {
          Point2D.Double expectedPoint = expectedIter.next();
          if (!expectedPoint.equals(actualPoint)) {
             fail("Actual convex hull does not match expected.");
@@ -88,28 +86,28 @@ public class ConvexHullTest {
 
    @Test
    public void testGetConvexHull_removeCollinear() {
-      final List<Point2D.Double> POINTS = new ArrayList<>() {{
-         add(new Point2D.Double(1,4));
-         add(new Point2D.Double(1, 4));
-         add(new Point2D.Double(3,0));
-         add(new Point2D.Double(1, -1));
-         add(new Point2D.Double(-2,2));
-         add(new Point2D.Double(0,0)); // removed; collinear
-      }};
-      final List<Point2D.Double> EXPECTED_CONVEX_HULL = Collections.unmodifiableList(new ArrayList<>() {{
-         add(new Point2D.Double(1, -1));
-         add(new Point2D.Double(3,0));
-         add(new Point2D.Double(1,4));
-         add(new Point2D.Double(-2,2));
-         add(new Point2D.Double(1, -1));
-      }});
-      final List<Point2D.Double> ACTUAL_CONVEX_HULL = ConvexHull.getConvexHull(POINTS);
+      List<Point2D.Double> points = List.of(
+         new Point2D.Double(1,4),
+         new Point2D.Double(1, 4),
+         new Point2D.Double(3,0),
+         new Point2D.Double(1, -1),
+         new Point2D.Double(-2,2),
+         new Point2D.Double(0,0) // removed; collinear
+      );
+      List<Point2D.Double> expectedConvexHull = List.of(
+         new Point2D.Double(1, -1),
+         new Point2D.Double(3,0),
+         new Point2D.Double(1,4),
+         new Point2D.Double(-2,2),
+         new Point2D.Double(1, -1)
+      );
+      List<Point2D.Double> actualConvexHull = ConvexHull.getConvexHull(points);
 
-      assertEquals(EXPECTED_CONVEX_HULL.size(), ACTUAL_CONVEX_HULL.size());
+      assertEquals(expectedConvexHull.size(), actualConvexHull.size());
 
-      Iterator<Point2D.Double> expectedIter = EXPECTED_CONVEX_HULL.iterator();
+      Iterator<Point2D.Double> expectedIter = expectedConvexHull.iterator();
 
-      for (Point2D.Double actualPoint: ACTUAL_CONVEX_HULL) {
+      for (Point2D.Double actualPoint: actualConvexHull) {
          Point2D.Double expectedPoint = expectedIter.next();
          if (!expectedPoint.equals(actualPoint)) {
             fail("Actual convex hull does not match expected.");

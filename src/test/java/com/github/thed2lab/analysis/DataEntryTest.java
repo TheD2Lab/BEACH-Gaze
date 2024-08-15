@@ -5,8 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -18,64 +16,22 @@ import org.junit.rules.TemporaryFolder;
  * Unit Tests for the DataEntry class. Honestly, DataEntry's design is hard to test.
  */
 public class DataEntryTest {
-   final static List<String> GOOD_HEADERS = Collections.unmodifiableList(new ArrayList<>() {
-      {
-         add("CNT");
-         add("TIME(2023/02/22 14:26:24.897)");
-         add("FPOGID");
-      }
-   });
-   final static List<String> BAD_HEADERS = Collections.unmodifiableList(new ArrayList<>() {
-      {
-         add("CNT");
-         add("TIME(2023/02/22 14:26:24.897)");
-      }
-   });
+   private final static List<String> GOOD_HEADERS = List.of("CNT", "TIME(2023/02/22 14:26:24.897)", "FPOGID");
 
-   final static ArrayList<List<String>> GOOD_DATA = new ArrayList<>() {
-      {
-         add(Collections.unmodifiableList(new ArrayList<>() {
-            {
-               add("0");
-               add("0");
-               add("1");
-            }
-         }));
-         add(Collections.unmodifiableList(new ArrayList<>() {
-            {
-               add("1");
-               add("0.00696");
-               add("1");
-            }
-         }));
-         add(Collections.unmodifiableList(new ArrayList<>() {
-            {
-               add("2");
-               add("0.01331");
-               add("1");
-            }
-         }));
-      }
-   };
+   private final static List<String> BAD_HEADERS = List.of("CNT","TIME(2023/02/22 14:26:24.897)");
 
-   final static ArrayList<List<String>> BAD_DATA = new ArrayList<>() {
-      {
-         add(Collections.unmodifiableList(new ArrayList<>() {
-            {
-               add("0");
-               add("0");
-               add("1");
-            }
-         }));
-         add(Collections.unmodifiableList(new ArrayList<>() {
-            {
-               add("1");
-            }
-         }));
-      }
-   };
+   private final static List<List<String>> GOOD_DATA = List.of(
+         List.of("0", "0", "1"),
+         List.of("1", "0.00696", "1"),
+         List.of("2", "0.01331", "1")
+   );
 
-   final static String TEST_FILE_DIR = "./src/test/resources/";
+   private final static List<List<String>> BAD_DATA = List.of(
+      List.of("0", "0", "1"),
+      List.of("1")
+   );
+
+   private final static String TEST_FILE_DIR = "./src/test/resources/";
 
    @Rule
    public TemporaryFolder tempFolder = new TemporaryFolder();

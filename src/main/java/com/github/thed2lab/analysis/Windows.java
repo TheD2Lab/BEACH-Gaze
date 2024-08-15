@@ -7,8 +7,9 @@ import static com.github.thed2lab.analysis.Constants.LEFT_PUPIL_DIAMETER;
 import static com.github.thed2lab.analysis.Constants.RIGHT_PUPIL_DIAMETER;
 import static com.github.thed2lab.analysis.Constants.SACCADE_DIR;
 import static com.github.thed2lab.analysis.Constants.SACCADE_MAGNITUDE;
+import static com.github.thed2lab.analysis.Constants.SCREEN_HEIGHT;
+import static com.github.thed2lab.analysis.Constants.SCREEN_WIDTH;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,7 +18,7 @@ import java.util.Set;
 
 public class Windows {
 
-    private final static int BASELINE_LENGTH = 120;
+    private final static int BASELINE_LENGTH = 120; // two minutes
     private final static String LEFT_RIGHT_DIAMETER = LEFT_PUPIL_DIAMETER + " + " + RIGHT_PUPIL_DIAMETER;
 
     // Set of supported events that utilize the fixation file
@@ -38,148 +39,199 @@ public class Windows {
     ));
 
     public static void generateWindows(DataEntry allGaze, String outputDirectory, WindowSettings settings) {
-        List<String> headers = allGaze.getHeaders();
-        double t0 = Double.valueOf(allGaze.getValue(TIMESTAMP, 0));
+        double time0 = Double.valueOf(allGaze.getValue(TIMESTAMP, 0));
 
         // Generate baseline file
-        generateBaselineFile(allGaze, outputDirectory + "/baseline");
+        DataEntry baselineData = generateBaselineFiles(allGaze, outputDirectory + "/baseline");
 
         // Tumbling Window
         if (settings.tumblingEnabled) {
-            ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
-            DataEntry window = new DataEntry(headers);
-            double windowSize = settings.tumblingWindowSize;
-            double start = t0;
-            double end = start + windowSize;
-
-            for (int i = 0; i < allGaze.rowCount(); i++) {
-                List<String> currRow = allGaze.getRow(i);
-                Double t = Double.valueOf(allGaze.getValue(TIMESTAMP, i));
-                
-                if (t > end) { 
-                    end += windowSize;
-                    windows.add(window);
-                    window = new DataEntry(headers);
-                    window.process(currRow);
-                } else if (i == allGaze.rowCount() - 1) { // Check to see if this is the last row of data in the list, if so append it to the last window
-                    window.process(currRow);
-                    windows.add(window);
-                } else {
-                    window.process(currRow);
-                }
-            }
-
-            outputWindowFiles(windows, t0, outputDirectory + "/tumbling");
+            List<DataEntry> windows = spliceTumblingWindow(allGaze, settings.tumblingWindowSize);
+            outputWindowFiles(windows, time0, outputDirectory + "/tumbling");
         }
 
         // Expanding Window
         if (settings.expandingEnabled) {
-            ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
-            DataEntry window = new DataEntry(headers);
-            double windowSize = settings.expandingWindowSize;
-            double start = t0;
-            double end = start + windowSize;
-
-            for (int i = 0; i < allGaze.rowCount(); i++) {
-                List<String> currRow = allGaze.getRow(i);
-                Double t = Double.valueOf(allGaze.getValue(TIMESTAMP, i));
-
-                if (t > end) { 
-                    end += windowSize;
-                    windows.add(window);
-                    window = window.clone();
-                    window.process(currRow);
-                } else if (i == allGaze.rowCount() - 1) { // Check to see if this is the last row of data in the list, if so append it to the last window
-                    window.process(currRow);
-                    windows.add(window);
-                } else {
-                    window.process(currRow);
-                }
-            }
-
-            outputWindowFiles(windows, t0, outputDirectory + "/expanding");
+            List<DataEntry> windows = spliceExpandingWindow(allGaze, settings.expandingWindowSize);
+            outputWindowFiles(windows, time0, outputDirectory + "/expanding");
         }
 
         // Hopping Window
         if (settings.hoppingEnabled) {
-            ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
-            DataEntry window = new DataEntry(headers);
-            double windowSize = settings.hoppingWindowSize;
-            double hopSize = settings.hoppingHopSize;
-            double start = t0;
-            double end = start + windowSize;
-
-            for (int i = 0; i < allGaze.rowCount(); i++) {
-                double t1 = Double.parseDouble(allGaze.getValue(TIMESTAMP, i));
-                
-                if (t1 >= start) {
-                    for (int j = i; j < allGaze.rowCount(); j++) {
-                        List<String> row2 = allGaze.getRow(j);
-                        double t2 = Double.parseDouble(allGaze.getValue(TIMESTAMP, j));
-
-                        if (t2 >= end || j == allGaze.rowCount() - 1) {
-                            window.process(row2);
-                            windows.add(window);
-
-                            start += hopSize;
-                            end = start + windowSize;
-                            window = new DataEntry(headers);
-
-                            break;
-                        } else {
-                            window.process(row2);
-                        }
-                    }
-                }
-            }
-
-            outputWindowFiles(windows, t0, outputDirectory + "/hopping");
+            List<DataEntry> windows = spliceHoppingWindow(allGaze, settings.hoppingWindowSize, settings.hoppingHopSize);
+            outputWindowFiles(windows, time0, outputDirectory + "/hopping");
         }
 
         // Event Window
         if (settings.eventEnabled) {
-            ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
-            DataEntry window = new DataEntry(headers);
-            boolean isEventWindow = false;
-
-            String event = settings.event;
-            double timeoutLength = settings.eventTimeout;
-            double maxDuration = settings.eventMaxDuration;
-            double eventEnd = 0;
-
-            double baselineValue = getEventBaselineValue(outputDirectory, event);
-
-            for (int i = 0; i < allGaze.rowCount(); i++) {
-                Double t = Double.valueOf(allGaze.getValue(TIMESTAMP, i));
-                Double windowValue =  getEventWindowValue(allGaze, event, i);
-
-                // Get the initial timestamp
-                if (i == 0) {
-                    t0 = t;
-                }
-
-                if (windowValue > baselineValue) {
-                    if (!isEventWindow) maxDuration = t + settings.eventMaxDuration;
-                    isEventWindow = true;
-                    eventEnd = t + timeoutLength;
-                }
-
-                if (isEventWindow) {
-                    if (t > eventEnd || t > maxDuration || i == allGaze.rowCount() - 1) {
-                        windows.add(window);
-                        window = new DataEntry(headers);
-                        isEventWindow = false;
-                    } else {
-                        window.process(allGaze.getRow(i));
-                    }
-                }
-            }
-
-            outputWindowFiles(windows, t0, outputDirectory + "/event");
+            double baselineValue = getEventBaselineValue(baselineData, settings.event);
+            List<DataEntry> windows  = spliceEventWindow(allGaze, settings, baselineValue);
+            outputWindowFiles(windows, time0, outputDirectory + "/event");
         }
     }
 
-    static void outputWindowFiles(ArrayList<DataEntry> windows, double t0, String outputDirectory) {
+    /**
+     * Splices the all gaze data using the tumbling window pattern.
+     * @param allGaze the gaze data to be spliced.
+     * @param windowSize the size of the windows.
+     * @return the gaze data split into windows.
+     */
+    static List<DataEntry> spliceTumblingWindow(DataEntry allGaze, double windowSize) {
+        List<String> headers = allGaze.getHeaders();
+        ArrayList<DataEntry> windows = new ArrayList<>();
+        DataEntry window = new DataEntry(headers);
+        double start = Double.valueOf(allGaze.getValue(TIMESTAMP, 0));
+        double end = start + windowSize;
+
+        for (int i = 0; i < allGaze.rowCount(); i++) {
+            List<String> currRow = allGaze.getRow(i);
+            Double t = Double.valueOf(allGaze.getValue(TIMESTAMP, i));
+            
+            if (t > end) { 
+                end += windowSize;
+                windows.add(window);
+                window = new DataEntry(headers);
+                window.process(currRow);
+            } else if (i == allGaze.rowCount() - 1) { // Check to see if this is the last row of data in the list, if so append it to the last window
+                window.process(currRow);
+                windows.add(window);
+            } else {
+                window.process(currRow);
+            }
+        }
+        return windows;
+    }
+
+    /**
+     * Splices the all gaze data using the expanding window pattern.
+     * @param allGaze the gaze data to be spliced.
+     * @param windowSize the window increment size.
+     * @return the gaze data split into windows.
+     */
+    static List<DataEntry> spliceExpandingWindow(DataEntry allGaze, double windowSize) {
+        List<String> headers = allGaze.getHeaders();
+        ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
+        DataEntry window = new DataEntry(headers);
+        double start = Double.valueOf(allGaze.getValue(TIMESTAMP, 0));
+        double end = start + windowSize;
+
+        for (int i = 0; i < allGaze.rowCount(); i++) {
+            List<String> currRow = allGaze.getRow(i);
+            Double t = Double.valueOf(allGaze.getValue(TIMESTAMP, i));
+
+            if (t > end) { 
+                end += windowSize;
+                windows.add(window);
+                window = window.clone();
+                window.process(currRow);
+            } else if (i == allGaze.rowCount() - 1) { // Check to see if this is the last row of data in the list, if so append it to the last window
+                window.process(currRow);
+                windows.add(window);
+            } else {
+                window.process(currRow);
+            }
+        }
+        return windows;
+    }
+
+    /**
+     * Splices the all gaze data using the hopping window pattern.
+     * @param allGaze the gaze data to be spliced.
+     * @param windowSize the size of hopping windows.
+     * @param hopSize the hop distance of a hopping window.
+     * @return the gaze data split into windows.
+     */
+    static List<DataEntry> spliceHoppingWindow(DataEntry allGaze, double windowSize, double hopSize) {
+        List<String> headers = allGaze.getHeaders();
+        ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
+        DataEntry window = new DataEntry(headers);
+        double start = Double.valueOf(allGaze.getValue(TIMESTAMP, 0));
+        double end = start + windowSize;
+
+        for (int i = 0; i < allGaze.rowCount(); i++) {
+            double time1 = Double.parseDouble(allGaze.getValue(TIMESTAMP, i));
+            
+            if (time1 >= start) {
+                for (int j = i; j < allGaze.rowCount(); j++) {
+                    List<String> row2 = allGaze.getRow(j);
+                    double time2 = Double.parseDouble(allGaze.getValue(TIMESTAMP, j));
+
+                    if (time2 > end) { // don't include row2
+                        windows.add(window);
+                        start += hopSize;
+                        end = start + windowSize;
+                        window = new DataEntry(headers);
+                        break;
+                    } else if (j == allGaze.rowCount() - 1) {   // include row
+                        window.process(row2);
+                        windows.add(window);
+                        start += hopSize;
+                        end = start + windowSize;
+                        window = new DataEntry(headers);
+                    } else {
+                        window.process(row2);
+                    }
+                }
+            }
+        }
+        return windows;
+    }
+
+    /**
+     * Splices the all gaze data using the event window pattern.
+     * @param allGaze the gaze data to be spliced.
+     * @param settings window settings.
+     * @param baseDirectory the directory containing baseline data.
+     * @return the gaze data split into windows.
+     */
+    static List<DataEntry> spliceEventWindow(DataEntry allGaze, WindowSettings settings, double baselineValue) {
+        List<String> headers = allGaze.getHeaders();
+        ArrayList<DataEntry> windows = new ArrayList<DataEntry>();
+        DataEntry window = new DataEntry(headers);
+        boolean isEventWindow = false;
+
+        String event = settings.event;
+        double timeoutLength = settings.eventTimeout;
+        double maxDuration = settings.eventMaxDuration;
+        double eventEnd = 0;
+
+        for (int i = 0; i < allGaze.rowCount(); i++) {
+            double time = Double.valueOf(allGaze.getValue(TIMESTAMP, i));
+            double windowValue =  getEventWindowValue(allGaze, event, i);
+
+            if (windowValue > baselineValue) {
+                if (!isEventWindow) { 
+                    maxDuration = time + settings.eventMaxDuration;
+                    isEventWindow = true;
+                }
+                eventEnd = time + timeoutLength;
+            }
+
+            if (isEventWindow) {
+                if (time > eventEnd || time > maxDuration) {
+                    windows.add(window);
+                    window = new DataEntry(headers);
+                    // check if the current line is an event
+                    if (windowValue > baselineValue) {
+                        window.process(allGaze.getRow(i));
+                        maxDuration = time + settings.eventMaxDuration;
+                        eventEnd = time + timeoutLength;
+                    } else {
+                        isEventWindow = false;
+                    }
+                } else {
+                    window.process(allGaze.getRow(i));
+                }
+            }
+        }
+
+        if (window.rowCount() > 0) {    // add the last window
+            windows.add(window);
+        }
+        return windows;
+    }
+
+    static void outputWindowFiles(List<DataEntry> windows, double time0, String outputDirectory) {
         int windowCount = 1;
         List<List<String>> allWindowDGMs = new ArrayList<List<String>>();
         for (DataEntry windowGaze : windows) {
@@ -193,11 +245,11 @@ public class Windows {
             List<List<String>> results = Analysis.generateResults(windowGaze, windowFixations);
 
             // Calculate beginning time stamp, ending timestamp, window duration, initial/final seconds elapsed since window start
-            double t1 = Double.parseDouble(windowGaze.getValue(TIMESTAMP, 0));
-            double t2 = Double.parseDouble(windowGaze.getValue(TIMESTAMP, windowGaze.rowCount() - 1));
-            double windowDuration = t2 - t1;
-            double initialDuration = t1 - t0;
-            double finalDuration = t2 - t0;
+            double time1 = Double.parseDouble(windowGaze.getValue(TIMESTAMP, 0));
+            double time2 = Double.parseDouble(windowGaze.getValue(TIMESTAMP, windowGaze.rowCount() - 1));
+            double windowDuration = time2 - time1;
+            double initialDuration = time1 - time0;
+            double finalDuration = time2 - time0;
 
             List<String> headers = results.get(0);
             headers.add("beginning_timestamp");
@@ -207,8 +259,8 @@ public class Windows {
             headers.add("final_seconds_elapsed_since_start");
             
             List<String> dgms = results.get(1);
-            dgms.add(String.valueOf(t1));
-            dgms.add(String.valueOf(t2));
+            dgms.add(String.valueOf(time1));
+            dgms.add(String.valueOf(time2));
             dgms.add(String.valueOf(windowDuration));
             dgms.add(String.valueOf(initialDuration));
             dgms.add(String.valueOf(finalDuration));
@@ -227,15 +279,15 @@ public class Windows {
         FileHandler.writeToCSV(allWindowDGMs, outputDirectory, "all_window_DGMs");
     }
 
-    static void generateBaselineFile(DataEntry allGaze, String outputDirectory) {
+    static DataEntry generateBaselineFiles(DataEntry allGaze, String outputDirectory) {
         DataEntry baseline = new DataEntry(allGaze.getHeaders());
         double startTime = Double.valueOf(allGaze.getValue(TIMESTAMP, 0));
         double endTime = startTime + BASELINE_LENGTH;
 
         for (int i = 0; i < allGaze.rowCount(); i++) {
-            Double t = Double.parseDouble(allGaze.getValue(TIMESTAMP, i));
+            Double time = Double.parseDouble(allGaze.getValue(TIMESTAMP, i));
 
-            if (t >= endTime) {
+            if (time >= endTime) {
                 break;
             } else {
                 baseline.process(allGaze.getRow(i));
@@ -245,49 +297,45 @@ public class Windows {
         // Since baseline is continuous, can filter by fixations
         baseline.writeToCSV(outputDirectory, "baseline");
         FileHandler.writeToCSV(Analysis.generateResults(baseline, DataFilter.filterByFixations(baseline)), outputDirectory, "baseline_DGMs");
+        return baseline;
     }
 
-    static double getRawEventBaselineValue(String fileDirectory, String event) {
+    static double getRawEventBaselineValue(DataEntry baselineData, String event) {
         double eventValue = 0;
 
-        File baselineFile = new File(fileDirectory + "/baseline/baseline.csv");
-        DataEntry baseline = FileHandler.buildDataEntry(baselineFile);
-        baseline = fixationEvents.contains(event) ? DataFilter.filterByFixations(baseline) : baseline; // Determine if we need to filter by fiaxtions
-        baseline = DataFilter.filterByValidity(baseline); // Filter by validity
+        baselineData = fixationEvents.contains(event) ? DataFilter.filterByFixations(baselineData) : baselineData; // Determine if we need to filter by fixations
+        baselineData = DataFilter.filterByValidity(baselineData, SCREEN_WIDTH, SCREEN_HEIGHT); // Filter by validity
         
-        for (int i = 0; i < baseline.rowCount(); i++) {
-            eventValue += Double.parseDouble(baseline.getValue(event, i));
+        for (int i = 0; i < baselineData.rowCount(); i++) {
+            eventValue += Double.parseDouble(baselineData.getValue(event, i));
         }
 
-        eventValue /= baseline.rowCount();
+        eventValue /= baselineData.rowCount();
         
         return eventValue;
     }
 
-    static double getAveragePupilDilationBaseline(String fileDirectory) {
+    static double getAveragePupilDilationBaseline(DataEntry baselineData) {
         double eventValue = 0;
-
-        File baselineFile = new File(fileDirectory + "/baseline/baseline.csv");
-        DataEntry baseline = FileHandler.buildDataEntry(baselineFile);
-        baseline = DataFilter.filterByValidity(baseline); // Filter by validity
+        baselineData = DataFilter.filterByValidity(baselineData, SCREEN_WIDTH, SCREEN_HEIGHT); // Filter by validity
         
-        for (int i = 0; i < baseline.rowCount(); i++) {
-            double left = Double.parseDouble(baseline.getValue(LEFT_PUPIL_DIAMETER, i));
-            double right = Double.parseDouble(baseline.getValue(RIGHT_PUPIL_DIAMETER, i));
+        for (int i = 0; i < baselineData.rowCount(); i++) {
+            double left = Double.parseDouble(baselineData.getValue(LEFT_PUPIL_DIAMETER, i));
+            double right = Double.parseDouble(baselineData.getValue(RIGHT_PUPIL_DIAMETER, i));
             eventValue += ((left + right) / 2);
         }
 
-        eventValue /= baseline.rowCount();
+        eventValue /= baselineData.rowCount();
         
         return eventValue;
     }
 
-    static double getEventBaselineValue(String fileDirectory, String event) {
+    static double getEventBaselineValue(DataEntry baselineData, String event) {
         switch(event) {
             case LEFT_RIGHT_DIAMETER:
-                return getAveragePupilDilationBaseline(fileDirectory);
+                return getAveragePupilDilationBaseline(baselineData);
             default:
-                return getRawEventBaselineValue(fileDirectory, event);
+                return getRawEventBaselineValue(baselineData, event);
         }
     }
 
