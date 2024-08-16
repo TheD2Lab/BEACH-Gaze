@@ -39,7 +39,7 @@ public class AreaOfInterests {
         
         for (String aoiKey : aoiGazeMap.keySet()) {
             DataEntry aoiData = aoiGazeMap.get(aoiKey);
-            aoiData.writeToCSV(outputDirectory + "/AOIs", aoiKey + "_all_gaze");
+            aoiData.writeToCSV(outputDirectory + "/AOIs", aoiKey.replace(" ", "_") + "_all_gaze");
         }
 
         List<List<String>> aoiMetrics = getMetrics(allGazeData, filteredFixations, aoiGazeMap, aoiFixMap);
