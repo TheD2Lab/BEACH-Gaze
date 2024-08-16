@@ -6,8 +6,8 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -203,26 +203,26 @@ public class SaccadesTest {
 
    @Test
    public void testSaccadeAnalyze_validFixations_returnHeadersAndValues() {
-      final String DATA_PATH = "./src/test/resources/valid_fixations.csv";
-      Map<String, String> expectedResults = new HashMap<String, String>();
-      expectedResults.put("total_number_of_saccades", "16");
+      final String DATA_PATH = "./src/test/resources/valid_fixation_screenApplied.csv";
+      Map<String, Double> expectedResults = new LinkedHashMap<String, Double>();
+      expectedResults.put("total_number_of_saccades", 16.);
 
-      expectedResults.put("sum_of_all_saccade_lengths", "1.4804786014");
-      expectedResults.put("mean_saccade_length", "0.0925299126");
-      expectedResults.put("median_saccade_length", "0.0761603796");
-      expectedResults.put("stdev_of_saccade_lengths", "0.0572082421");
-      expectedResults.put("min_saccade_length", "0.0167247123");
-      expectedResults.put("max_saccade_length", "0.2016258416");
+      expectedResults.put("sum_of_all_saccade_lengths", 2530.8660814283);
+      expectedResults.put("mean_saccade_length", 158.1791300893);
+      expectedResults.put("median_saccade_length", 119.3467488446);
+      expectedResults.put("stdev_of_saccade_lengths", 106.3517507880);
+      expectedResults.put("min_saccade_length", 20.7083517065);
+      expectedResults.put("max_saccade_length", 349.4148372122);
 
-      expectedResults.put("sum_of_all_saccade_durations", "0.19091");
-      expectedResults.put("mean_saccade_duration", "0.0119318750");
-      expectedResults.put("median_saccade_duration", "0.0067100000");
-      expectedResults.put("stdev_of_saccade_durations", "0.0094964149");
-      expectedResults.put("min_saccade_duration", "0.0059800000");
-      expectedResults.put("max_saccade_duration", "0.0302800000");
+      expectedResults.put("sum_of_all_saccade_durations", 0.19091);
+      expectedResults.put("mean_saccade_duration", 0.011931875);
+      expectedResults.put("median_saccade_duration", 0.00671);
+      expectedResults.put("stdev_of_saccade_durations", 0.0094964149);
+      expectedResults.put("min_saccade_duration", 0.00598);
+      expectedResults.put("max_saccade_duration", 0.03028);
 
-      expectedResults.put("scanpath_duration", "4.95373");
-      expectedResults. put("fixation_to_saccade_ratio", "24.9479859620");
+      expectedResults.put("scanpath_duration", 4.95373);
+      expectedResults. put("fixation_to_saccade_ratio", 24.9479859620);
 
       DataEntry dEntry = FileHandler.buildDataEntry(new File(DATA_PATH));
       Map<String, String> actualResults = Saccades.analyze(dEntry);
@@ -230,8 +230,8 @@ public class SaccadesTest {
       assertEquals("Unexpected output size.", expectedResults.size(), actualResults.size());
 
       for (String key : expectedResults.keySet()) {
-         if (Math.abs(Double.valueOf(expectedResults.get(key)) - Double.valueOf(actualResults.get(key))) > PRECISION) {
-            fail(String.format("Different values for %s\n\tExpected: %s\n\tActual: %s",
+         if (Math.abs(expectedResults.get(key) - Double.valueOf(actualResults.get(key))) > PRECISION) {
+            fail(String.format("Different values for %s\n\tExpected: %f\n\tActual: %s",
                key,
                expectedResults.get(key),
                actualResults.get(key)
