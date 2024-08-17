@@ -36,24 +36,24 @@ public class FixationsTests {
 
    @Test
    public void testFixationsAnalyze_realData_returnHeadersAndValues() {
-      final String FIXATION_PATH = "./src/test/resources/filtered_by_fixation.csv";
-      Map<String, String> expectedResults = new HashMap<String, String>();
-      expectedResults.put("total_number_of_fixations", "24");
-      expectedResults.put("sum_of_all_fixation_duration_s", "5.63392");
-      expectedResults.put("mean_fixation_duration_s", "0.234746667");
-      expectedResults.put("median_fixation_duration_s", "0.16748");
-      expectedResults.put("stdev_of_fixation_durations_s", "0.154818618");
-      expectedResults.put("min_fixation_duration_s", "0.03382");
-      expectedResults.put("max_fixation_duration_s", "0.66125");
+      final String FIXATION_PATH = "./src/test/resources/valid_fixations.csv";
+      Map<String, Double> expectedResults = new HashMap<String, Double>();
+      expectedResults.put("total_number_of_fixations", 20.);
+      expectedResults.put("sum_of_all_fixation_duration_s", 4.76282);
+      expectedResults.put("mean_fixation_duration_s", 0.238141);
+      expectedResults.put("median_fixation_duration_s", 0.16748);
+      expectedResults.put("stdev_of_fixation_durations_s", 0.152435548482);
+      expectedResults.put("min_fixation_duration_s", 0.08044);
+      expectedResults.put("max_fixation_duration_s", 0.66125);
       DataEntry actual_data = FileHandler.buildDataEntry(new File(FIXATION_PATH));
       Map<String, String> actualResults = Collections.unmodifiableMap(Fixations.analyze(actual_data));
 
       assertEquals("Different number of fixation results", expectedResults.size(), actualResults.size());
 
       for(String key: expectedResults.keySet()) {
-         if(Math.abs(Double.valueOf(expectedResults.get(key)) - Double.valueOf(actualResults.get(key))) > PRECISION) {
+         if(Math.abs(expectedResults.get(key) - Double.valueOf(actualResults.get(key))) > PRECISION) {
             fail(String.format(
-               "Different values for %s\n\tExpected: %s\n\tActual: %s",
+               "Different values for %s\n\tExpected: %f\n\tActual: %s",
                key,
                expectedResults.get(key),
                actualResults.get(key)

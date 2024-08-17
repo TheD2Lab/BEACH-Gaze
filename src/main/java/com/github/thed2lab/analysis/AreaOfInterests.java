@@ -26,7 +26,7 @@ public class AreaOfInterests {
             return;
         }
 
-        DataEntry filteredFixations = DataFilter.filterByValidity(fixationData, SCREEN_WIDTH, SCREEN_HEIGHT);
+        DataEntry filteredFixations = DataFilter.filterByValidity(fixationData);
         Map<String, DataEntry> aoiFixMap = splitAoiData(filteredFixations);
 
         // For any AOIs not in aoiFixationMetrics, add an empty DataEntry
@@ -39,7 +39,7 @@ public class AreaOfInterests {
         
         for (String aoiKey : aoiGazeMap.keySet()) {
             DataEntry aoiData = aoiGazeMap.get(aoiKey);
-            aoiData.writeToCSV(outputDirectory + "/AOIs", aoiKey + "_all_gaze");
+            aoiData.writeToCSV(outputDirectory + "/AOIs", aoiKey.replace(" ", "_") + "_all_gaze");
         }
 
         List<List<String>> aoiMetrics = getMetrics(allGazeData, filteredFixations, aoiGazeMap, aoiFixMap);
