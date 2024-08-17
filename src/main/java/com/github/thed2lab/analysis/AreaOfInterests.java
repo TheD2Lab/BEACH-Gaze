@@ -26,7 +26,7 @@ public class AreaOfInterests {
             return;
         }
 
-        DataEntry filteredFixations = DataFilter.filterByValidity(fixationData, SCREEN_WIDTH, SCREEN_HEIGHT);
+        DataEntry filteredFixations = DataFilter.filterByValidity(fixationData);
         Map<String, DataEntry> aoiFixMap = splitAoiData(filteredFixations);
 
         // For any AOIs not in aoiFixationMetrics, add an empty DataEntry

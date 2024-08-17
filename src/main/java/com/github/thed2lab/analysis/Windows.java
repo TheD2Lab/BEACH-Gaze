@@ -304,7 +304,7 @@ public class Windows {
         double eventValue = 0;
 
         baselineData = fixationEvents.contains(event) ? DataFilter.filterByFixations(baselineData) : baselineData; // Determine if we need to filter by fixations
-        baselineData = DataFilter.filterByValidity(baselineData, SCREEN_WIDTH, SCREEN_HEIGHT); // Filter by validity
+        baselineData = DataFilter.filterByValidity(baselineData); // Filter by validity
         
         for (int i = 0; i < baselineData.rowCount(); i++) {
             eventValue += Double.parseDouble(baselineData.getValue(event, i));
@@ -317,7 +317,7 @@ public class Windows {
 
     static double getAveragePupilDilationBaseline(DataEntry baselineData) {
         double eventValue = 0;
-        baselineData = DataFilter.filterByValidity(baselineData, SCREEN_WIDTH, SCREEN_HEIGHT); // Filter by validity
+        baselineData = DataFilter.filterByValidity(baselineData); // Filter by validity
         
         for (int i = 0; i < baselineData.rowCount(); i++) {
             double left = Double.parseDouble(baselineData.getValue(LEFT_PUPIL_DIAMETER, i));

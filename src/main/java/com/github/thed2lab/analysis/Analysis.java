@@ -53,10 +53,10 @@ public class Analysis {
                 System.out.println("Analyzing " + pName);
 
                 // Build DataEntrys
-                DataEntry allGaze = DataFilter.applyScreenSize(FileHandler.buildDataEntry(f), SCREEN_WIDTH, SCREEN_HEIGHT);
-                DataEntry validGaze = DataFilter.filterByValidity(allGaze, SCREEN_WIDTH, SCREEN_HEIGHT);
+                DataEntry allGaze = FileHandler.buildDataEntry(f);
+                DataEntry validGaze = DataFilter.filterByValidity(allGaze);
                 DataEntry fixations = DataFilter.filterByFixations(allGaze);
-                DataEntry validFixations = DataFilter.filterByValidity(fixations, SCREEN_HEIGHT, SCREEN_WIDTH);
+                DataEntry validFixations = DataFilter.filterByValidity(fixations);
                 
                 // Write DataEntrys to file
                 validGaze.writeToCSV(pDirectory, pName + "_valid_all_gaze");
@@ -167,18 +167,18 @@ public class Analysis {
 
     /**
      * Helper methods that generates the descriptive gaze measures.
-     * @param allGaze all gaze data for the whole screen, with screen size applied.
-     * @param areaGaze the gaze data that ocurred within a target portion of screen, i.e., either the whole screen or an AOI, with screen
-     * size applied.
+     * @param allGaze all gaze data for the whole screen.
+     * @param areaGaze the gaze data that ocurred within a target portion of screen, i.e., either the whole screen or an AOI.
      * @param areaFixations the gaze data that ocurred within a target portion of screen, i.e., either the whole screen or an AOI,
      * and filtered by fixation with screen size applied.
      * @return a {@code List<List<String>} where the first inner-list is the measure names, and second inner-list is the calculated values.
      */
     private static List<List<String>> generateResultsHelper(DataEntry allGaze, DataEntry areaGaze, DataEntry areaFixations) {
         // an argument could be made to filter before entering this function; there is a code smell due to blink rate and saccadeV changing
-        DataEntry validAllGaze = DataFilter.filterByValidity(allGaze, SCREEN_WIDTH, SCREEN_HEIGHT); 
-        DataEntry validAreaGaze = DataFilter.filterByValidity(areaGaze, SCREEN_WIDTH, SCREEN_HEIGHT);
-        DataEntry validAreaFixations = DataFilter.filterByValidity(areaFixations, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        DataEntry validAllGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(allGaze), SCREEN_WIDTH, SCREEN_HEIGHT); 
+        DataEntry validAreaGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(areaGaze), SCREEN_WIDTH, SCREEN_HEIGHT);
+        DataEntry validAreaFixations = DataFilter.applyScreenSize(DataFilter.filterByValidity(areaFixations), SCREEN_WIDTH, SCREEN_HEIGHT);
         
         LinkedHashMap<String,String> resultsMap = new LinkedHashMap<String, String>();
         resultsMap.putAll(Fixations.analyze(validAreaFixations));
