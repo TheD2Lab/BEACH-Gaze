@@ -1,6 +1,7 @@
 package com.github.thed2lab.analysis;
 
 import static com.github.thed2lab.analysis.Constants.AOI_LABEL;
+import static com.github.thed2lab.analysis.Constants.FIXATION_ID;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,20 +23,23 @@ public class GazeEntropy {
         var transitionProbability = new HashMap<String, Map<String, Double>>();
         var aoiSequence = new ArrayList<String>();
         String lastAoi = null;
+        int lastId = -1; // arbitrary number that will never be the ID
         
         int fixationCount = fixations.rowCount();
         
         for (int row = 0; row < fixations.rowCount(); row++) {
             String aoi = fixations.getValue(AOI_LABEL, row);
+            int curId = Integer.valueOf(fixations.getValue(FIXATION_ID, row));
             aoiSequence.add(aoi);
             aoiProbability.put(aoi, aoiProbability.getOrDefault(aoi, 0.0) + 1);
-            if (lastAoi != null) {  // skips the first loop
+            if (lastAoi != null && curId == lastId + 1) {  // skips the first loop and non-consecutive fixations
                 Map<String, Double> relationMatrix = transitionProbability.getOrDefault(lastAoi, new HashMap<String,Double>());
                 double count = relationMatrix.getOrDefault(aoi, 0.0);
                 relationMatrix.put(aoi, count + 1);
                 transitionProbability.put(lastAoi, relationMatrix);
             }
             lastAoi = aoi;
+            lastId = curId;
         }
 
         for (Map.Entry<String, Double> entry : aoiProbability.entrySet()) {

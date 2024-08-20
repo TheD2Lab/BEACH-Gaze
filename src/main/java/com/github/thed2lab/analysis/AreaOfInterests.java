@@ -3,8 +3,6 @@ package com.github.thed2lab.analysis;
 import static com.github.thed2lab.analysis.Constants.AOI_LABEL;
 import static com.github.thed2lab.analysis.Constants.FIXATION_DURATION;
 import static com.github.thed2lab.analysis.Constants.FIXATION_ID;
-import static com.github.thed2lab.analysis.Constants.SCREEN_HEIGHT;
-import static com.github.thed2lab.analysis.Constants.SCREEN_WIDTH;
 
 import java.util.ArrayList;
 import java.util.Arrays;
