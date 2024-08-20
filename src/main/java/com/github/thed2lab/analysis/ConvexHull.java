@@ -158,7 +158,7 @@ public class ConvexHull {
     /**
      * Returns a sorted set of points from the list <code>points</code>. The
      * set of points are sorted in increasing order of the angle they and the
-     * lowest point <tt>P</tt> make with the x-axis. If tow (or more) points
+     * lowest point <tt>P</tt> make with the x-axis. If two (or more) points
      * form the same angle towards <tt>P</tt>, the one closest to <tt>P</tt>
      * comes first.
      *
