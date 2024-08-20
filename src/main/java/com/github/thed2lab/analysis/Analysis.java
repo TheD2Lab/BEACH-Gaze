@@ -187,9 +187,9 @@ public class Analysis {
         resultsMap.putAll(Angles.analyze(validAreaFixations));
         resultsMap.putAll(ConvexHull.analyze(validAreaFixations));
         resultsMap.putAll(GazeEntropy.analyze(validAreaFixations));
-        resultsMap.putAll(Blinks.analyze(areaGaze));
+        resultsMap.putAll(Blinks.analyze(areaGaze));    // unfiltered
         resultsMap.putAll(Gaze.analyze(validAreaGaze));
-        resultsMap.putAll(Event.analyze(validAreaGaze));
+        resultsMap.putAll(Event.analyze(areaGaze)); // unfiltered
 
         var resultsList = new ArrayList<List<String>>(2);
         resultsList.add(new ArrayList<>(resultsMap.keySet()));
