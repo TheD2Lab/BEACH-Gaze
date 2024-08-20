@@ -257,6 +257,11 @@ public class Windows {
             headers.add("window_duration");
             headers.add("initial_seconds_elapsed_since_start");
             headers.add("final_seconds_elapsed_since_start");
+
+            // In the combined window folder, add headers if there are none
+            if (allWindowDGMs.size() == 0) {
+                allWindowDGMs.add(headers);
+            }
             
             List<String> dgms = results.get(1);
             dgms.add(String.valueOf(time1));
@@ -265,11 +270,6 @@ public class Windows {
             dgms.add(String.valueOf(initialDuration));
             dgms.add(String.valueOf(finalDuration));
             allWindowDGMs.add(dgms);
-
-            // In the combined window folder, add headers if there are none
-            if (allWindowDGMs.size() == 0) {
-                allWindowDGMs.add(headers);
-            }
             
             FileHandler.writeToCSV(results, windowDirectory, fileName + "_DGMs");
             AreaOfInterests.generateAOIs(windowGaze, windowFixations, windowDirectory, fileName);
