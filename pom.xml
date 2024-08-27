@@ -6,12 +6,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.thed2lab</groupId>
-  <artifactId>gazepoint-data-analysis</artifactId>
+  <artifactId>beach-gaze</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>gazepoint-data-analysis</name>
+  <name>BEACH-gaze</name>
   <!-- FIXME change it to the project's website -->
-  <url>https://github.com/TheD2Lab/gazepoint-data-analysis</url>
+  <url>https://github.com/TheD2Lab/BEACH-Gaze</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
