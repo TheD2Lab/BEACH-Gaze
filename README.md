@@ -1,4 +1,4 @@
-###**B**each **E**nvironment for the **A**nalyti**c**s of **H**uman **Gaze** (BEACH-Gaze) provides reuseable and extensible support to the broader scientific community interested in descriptive and predictive gaze analytics applied to a wide range of domains. 
+**B**each **E**nvironment for the **A**nalyti**c**s of **H**uman **Gaze** (BEACH-Gaze) provides reuseable and extensible support to the broader scientific community interested in descriptive and predictive gaze analytics applied to a wide range of domains. 
 
 # Abstract
 
