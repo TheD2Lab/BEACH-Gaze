@@ -9,23 +9,27 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.opencsv.CSVReader;
 
 public class UserInterface {
 
-    File[] inputFiles;
-    String outputDirectory;
+    File[] analyticsInputFiles;
+    String analyticsOutputDirectory;
+
+    File[] datasetFiles;
+    String predictionsOutputDirectory;
+    boolean isClassification;
+
     WindowSettings windowSettings;
 
+    private JPanel analysisPanel;
+    private JPanel helpPanel;
+    private JPanel predictionsPanel;
+
+    // UI Components for analysis panel
     private BufferedImage tumblingWindowImage;
     private BufferedImage hoppingWindowImage;
     private BufferedImage eventWindowImage;
@@ -33,12 +37,10 @@ public class UserInterface {
     private JComboBox<String> eventComboBox;
     private JFrame frame;
     private JTabbedPane tabs;
-    private JPanel analysisPanel;
-    private JPanel helpPanel;
     private JButton selectFilesButton;
     private JLabel fileCountLabel;
-    private JButton browseDirectoryButton;
-    private JTextField directoryField;
+    private JButton analyticsBrowseDirectoryButton;
+    private JTextField analyticsDirectoryField;
     private JButton runAnalysisButton;
     private JCheckBox tumblingCheckBox;
     private JTextField tumblingWindowSizeField;
@@ -50,6 +52,15 @@ public class UserInterface {
     private JCheckBox eventCheckBox;
     private JTextField eventTimeoutField;
     private JTextField eventMaxDurationField;
+
+    // UI Components for predictions panel
+    private JButton selectDatasetButton;
+    private JLabel dataFilesCountLabel;
+    private JButton predictionsBrowseDirectoryButton;
+    private JTextField predictionsDirectoryField;
+    private JCheckBox classificationCheckBox;
+    private JCheckBox regressionCheckBox;
+    private JButton runExperimentButton;
 
     public UserInterface() {
         try {
@@ -66,8 +77,15 @@ public class UserInterface {
         }
 
         // Default values
-        inputFiles = new File[0];
-        outputDirectory = new File(System.getProperty("user.dir")).getParent();
+        analyticsInputFiles = new File[0];
+        datasetFiles = new File[0];
+        
+        String defaultDirectory = new File(System.getProperty("user.dir")).getParent();
+        analyticsOutputDirectory = defaultDirectory;
+        predictionsOutputDirectory = defaultDirectory;
+
+        isClassification = true;
+
         windowSettings = new WindowSettings();
 
         buildFrame();
@@ -79,7 +97,7 @@ public class UserInterface {
     }
 
     private void buildFrame() {
-        frame = new JFrame("Gazepoint Analysis Tool");
+        frame = new JFrame("BEACH-Gaze");
         frame.setSize(800, 600);
         frame.setResizable(false);
         frame.setLayout(new GridBagLayout());
@@ -125,7 +143,7 @@ public class UserInterface {
         componentGBC.gridwidth = 3;
         gazePanel.add(selectFilesButton, componentGBC);
 
-        fileCountLabel = new JLabel(inputFiles.length + " files selected");
+        fileCountLabel = new JLabel(analyticsInputFiles.length + " files selected");
         componentGBC.gridx = GridBagConstraints.REMAINDER;
         componentGBC.gridy = 2;
         componentGBC.gridwidth = 2;
@@ -137,19 +155,19 @@ public class UserInterface {
         componentGBC.gridy = 3;
         gazePanel.add(directoryLabel, componentGBC);
 
-        browseDirectoryButton = new JButton("Browse");
+        analyticsBrowseDirectoryButton = new JButton("Browse");
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 2;
         componentGBC.gridy = 4;
         componentGBC.gridwidth = 10;
-        gazePanel.add(browseDirectoryButton, componentGBC);
+        gazePanel.add(analyticsBrowseDirectoryButton, componentGBC);
 
-        directoryField = new JTextField(outputDirectory, 20);
-        directoryField.setEditable(false);
+        analyticsDirectoryField = new JTextField(analyticsOutputDirectory, 20);
+        analyticsDirectoryField.setEditable(false);
         componentGBC.gridx = 0;
         componentGBC.gridy = 4;
         componentGBC.gridwidth = 2;
-        gazePanel.add(directoryField, componentGBC);
+        gazePanel.add(analyticsDirectoryField, componentGBC);
 
         analysisPanel.add(gazePanel, panelGBC);
     }
@@ -327,9 +345,6 @@ public class UserInterface {
     private void buildConsolePanel() {
         JPanel consolePanel = new JPanel();
         consolePanel.setLayout(new GridBagLayout());
-        // Border border = new CompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
-        //                                    BorderFactory.createEmptyBorder(10,10,10,10));
-        // consolePanel.setBorder(border);
 
         // Constraints dictate location of UI components
         GridBagConstraints panelGBC = new GridBagConstraints();
@@ -348,14 +363,6 @@ public class UserInterface {
         componentGBC.ipady = 10;
         componentGBC.gridwidth = 1;
         componentGBC.gridheight = 1;
-
-        // JLabel consoleLabel = new JLabel("Console Errors");
-        // componentGBC.insets = new Insets(0, 0, 0, 350);
-        // componentGBC.gridx = 0;
-        // componentGBC.gridy = 0;
-        // componentGBC.gridwidth = 1;
-        // componentGBC.gridheight = 1;
-        // consolePanel.add(consoleLabel, componentGBC);
         
         runAnalysisButton = new JButton("Run Analysis");
         runAnalysisButton.setFont(runAnalysisButton.getFont().deriveFont(20f));
@@ -397,35 +404,20 @@ public class UserInterface {
         componentGBC.gridheight = 1;
         windowsHelpPanel.add(windowsLabel, componentGBC);
 
-        // JTextArea windowsAbstract = new JTextArea(
-        //     "To further support predictive gaze analytics, we offer additional, optional approaches to analyzing gaze data with the use of discrete-timed windows. " +
-        //     "This approach to predictive gaze analytics focuses on learning from digests of user gaze (tumbling window), snapshots of the most recent user gaze (hopping window)," +
-        //     "gaze captured during significant events (event-based window), as well as all known gaze to date (expanding window). "
-        // );
-        // windowsAbstract.setFont(windowsLabel.getFont().deriveFont(Font.PLAIN));
-        // windowsAbstract.setLineWrap(true);
-        // windowsAbstract.setWrapStyleWord(true);
-        // windowsAbstract.setEditable(false);
-        // componentGBC.insets = new Insets(0, 0, 0, 20);
-        // componentGBC.gridx = GridBagConstraints.REMAINDER;
-        // componentGBC.gridy = 1;
-        // componentGBC.gridwidth = GridBagConstraints.REMAINDER;
-        // componentGBC.gridheight = 10;
-        // windowsHelpPanel.add(windowsAbstract, componentGBC);
 
         String windowsAbstract = "<html><p width=\"750\">" +
         "To further support predictive gaze analytics, we offer additional, optional approaches to analyzing gaze data with the use of discrete-timed windows. " +
         "This approach to predictive gaze analytics focuses on learning from digests of user gaze (tumbling window), snapshots of the most recent user gaze (hopping window), " +
-        "gaze captured during significant events (event-based window), as well as all known gaze to date (expanding window)." +
+        "gaze captured during significant events (event-based window), as well as all known gaze to date (expanding window). Note: in this interface, we make use of" +
+        "JTextFields. To update state values, you MUST press ENTER after typing a value: for example, when using tumbling windows you must input a window size and " + 
+        "that window size will ONLY register after you have pressed ENTER." +
         "</p></html>";
         JLabel windowsDescriptionLabel = new JLabel(windowsAbstract);
-        //componentGBC.insets = new Insets(0, 0, 0, 20);
         componentGBC.gridx = 0;
         componentGBC.gridy = 1;
         componentGBC.gridwidth = GridBagConstraints.REMAINDER;
         componentGBC.gridheight = 3;
         windowsHelpPanel.add(windowsDescriptionLabel, componentGBC);
-
 
         JLabel tumblingLabel = new JLabel("Tumbling Window");
         tumblingLabel.setFont(tumblingLabel.getFont().deriveFont(Font.BOLD, 12f));
@@ -500,7 +492,7 @@ public class UserInterface {
 
         String eventDescription = "<html><p width=\"700\">" +
         "During interactions with the presented stimuli, users may experience defining moments that are impactful enough to affect their performance. These may translate " +
-        "to notable gaze behaviors, which are likely to be indicative of a user's performance. Events in this software are defined as an analytic that exceeds its baseline value (generated from the first two minutes of a participant's data) " +
+        "to notable gaze behaviors, which are likely to be indicative of a user's performance. Events in this software are defined as an analytic that exceeds its baseline value (average value generated from the first two minutes of a participant's data) " +
         "Specifically, a session window begins when the first event is found, to which it then keeps searching for the next event within a specified time period. If nothing is found, the event window closes out after the timeout period; if an " +
         "event is found, the timeout period is renewed. Two parameters are needed: the event-defining analytic and the timeout length. As an example: if the fixation duration is chosen as the analytic and " +
         "a timeout period of 20 seconds is chosen, whenever the user's fixation duration exceeds the baseline value, a window session will be created until 20 seconds have elapsed, or the user's fixation duration once again exceeds the baseline value, thereby prolonging the session by another 20 seconds." +
@@ -520,11 +512,26 @@ public class UserInterface {
         componentGBC.gridheight = 1;
         windowsHelpPanel.add(eventImageLabel, componentGBC);
 
+        String eventOptionsDescription = "<html><p width=\"700\">" +
+        "Currently, events supports 7 different options: SACCADE_MAG, which is the magnitude of the saccade calculated as distance between each fixation (in pixels); " +
+        "SACCADE_DIR, which is the angle between each fixation in degrees from horizontal; " +
+        "LPMM and RPMM, which is the diameter of the left and right eye pupil respectively in millimeters; " +
+        "LPMM + RPMM, which is the average value of LPMM and RPMM; " +
+        "FPOGD, the duration of the fixation point of gaze in seconds; " +
+        "and lastly BKPMIN, the number of blinks in the previous 60 second period of time." +
+        "</p></html>";
+        JLabel eventOptionsLabel = new JLabel(eventOptionsDescription);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 13;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+        windowsHelpPanel.add(eventOptionsLabel, componentGBC);
+
         JLabel expandingLabel = new JLabel("Expanding Window");
         expandingLabel.setFont(expandingLabel.getFont().deriveFont(Font.BOLD, 12f));
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 0;
-        componentGBC.gridy = 13;
+        componentGBC.gridy = 14;
         componentGBC.gridwidth = 1;
         componentGBC.gridheight = 1;
         windowsHelpPanel.add(expandingLabel, componentGBC);
@@ -541,14 +548,14 @@ public class UserInterface {
         JLabel expandingDescriptionLabel = new JLabel(expandingDescription);
         componentGBC.insets = new Insets(0, 0, 10, 0);
         componentGBC.gridx = 0;
-        componentGBC.gridy = 14;
+        componentGBC.gridy = 15;
         componentGBC.gridwidth = 1;
         componentGBC.gridheight = 1;
         windowsHelpPanel.add(expandingDescriptionLabel, componentGBC);
 
         JLabel expandingImageLabel = new JLabel(new ImageIcon(expandingWindowImage));
         componentGBC.gridx = 0;
-        componentGBC.gridy = 15;
+        componentGBC.gridy = 16;
         componentGBC.gridwidth = 1;
         componentGBC.gridheight = 1;
         windowsHelpPanel.add(expandingImageLabel, componentGBC);
@@ -556,18 +563,169 @@ public class UserInterface {
         helpPanel.add(windowsHelpPanel, panelGBC);
     }
 
+    private void buildPredictionsPanel() {
+        // Create panel for dataset settings
+        JPanel dataSettingsPanel = new JPanel();
+        dataSettingsPanel.setLayout(new GridBagLayout());
+
+        GridBagConstraints panelGBC = new GridBagConstraints();
+        panelGBC.anchor = GridBagConstraints.FIRST_LINE_START;
+        panelGBC.insets = new Insets(0, 0, 0, 150);
+        panelGBC.gridx = 0;
+        panelGBC.gridy = 0;
+        panelGBC.gridwidth = 1;
+        panelGBC.gridheight = 1;
+        panelGBC.weightx = 1;
+        panelGBC.weighty = 1;
+
+        GridBagConstraints componentGBC = new GridBagConstraints();
+        componentGBC.anchor = GridBagConstraints.FIRST_LINE_START;
+        componentGBC.ipadx = 5;
+        componentGBC.ipady = 5;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+
+        JLabel dataLabel = new JLabel("Dataset Settings");
+        dataLabel.setFont(dataLabel.getFont().deriveFont(Font.BOLD, 12f));
+        componentGBC.insets = new Insets(0, 0, 0, 120);
+        componentGBC.gridx = GridBagConstraints.REMAINDER;
+        componentGBC.gridy = 0;
+        componentGBC.gridwidth = 8;
+        dataSettingsPanel.add(dataLabel, componentGBC);
+
+        selectDatasetButton = new JButton("Select File(s)");
+        selectDatasetButton.setToolTipText("Select training dataset files");
+        componentGBC.gridx = GridBagConstraints.REMAINDER;
+        componentGBC.gridy = 1;
+        componentGBC.gridwidth = 3;
+        dataSettingsPanel.add(selectDatasetButton, componentGBC);
+
+        dataFilesCountLabel = new JLabel(datasetFiles.length + " files selected");
+        componentGBC.gridx = GridBagConstraints.REMAINDER;
+        componentGBC.gridy = 2;
+        componentGBC.gridwidth = 2;
+        dataSettingsPanel.add(dataFilesCountLabel, componentGBC);
+
+        JLabel directoryLabel = new JLabel("Output Directory");
+        componentGBC.insets = new Insets(10, 0, 0, 0);
+        componentGBC.gridx = GridBagConstraints.REMAINDER;
+        componentGBC.gridy = 3;
+        dataSettingsPanel.add(directoryLabel, componentGBC);
+
+        predictionsBrowseDirectoryButton = new JButton("Browse");
+        componentGBC.insets = new Insets(0, 0, 0, 0);
+        componentGBC.gridx = 2;
+        componentGBC.gridy = 4;
+        componentGBC.gridwidth = 10;
+        dataSettingsPanel.add(predictionsBrowseDirectoryButton, componentGBC);
+
+        predictionsDirectoryField = new JTextField(analyticsOutputDirectory, 20);
+        predictionsDirectoryField.setEditable(false);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 4;
+        componentGBC.gridwidth = 2;
+        dataSettingsPanel.add(predictionsDirectoryField, componentGBC);
+
+        predictionsPanel.add(dataSettingsPanel, panelGBC);
+
+        // Create panel for classifier settings
+        JPanel classifierSettingsPanel = new JPanel();
+        classifierSettingsPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        classifierSettingsPanel.setLayout(new GridBagLayout());
+
+        panelGBC = new GridBagConstraints();
+        panelGBC.anchor = GridBagConstraints.FIRST_LINE_START;
+        panelGBC.gridx = 1;
+        panelGBC.gridy = 0;
+        panelGBC.gridwidth = 1;
+        panelGBC.gridheight = 2;
+        panelGBC.weightx = 1;
+        panelGBC.weighty = 1;
+
+        componentGBC = new GridBagConstraints();
+        componentGBC.anchor = GridBagConstraints.FIRST_LINE_START;
+        componentGBC.ipadx = 5;
+        componentGBC.ipady = 5;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+
+        JLabel classificationLabel = new JLabel("Classifier Settings");
+        classificationLabel.setFont(classificationLabel.getFont().deriveFont(Font.BOLD, 12f));
+        componentGBC.insets = new Insets(0, 0, 0, 120);
+        componentGBC.gridx = GridBagConstraints.REMAINDER;
+        componentGBC.gridy = 0;
+        componentGBC.gridwidth = 8;
+        classifierSettingsPanel.add(classificationLabel, componentGBC);
+
+        classificationCheckBox = new JCheckBox("Classification");
+        classificationCheckBox.setSelected(isClassification);
+        componentGBC.insets = new Insets(0, 0, 0, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 1;
+        componentGBC.gridwidth = 1;
+        classifierSettingsPanel.add(classificationCheckBox, componentGBC);
+
+        regressionCheckBox = new JCheckBox("Regression");
+        componentGBC.insets = new Insets(0, 0, 0, 0);
+        componentGBC.gridx = 1;
+        componentGBC.gridy = 1;
+        componentGBC.gridwidth = 1;
+        classifierSettingsPanel.add(regressionCheckBox, componentGBC);
+
+        predictionsPanel.add(classifierSettingsPanel, panelGBC);
+
+        // Create panel for WEKA button
+        JPanel experimentPanel = new JPanel();
+        experimentPanel.setLayout(new GridBagLayout());
+
+        panelGBC = new GridBagConstraints();
+        panelGBC.anchor = GridBagConstraints.FIRST_LINE_START;
+        panelGBC.insets = new Insets(300, 0, 0, 0);
+        panelGBC.gridx = 0;
+        panelGBC.gridy = 1;
+        panelGBC.gridwidth = 2;
+        panelGBC.gridheight = 2;
+        panelGBC.weightx = 2;
+        panelGBC.weighty = 2;
+
+        componentGBC = new GridBagConstraints();
+        componentGBC.anchor = GridBagConstraints.FIRST_LINE_START;
+        componentGBC.ipadx = 10;
+        componentGBC.ipady = 10;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+
+        runExperimentButton = new JButton("Run WEKA Experiment");
+        runExperimentButton.setFont(runExperimentButton.getFont().deriveFont(20f));
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 0;
+        componentGBC.gridwidth = 1;
+        componentGBC.gridheight = 1;
+        experimentPanel.add(runExperimentButton, componentGBC);
+
+        predictionsPanel.add(experimentPanel, panelGBC);
+    }
+
     private void setEventHandlers() {
         // Buttons
         selectFilesButton.addActionListener(e -> {
-            selectInputFiles();
+            selectAnalyticsInputFiles();
         });
 
-        browseDirectoryButton.addActionListener(e -> {
-            selectFileDirectory();
+        analyticsBrowseDirectoryButton.addActionListener(e -> {
+            selectAnalyticsFileDirectory();
         });
 
         runAnalysisButton.addActionListener(e -> {
             runAnalysis();
+        });
+
+        selectDatasetButton.addActionListener(e -> {
+            selectDatasetFiles();
+        });
+
+        predictionsBrowseDirectoryButton.addActionListener(e -> {
+            selectPredictionsFileDirectory();
         });
 
         // Checkboxes
@@ -597,6 +755,26 @@ public class UserInterface {
                 windowSettings.eventEnabled = true;
             else 
                 windowSettings.eventEnabled = false;
+        });
+
+        classificationCheckBox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                isClassification = true;
+                regressionCheckBox.setSelected(false);
+            } else {
+                isClassification = false;
+                regressionCheckBox.setSelected(true);
+            }
+        });
+
+        regressionCheckBox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                isClassification = false;
+                classificationCheckBox.setSelected(false);
+            } else {
+                isClassification = true;
+                classificationCheckBox.setSelected(true);
+            }
         });
 
         // Text fields
@@ -636,7 +814,7 @@ public class UserInterface {
         });
     }
 
-    private void selectInputFiles() {
+    private void selectAnalyticsInputFiles() {
         FileNameExtensionFilter filter = new FileNameExtensionFilter(("CSV Files"), "csv");
         JFileChooser chooser = new JFileChooser();
 
@@ -646,25 +824,51 @@ public class UserInterface {
 
         int returnVal = chooser.showOpenDialog(frame);
         if(returnVal == JFileChooser.APPROVE_OPTION) {
-            inputFiles = chooser.getSelectedFiles();
+            analyticsInputFiles = chooser.getSelectedFiles();
         }
 
-        fileCountLabel.setText(inputFiles.length + " files selected");
+        fileCountLabel.setText(analyticsInputFiles.length + " files selected");
     }
 
-    private void selectFileDirectory() {
+    private void selectAnalyticsFileDirectory() {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int returnVal = chooser.showOpenDialog(frame);
         if(returnVal == JFileChooser.APPROVE_OPTION) {
-            outputDirectory = chooser.getSelectedFile().getAbsolutePath();
-            directoryField.setText(outputDirectory);
+            analyticsOutputDirectory = chooser.getSelectedFile().getAbsolutePath();
+            analyticsDirectoryField.setText(analyticsOutputDirectory);
+        }
+    }
+
+    private void selectDatasetFiles() {
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(("CSV Files"), "csv");
+        JFileChooser chooser = new JFileChooser();
+
+        chooser.setMultiSelectionEnabled(true);
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.setFileFilter(filter);
+
+        int returnVal = chooser.showOpenDialog(frame);
+        if(returnVal == JFileChooser.APPROVE_OPTION) {
+            datasetFiles = chooser.getSelectedFiles();
+        }
+
+        dataFilesCountLabel.setText(datasetFiles.length + " files selected");
+    }
+
+    private void selectPredictionsFileDirectory() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int returnVal = chooser.showOpenDialog(frame);
+        if(returnVal == JFileChooser.APPROVE_OPTION) {
+            predictionsOutputDirectory = chooser.getSelectedFile().getAbsolutePath();
+            predictionsDirectoryField.setText(predictionsOutputDirectory);
         }
     }
 
     private void runAnalysis() {
         // Append a results folder to the output directory path
-        String resultsDirectory = outputDirectory + "/results";
+        String resultsDirectory = analyticsOutputDirectory + "/results";
 
         // Create a subfolder within the given output directory called "results" if one does not exist
         File f = new File(resultsDirectory);
@@ -681,7 +885,7 @@ public class UserInterface {
             }
         }
 
-        Parameters params = new Parameters(inputFiles, resultsDirectory, windowSettings);
+        Parameters params = new Parameters(analyticsInputFiles, resultsDirectory, windowSettings);
         Analysis analysis = new Analysis(params);
         boolean isSuccessful = analysis.run();
     }
@@ -698,39 +902,15 @@ public class UserInterface {
         helpPanel = new JPanel(new GridBagLayout());
         helpPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         buildHelpPagePanel();
-
         JScrollPane helpPanelScrollable = new JScrollPane(helpPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-        tabs.addTab("Analysis", analysisPanel);
+        predictionsPanel = new JPanel(new GridBagLayout());
+        predictionsPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        buildPredictionsPanel();
+
+        tabs.addTab("Analytics", analysisPanel);
+        tabs.addTab("Predictions", predictionsPanel);
         tabs.addTab("Help", helpPanelScrollable);
-    }
-
-    private static boolean validateFields() {
-        return false;
-    }
-
-    private static List<String> getHeaders(File f) {
-        List<String> numericHeaders = new ArrayList<String>();
-
-        try {
-            CSVReader reader = new CSVReader(new FileReader(f));
-
-            List<String> headers = Arrays.asList(reader.readNext());
-            List<String> values = Arrays.asList(reader.readNext());
-
-            for (int i = 0; i < headers.size(); i++) {
-                String header = headers.get(i);
-                String val = values.get(i);
-
-                if (isNumeric(val)) numericHeaders.add(header);
-            }
-
-            reader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return numericHeaders;
     }
 
     public static boolean isNumeric(String str) {
