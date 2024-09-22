@@ -71,22 +71,32 @@ public class WekaExperiment {
 		File[] dataset = params.getDataSet();
 		boolean isClassification = params.getIsClassification();
 		Classifier[] classifiers = isClassification ? getClassificationClassifiers() : getRegressionClassifiers();
-
-		for (File f : dataset) {
-			String fileName = f.getName();
-			System.out.println("Conducting experiment on " + fileName);
-
-			String outputDirectory = params.getDirectory() + "/" + fileName.replace(".csv", "");
-			File d = new File(outputDirectory);
+		
+		String outputDirectory = params.getDirectory();
+		File d = new File(outputDirectory);
 			if (!d.exists()) {
 				d.mkdirs();
-			}
-
-			runExperiment(f, classifiers, isClassification, outputDirectory);
 		}
+		
+		ArrayList<ClassifierResult[]> allResults = new ArrayList<>();
+		ArrayList<String> fileNames = new ArrayList<String>();
+
+		for (File f : dataset) {
+			String fileName = f.getName().replace(".csv", "");
+			fileNames.add(fileName);
+			System.out.println("Conducting experiment on " + fileName);
+
+			ResultMatrix matrix = runExperiment(f, classifiers, isClassification, outputDirectory);
+			ClassifierResult[] res = getClassificationExperimentResults(classifiers, matrix);
+			
+			allResults.add(res);
+		}
+
+		writeResultsToCSV(classifiers, allResults, fileNames, outputDirectory + "/predictions.csv");
+		System.out.println("Predictions Complete.");
 	}
 
-	public void runExperiment(File f, Classifier[] classifiers, boolean isClassification, String outputDirectory) throws Exception {
+	public ResultMatrix runExperiment(File f, Classifier[] classifiers, boolean isClassification, String outputDirectory) throws Exception {
 		// setup weka.experiment
 		Experiment exp = new Experiment();
 		exp.setPropertyArray(new Classifier[0]);
@@ -132,7 +142,7 @@ public class WekaExperiment {
 		// *this is important for WEKA experimenter calculations*
 		InstancesResultListener irl = new InstancesResultListener();
 
-		File outputFile = new File(outputDirectory + "/InstancesResultListener.csv");
+		File outputFile = new File(outputDirectory + "/ " + f.getName() + "_InstancesResultListener.csv");
 		//outputFile.createNewFile();
 		irl.setOutputFile(outputFile);
 		exp.setResultListener(irl);
@@ -168,7 +178,18 @@ public class WekaExperiment {
 
 		ResultMatrix matrix = tester.getResultMatrix();
 		//irl.getOutputFile().delete();
-		FileHandler.writeToText(matrix.toString(), outputDirectory, "predictions.txt");
+		// FileHandler.writeToText(matrix.toString(), outputDirectory, "predictions.txt");
+		return matrix;
+	}
+
+	private static ClassifierResult[] getClassificationExperimentResults(Classifier[] classifiers, ResultMatrix matrix) {
+		ClassifierResult[] classifierResults = new ClassifierResult[classifiers.length];
+
+		for (int i = 0; i < matrix.getColCount(); i++) {
+			classifierResults[i] = new ClassifierResult(classifiers[i], (double) Math.round(matrix.getMean(i, 0) * 100) / 100, matrix.getSignificance(i, 0));
+		}
+
+		return classifierResults;
 	}
 
     private static Classifier[] getClassificationClassifiers() throws Exception {
@@ -291,5 +312,54 @@ public class WekaExperiment {
         classifiers[26] = new AttributeSelectedClassifier();
 
 		return classifiers;
+	}
+
+	private static void writeResultsToCSV(Classifier[] classifiers, ArrayList<ClassifierResult[]> results, ArrayList<String> fileNames, String fileLocation) {
+		// first create file object for file placed at location
+		// specified by filepath
+		File file = new File(fileLocation);
+		try {
+			// create FileWriter object with file as parameter
+			FileWriter outputfile = new FileWriter(file);
+
+			// create CSVWriter object filewriter object as parameter
+			CSVWriter writer = new CSVWriter(outputfile);
+
+			// adding header to csv
+			String[] header = new String[fileNames.size() + 1];
+			header[0] = "Classifier Name";
+
+			for (int i = 0; i < fileNames.size(); i++) {
+				header[i + 1] = fileNames.get(i);
+			}
+
+			writer.writeNext(header);
+
+			// add data to csv
+
+			for (int i = 0; i < classifiers.length; i++) {
+				String[] data = new String[fileNames.size() + 1];
+				data[0] = classifiers[i].getClass().getSimpleName();
+				for (int j = 0; j < results.size(); j++) {
+
+					ClassifierResult r = results.get(j)[i];
+					int sig = r.getSignificance();
+					String score = r.getScore().toString();
+					if (sig > 0 || sig < 0) {
+						data[j + 1] = String.format("%s,%d", score, sig);
+					} else {
+						data[j + 1] = score;
+					}
+
+				}
+				writer.writeNext(data);
+			}
+
+			// closing writer connection
+			writer.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
