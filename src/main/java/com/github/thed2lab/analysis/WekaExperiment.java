@@ -142,7 +142,7 @@ public class WekaExperiment {
 		// *this is important for WEKA experimenter calculations*
 		InstancesResultListener irl = new InstancesResultListener();
 
-		File outputFile = new File(outputDirectory + "/ " + f.getName() + "_InstancesResultListener.csv");
+		File outputFile = new File(outputDirectory + "/ " + f.getName().replace(".csv", "") + "_InstancesResultListener.csv");
 		//outputFile.createNewFile();
 		irl.setOutputFile(outputFile);
 		exp.setResultListener(irl);
@@ -345,8 +345,17 @@ public class WekaExperiment {
 					ClassifierResult r = results.get(j)[i];
 					int sig = r.getSignificance();
 					String score = r.getScore().toString();
-					if (sig > 0 || sig < 0) {
-						data[j + 1] = String.format("%s,%d", score, sig);
+					if (sig != 0) {
+						switch (sig) {
+							case 1:
+								data[j + 1] = score + " v";
+								break;
+							case 2:
+								data[j + 1] = score + " *";
+								break;
+							default:
+								data[j + 1] = String.format("%s %d", score, sig);
+						}
 					} else {
 						data[j + 1] = score;
 					}
