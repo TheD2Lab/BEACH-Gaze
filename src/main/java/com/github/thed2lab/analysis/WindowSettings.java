@@ -17,18 +17,11 @@ public class WindowSettings {
     public double eventTimeout;
     public double eventMaxDuration;
 
-    // TODO: delete unused variables if there is not plan to use them
-    public boolean eventThresholdEnabled;
-    public double eventWindowSize;
-    public int eventThreshold;
-    public String thresholdEvent;
-
     public WindowSettings() {
         this.tumblingEnabled = false;
         this.expandingEnabled = false;
         this.hoppingEnabled = false;
         this.eventEnabled = false;
-        this.eventThresholdEnabled = false;
     }
 
     @Override
