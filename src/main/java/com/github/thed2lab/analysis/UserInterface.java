@@ -60,7 +60,7 @@ public class UserInterface {
     private JTextField predictionsDirectoryField;
     private JCheckBox classificationCheckBox;
     private JCheckBox regressionCheckBox;
-    private JButton runExperimentButton;
+    private JButton runPredictionsButton;
 
     public UserInterface() {
         try {
@@ -664,6 +664,7 @@ public class UserInterface {
         componentGBC.gridy = 1;
         componentGBC.gridwidth = 1;
         classifierSettingsPanel.add(classificationCheckBox, componentGBC);
+        classificationCheckBox.setEnabled(false); // Disable option to toggle between classification and regression classifiers
 
         regressionCheckBox = new JCheckBox("Regression");
         componentGBC.insets = new Insets(0, 0, 0, 0);
@@ -671,10 +672,11 @@ public class UserInterface {
         componentGBC.gridy = 1;
         componentGBC.gridwidth = 1;
         classifierSettingsPanel.add(regressionCheckBox, componentGBC);
+        regressionCheckBox.setEnabled(false); // Disable regression classifiers for now until supported
 
         predictionsPanel.add(classifierSettingsPanel, panelGBC);
 
-        // Create panel for WEKA button
+        // Create panel for predictions button
         JPanel experimentPanel = new JPanel();
         experimentPanel.setLayout(new GridBagLayout());
 
@@ -695,13 +697,13 @@ public class UserInterface {
         componentGBC.gridwidth = 1;
         componentGBC.gridheight = 1;
 
-        runExperimentButton = new JButton("Run WEKA Experiment");
-        runExperimentButton.setFont(runExperimentButton.getFont().deriveFont(20f));
+        runPredictionsButton = new JButton("Run Predictions");
+        runPredictionsButton.setFont(runPredictionsButton.getFont().deriveFont(20f));
         componentGBC.gridx = 0;
         componentGBC.gridy = 0;
         componentGBC.gridwidth = 1;
         componentGBC.gridheight = 1;
-        experimentPanel.add(runExperimentButton, componentGBC);
+        experimentPanel.add(runPredictionsButton, componentGBC);
 
         predictionsPanel.add(experimentPanel, panelGBC);
     }
@@ -726,6 +728,10 @@ public class UserInterface {
 
         predictionsBrowseDirectoryButton.addActionListener(e -> {
             selectPredictionsFileDirectory();
+        });
+
+        runPredictionsButton.addActionListener(e -> {
+            runPredictions();
         });
 
         // Checkboxes
@@ -887,7 +893,34 @@ public class UserInterface {
 
         Parameters params = new Parameters(analyticsInputFiles, resultsDirectory, windowSettings);
         Analysis analysis = new Analysis(params);
-        boolean isSuccessful = analysis.run();
+        analysis.run();
+    }
+
+    private void runPredictions() {
+        String predictionsDirectory = predictionsOutputDirectory + "/predictions";
+
+        // Create a subfolder within the given output directory called "predictions" if one does not exist
+        File f = new File(predictionsDirectory);
+        if (!f.exists()) {
+            f.mkdirs();
+        } else {
+            int fileCount = 1;
+            if (!predictionsDirectory.contains ("predictions (")) predictionsDirectory += (" (" + fileCount + ")");
+            f = new File(predictionsDirectory);
+            while (f.exists()) {
+                fileCount++;
+                predictionsDirectory = predictionsDirectory.replace(String.valueOf(fileCount - 1), String.valueOf(fileCount));
+                f = new File(predictionsDirectory);
+            }
+        }
+
+        try {
+            WekaParameters params = new WekaParameters(datasetFiles, predictionsDirectory, isClassification);
+            WekaExperiment experiment = new WekaExperiment(params);
+            experiment.run();
+        } catch (Exception e) {
+            System.err.println(e);
+        }
     }
 
     private void buildTabPanels() {

@@ -1,6 +1,5 @@
 package com.github.thed2lab.analysis;
 
-
 import java.beans.PropertyDescriptor;
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,13 +9,13 @@ import java.util.*;
 
 // opencsv
 import com.opencsv.CSVWriter;
-
 import net.bytebuddy.jar.asm.Attribute;
+
 // weka.jar
 import weka.core.Instances;
 import weka.core.Range;
 import weka.core.Utils;
-
+import weka.core.converters.CSVLoader;
 // weka classifiers
 import weka.classifiers.*;
 import weka.classifiers.bayes.*;
@@ -33,10 +32,144 @@ import weka.experiment.*;
 import javax.swing.*;
 
 public class WekaExperiment {
+
+	private WekaParameters params;
+
+	public WekaExperiment(WekaParameters params) {
+		this.params = params;
+	}
     
-    public void run() {
-        
-    }
+    // public void run() throws Exception {
+	// 	File[] dataset = params.getDataSet();
+	// 	boolean isClassification = params.getIsClassification();
+	// 	Classifier[] classifiers = isClassification ? getClassificationClassifiers() : getRegressionClassifiers();
+
+	// 	for (int i = 0; i < dataset.length; i++) {
+	// 		// Load .CSV training datafiles
+	// 		CSVLoader loader = new CSVLoader();
+	// 		loader.setSource(dataset[i]);
+	// 		Instances trainingDataSet = loader.getDataSet();
+
+	// 		// Set the class index to the last field in the data set,
+	// 		// i.e predict the last column in the given dataset
+	// 		trainingDataSet.setClassIndex(trainingDataSet.numAttributes() - 1);
+			
+	// 		for (Classifier c : classifiers) {
+	// 			c.buildClassifier(trainingDataSet);
+	// 			Evaluation eval = new Evaluation(trainingDataSet);
+	// 			eval.crossValidateModel(c, trainingDataSet, 10, new Random(1));
+				
+	// 			//System.out.println(eval.fMeasure(1)+" "+eval.precision(1)+" "+eval.recall(1)+" ");
+	// 			System.out.println(c.getClass().getSimpleName() + " " + dataset[i].getName() + " " + eval.pctCorrect());
+	// 		}
+	// 	}
+		
+	// 	System.out.println("Predictions Complete.");
+    // }
+
+	public void run() throws Exception {
+		File[] dataset = params.getDataSet();
+		boolean isClassification = params.getIsClassification();
+		Classifier[] classifiers = isClassification ? getClassificationClassifiers() : getRegressionClassifiers();
+
+		for (File f : dataset) {
+			String fileName = f.getName();
+			System.out.println("Conducting experiment on " + fileName);
+
+			String outputDirectory = params.getDirectory() + "/" + fileName.replace(".csv", "");
+			File d = new File(outputDirectory);
+			if (!d.exists()) {
+				d.mkdirs();
+			}
+
+			runExperiment(f, classifiers, isClassification, outputDirectory);
+		}
+	}
+
+	public void runExperiment(File f, Classifier[] classifiers, boolean isClassification, String outputDirectory) throws Exception {
+		// setup weka.experiment
+		Experiment exp = new Experiment();
+		exp.setPropertyArray(new Classifier[0]);
+		exp.setUsePropertyIterator(true);
+
+		// setup for classification or regression
+		SplitEvaluator se = null;
+		Classifier sec = null;
+
+		if (isClassification) {
+			se = new ClassifierSplitEvaluator();
+			sec = ((ClassifierSplitEvaluator) se).getClassifier();
+		} else {
+			se = new RegressionSplitEvaluator();
+			sec = ((RegressionSplitEvaluator) se).getClassifier();
+		}
+
+		// cross validation
+		CrossValidationResultProducer cvrp = new CrossValidationResultProducer();
+		cvrp.setNumFolds(10);
+		cvrp.setSplitEvaluator(se);
+
+		PropertyNode[] propertyPath = new PropertyNode[2];
+		propertyPath[0] = new PropertyNode(se,
+				new PropertyDescriptor("splitEvaluator", CrossValidationResultProducer.class),
+				CrossValidationResultProducer.class);
+
+		propertyPath[1] = new PropertyNode(sec, new PropertyDescriptor("classifier", se.getClass()), se.getClass());
+
+		exp.setResultProducer(cvrp);
+		exp.setPropertyPath(propertyPath);
+
+		// set classifiers here
+		exp.setPropertyArray(classifiers);
+
+		DefaultListModel model = new DefaultListModel();
+
+		// set dataset here
+		model.addElement(f);
+
+		exp.setDatasets(model);
+
+		// *this is important for WEKA experimenter calculations*
+		InstancesResultListener irl = new InstancesResultListener();
+
+		File outputFile = new File(outputDirectory + "/InstancesResultListener.csv");
+		//outputFile.createNewFile();
+		irl.setOutputFile(outputFile);
+		exp.setResultListener(irl);
+
+		exp.initialize();
+		exp.runExperiment();
+		exp.postProcess();
+
+		PairedCorrectedTTester tester = new PairedCorrectedTTester();
+		Instances result = new Instances(new BufferedReader(new FileReader(irl.getOutputFile())));
+
+		tester.setInstances(result);
+		tester.setSortColumn(-1);
+
+		tester.setRunColumn(result.attribute("Key_Run").index());
+		if (isClassification) {
+			tester.setFoldColumn(result.attribute("Key_Fold").index());
+		}
+		tester.setDatasetKeyColumns(new Range("" + (result.attribute("Key_Dataset").index() + 1)));
+		tester.setResultsetKeyColumns(new Range("" + (result.attribute("Key_Scheme").index() + 1) + ","
+				+ (result.attribute("Key_Scheme_options").index() + 1) + ","
+				+ (result.attribute("Key_Scheme_version_ID").index() + 1)));
+		tester.setResultMatrix(new ResultMatrixPlainText());
+		tester.setDisplayedResultsets(null);
+		tester.setSignificanceLevel(0.05);
+		tester.setShowStdDevs(true);
+
+		if (isClassification) {
+			tester.multiResultsetFull(0, result.attribute("Percent_correct").index());
+		} else {
+			tester.multiResultsetFull(0, result.attribute("Root_mean_squared_error").index());
+		}
+
+		ResultMatrix matrix = tester.getResultMatrix();
+		//irl.getOutputFile().delete();
+		FileHandler.writeToText(matrix.toString(), outputDirectory, "predictions.txt");
+	}
 
     private static Classifier[] getClassificationClassifiers() throws Exception {
 		Classifier[] classifiers = new Classifier[46];

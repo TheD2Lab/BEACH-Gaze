@@ -86,7 +86,7 @@ public class FileHandler {
             File dir = new File(outputDirectory);
             if (!dir.exists()) dir.mkdirs();
 
-            // Append a .csv to the file name if it's missing
+            // Append a .txt to the file name if it's missing
             String fString = fileName.contains(".txt") ? fileName : fileName + ".txt";
             
             File file = new File(outputDirectory + "/" + fString);
