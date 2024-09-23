@@ -941,8 +941,8 @@ public class UserInterface {
         predictionsPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         buildPredictionsPanel();
 
-        tabs.addTab("Analytics", analysisPanel);
-        tabs.addTab("Predictions", predictionsPanel);
+        tabs.addTab("Descriptive Analytics", analysisPanel);
+        tabs.addTab("Predictive Analytics", predictionsPanel);
         tabs.addTab("Help", helpPanelScrollable);
     }
 
