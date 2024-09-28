@@ -664,7 +664,6 @@ public class UserInterface {
         componentGBC.gridy = 1;
         componentGBC.gridwidth = 1;
         classifierSettingsPanel.add(classificationCheckBox, componentGBC);
-        classificationCheckBox.setEnabled(false); // Disable option to toggle between classification and regression classifiers
 
         regressionCheckBox = new JCheckBox("Regression");
         componentGBC.insets = new Insets(0, 0, 0, 0);
@@ -672,7 +671,6 @@ public class UserInterface {
         componentGBC.gridy = 1;
         componentGBC.gridwidth = 1;
         classifierSettingsPanel.add(regressionCheckBox, componentGBC);
-        regressionCheckBox.setEnabled(false); // Disable regression classifiers for now until supported
 
         predictionsPanel.add(classifierSettingsPanel, panelGBC);
 
