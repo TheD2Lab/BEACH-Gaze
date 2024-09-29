@@ -264,7 +264,7 @@ public class WekaExperiment {
 	}
 
     private static Classifier[] getRegressionClassifiers() {
-		Classifier[] classifiers = new Classifier[20];
+		Classifier[] classifiers = new Classifier[27];
 
 		// set baseline classifier here
 		classifiers[0] = new ZeroR();
