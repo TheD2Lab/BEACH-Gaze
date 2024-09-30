@@ -185,8 +185,9 @@ public class WekaExperiment {
 	private static ClassifierResult[] getClassificationExperimentResults(Classifier[] classifiers, ResultMatrix matrix) {
 		ClassifierResult[] classifierResults = new ClassifierResult[classifiers.length];
 
+
 		for (int i = 0; i < matrix.getColCount(); i++) {
-			classifierResults[i] = new ClassifierResult(classifiers[i], (double) Math.round(matrix.getMean(i, 0) * 100) / 100, matrix.getSignificance(i, 0));
+			classifierResults[i] = new ClassifierResult(classifiers[i], (double) Math.round(matrix.getMean(i, 0) * 100) / 100, matrix.getSignificance(i, 0), matrix.getColName(i));
 		}
 
 		return classifierResults;
@@ -315,60 +316,66 @@ public class WekaExperiment {
 	}
 
 	private static void writeResultsToCSV(Classifier[] classifiers, ArrayList<ClassifierResult[]> results, ArrayList<String> fileNames, String fileLocation) {
-		// first create file object for file placed at location
-		// specified by filepath
-		File file = new File(fileLocation);
 		try {
-			// create FileWriter object with file as parameter
+			File file = new File(fileLocation);
 			FileWriter outputfile = new FileWriter(file);
-
-			// create CSVWriter object filewriter object as parameter
 			CSVWriter writer = new CSVWriter(outputfile);
 
 			// adding header to csv
-			String[] header = new String[fileNames.size() + 1];
-			header[0] = "Classifier Name";
+			String[] header = new String[classifiers.length + 1];
+			
+			header[0] = "Dataset";
 
-			for (int i = 0; i < fileNames.size(); i++) {
-				header[i + 1] = fileNames.get(i);
+			for (int i = 0; i < classifiers.length; i++) {
+				header[i + 1] = classifiers[i].getClass().getSimpleName();
 			}
 
 			writer.writeNext(header);
 
-			// add data to csv
+			for (int i = 0; i < fileNames.size(); i++) {
+				String[] data = new String[classifiers.length + 1];
+				data[0] = fileNames.get(i);
+				ClassifierResult[] classifierResults = results.get(i);
+				int k = 0;
 
-			for (int i = 0; i < classifiers.length; i++) {
-				String[] data = new String[fileNames.size() + 1];
-				data[0] = classifiers[i].getClass().getSimpleName();
-				for (int j = 0; j < results.size(); j++) {
+				for (int j = 0; j < classifiers.length; j++) {
+					String currClassifierName = classifiers[j].getClass().getSimpleName();
+					ClassifierResult r = classifierResults[k];
+					k++;
 
-					ClassifierResult r = results.get(j)[i];
-					int sig = r.getSignificance();
-					String score = r.getScore().toString();
-					if (sig != 0) {
-						switch (sig) {
-							case 1:
-								data[j + 1] = score + " v";
-								break;
-							case 2:
-								data[j + 1] = score + " *";
-								break;
-							default:
-								data[j + 1] = String.format("%s %d", score, sig);
-						}
+					if (r == null) {
+						data[j + 1] = "NaN";
+					} else if (!r.getClassifierCol().contains(currClassifierName)) {
+						System.out.println(r.getClassifierCol());
+						System.out.println(currClassifierName);
+						data[j + 1] = "NaN";
+						k--;;
 					} else {
-						data[j + 1] = score;
+						int sig = r.getSignificance();
+						String score = r.getScore().toString();
+						if (sig == 0) {
+							data[j + 1] = score;
+						} else {
+							switch (sig) {
+								case 1:
+									data[j + 1] = score + " v";
+									break;
+								case 2:
+									data[j + 1] = score + " *";
+									break;
+								default:
+									data[j + 1] = String.format("%s %d", score, sig);
+							}
+						}
 					}
-
 				}
 				writer.writeNext(data);
 			}
-
-			// closing writer connection
 			writer.close();
+			outputfile.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 	}
 }

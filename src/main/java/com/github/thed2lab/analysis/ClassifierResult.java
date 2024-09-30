@@ -6,20 +6,23 @@ public class ClassifierResult {
     private Classifier classifier;
     private Double score;
     private int significance;
+    private String classifierCol;
 
-    public  ClassifierResult(Classifier classifier, Double score, int significance){
+    // Need to verify if classifier assigned is accurate, I don't think it is
+    public ClassifierResult(Classifier classifier, Double score, int significance, String classifierCol) {
         this.classifier = classifier;
         this.score = score;
         this.significance = significance;
+        this.classifierCol = classifierCol;
     }
 
     public Classifier getClassifier() {
         return classifier;
     }
 
-    public String getClassifierName() {
-        return classifier.getClass().getSimpleName();
-    }
+    // public String getClassifierName() {
+    //     return classifier.getClass().getSimpleName();
+    // }
 
     public Double getScore() {
         return score;
@@ -27,5 +30,9 @@ public class ClassifierResult {
 
     public int getSignificance() {
         return significance;
+    }
+
+    public String getClassifierCol() {
+        return classifierCol;
     }
 }
