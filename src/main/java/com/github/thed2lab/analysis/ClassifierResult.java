@@ -16,9 +16,9 @@ public class ClassifierResult {
         this.classifierCol = classifierCol;
     }
 
-    public Classifier getClassifier() {
-        return classifier;
-    }
+    // public Classifier getClassifier() {
+    //     return classifier;
+    // }
 
     // public String getClassifierName() {
     //     return classifier.getClass().getSimpleName();
