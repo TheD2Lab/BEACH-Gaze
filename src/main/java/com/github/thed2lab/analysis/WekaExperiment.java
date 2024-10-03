@@ -349,7 +349,7 @@ public class WekaExperiment {
 						System.out.println(r.getClassifierCol());
 						System.out.println(currClassifierName);
 						data[j + 1] = "NaN";
-						k--;;
+						k--;
 					} else {
 						int sig = r.getSignificance();
 						String score = r.getScore().toString();
