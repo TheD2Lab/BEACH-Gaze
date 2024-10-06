@@ -33,7 +33,7 @@ public class DataFilter {
             }
         }
         // Edge case: check last valid fixation is the last line of file or followed by only saccades
-        if (lastValidFixation != filtered.getRow(filtered.rowCount()-1)) {
+        if (filtered.rowCount() != 0 && lastValidFixation != filtered.getRow(filtered.rowCount()-1)) {
             filtered.process(lastValidFixation);    // add fixation if it wasn't already added
         }
         
