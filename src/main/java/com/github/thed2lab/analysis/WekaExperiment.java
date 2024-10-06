@@ -132,7 +132,7 @@ public class WekaExperiment {
 		// set classifiers here
 		exp.setPropertyArray(classifiers);
 
-		DefaultListModel model = new DefaultListModel();
+		DefaultListModel<File> model = new DefaultListModel<File>();
 
 		// set dataset here
 		model.addElement(f);
@@ -142,8 +142,7 @@ public class WekaExperiment {
 		// *this is important for WEKA experimenter calculations*
 		InstancesResultListener irl = new InstancesResultListener();
 
-		File outputFile = new File(outputDirectory + "/ " + f.getName().replace(".csv", "") + "_InstancesResultListener.csv");
-		//outputFile.createNewFile();
+		File outputFile = new File(outputDirectory + "/ " + f.getName().replace(".csv", "") + "_irl.csv");
 		irl.setOutputFile(outputFile);
 		exp.setResultListener(irl);
 
@@ -173,12 +172,11 @@ public class WekaExperiment {
 		if (isClassification) {
 			tester.multiResultsetFull(0, result.attribute("Percent_correct").index());
 		} else {
-			tester.multiResultsetFull(0, result.attribute("Root_mean_squared_error").index());
+			tester.multiResultsetFull(0, result.attribute("Root_relative_squared_error").index());
 		}
 
 		ResultMatrix matrix = tester.getResultMatrix();
 		//irl.getOutputFile().delete();
-		// FileHandler.writeToText(matrix.toString(), outputDirectory, "predictions.txt");
 		return matrix;
 	}
 

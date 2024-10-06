@@ -52,6 +52,7 @@ public class UserInterface {
     private JCheckBox eventCheckBox;
     private JTextField eventTimeoutField;
     private JTextField eventMaxDurationField;
+    private JTextField eventBaselineDurationField;
 
     // UI Components for predictions panel
     private JButton selectDatasetButton;
@@ -331,13 +332,26 @@ public class UserInterface {
         itemSet.addAll(Windows.allGazeEvents);
 
         eventComboBox = new JComboBox<String>(itemSet.toArray(new String[itemSet.size()]));
+        windowSettings.event = (String) eventComboBox.getSelectedItem();
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 1;
         componentGBC.gridy = 11;
         componentGBC.gridwidth = 3;
         windowsPanel.add(eventComboBox, componentGBC);
 
-        windowSettings.event = (String) eventComboBox.getSelectedItem();
+        JLabel baselineDurationLabel = new JLabel("Baseline Duration (s)");
+        componentGBC.insets = new Insets(0, 20, 0, 0);
+        componentGBC.gridx = 0;
+        componentGBC.gridy = 12;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(baselineDurationLabel, componentGBC);
+
+        eventBaselineDurationField = new JTextField("", 10);
+        componentGBC.insets = new Insets(0, 0, 0, 0);
+        componentGBC.gridx = 1;
+        componentGBC.gridy = 12;
+        componentGBC.gridwidth = 1;
+        windowsPanel.add(eventBaselineDurationField, componentGBC);
 
         analysisPanel.add(windowsPanel, panelGBC);
     }
@@ -349,7 +363,7 @@ public class UserInterface {
         // Constraints dictate location of UI components
         GridBagConstraints panelGBC = new GridBagConstraints();
         panelGBC.anchor = GridBagConstraints.LAST_LINE_START;
-        panelGBC.insets = new Insets(50, 0, 35, 0);
+        panelGBC.insets = new Insets(20, 0, 35, 0);
         panelGBC.gridx = 0;
         panelGBC.gridy = 2;
         panelGBC.gridwidth = 1;
@@ -810,6 +824,11 @@ public class UserInterface {
         eventMaxDurationField.addActionListener(e -> {
             String text = eventMaxDurationField.getText();
             if (isNumeric(text)) windowSettings.eventMaxDuration = Double.parseDouble(text);
+        });
+
+        eventBaselineDurationField.addActionListener(e -> {
+            String text = eventBaselineDurationField.getText();
+            if (isNumeric(text)) windowSettings.eventBaselineDuration = Double.parseDouble(text);
         });
 
         // Comboboxes

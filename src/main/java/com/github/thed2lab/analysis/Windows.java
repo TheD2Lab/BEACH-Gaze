@@ -18,7 +18,6 @@ import java.util.Set;
 
 public class Windows {
 
-    private final static int BASELINE_LENGTH = 120; // two minutes
     private final static String LEFT_RIGHT_DIAMETER = LEFT_PUPIL_DIAMETER + " + " + RIGHT_PUPIL_DIAMETER;
 
     // Set of supported events that utilize the fixation file
@@ -42,7 +41,7 @@ public class Windows {
         double time0 = Double.valueOf(allGaze.getValue(TIMESTAMP, 0));
 
         // Generate baseline file
-        DataEntry baselineData = generateBaselineFiles(allGaze, outputDirectory + "/baseline");
+        DataEntry baselineData = generateBaselineFiles(allGaze, outputDirectory + "/baseline", settings.eventBaselineDuration);
 
         // Tumbling Window
         if (settings.tumblingEnabled) {
@@ -279,10 +278,10 @@ public class Windows {
         FileHandler.writeToCSV(allWindowDGMs, outputDirectory, "all_window_DGMs");
     }
 
-    static DataEntry generateBaselineFiles(DataEntry allGaze, String outputDirectory) {
+    static DataEntry generateBaselineFiles(DataEntry allGaze, String outputDirectory, double baselineDuration) {
         DataEntry baseline = new DataEntry(allGaze.getHeaders());
         double startTime = Double.valueOf(allGaze.getValue(TIMESTAMP, 0));
-        double endTime = startTime + BASELINE_LENGTH;
+        double endTime = startTime + baselineDuration;
 
         for (int i = 0; i < allGaze.rowCount(); i++) {
             Double time = Double.parseDouble(allGaze.getValue(TIMESTAMP, i));

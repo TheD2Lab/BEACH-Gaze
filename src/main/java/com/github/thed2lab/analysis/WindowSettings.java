@@ -2,6 +2,11 @@ package com.github.thed2lab.analysis;
 
 public class WindowSettings {
 
+    /*
+     * Data class to store user window settings
+     * All time based metrics are in seconds
+     */
+
     public boolean tumblingEnabled;
     public double tumblingWindowSize;
 
@@ -16,6 +21,7 @@ public class WindowSettings {
     public String event;
     public double eventTimeout;
     public double eventMaxDuration;
+    public double eventBaselineDuration;
 
     public WindowSettings() {
         this.tumblingEnabled = false;
