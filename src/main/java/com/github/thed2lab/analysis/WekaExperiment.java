@@ -16,6 +16,8 @@ import weka.core.Instances;
 import weka.core.Range;
 import weka.core.Utils;
 import weka.core.converters.CSVLoader;
+import weka.core.WekaPackageManager;
+
 // weka classifiers
 import weka.classifiers.*;
 import weka.classifiers.bayes.*;
@@ -97,6 +99,9 @@ public class WekaExperiment {
 	}
 
 	public ResultMatrix runExperiment(File f, Classifier[] classifiers, boolean isClassification, String outputDirectory) throws Exception {
+		// Load necessary packages
+		WekaPackageManager.loadPackages(false);
+
 		// setup weka.experiment
 		Experiment exp = new Experiment();
 		exp.setPropertyArray(new Classifier[0]);
@@ -262,14 +267,15 @@ public class WekaExperiment {
 		return classifiers;
 	}
 
-    private static Classifier[] getRegressionClassifiers() {
-		Classifier[] classifiers = new Classifier[27];
+    private static Classifier[] getRegressionClassifiers() throws Exception{
+		Classifier[] classifiers = new Classifier[30];
 
 		// set baseline classifier here
 		classifiers[0] = new ZeroR();
 
 		// functions
 		classifiers[1] = new GaussianProcesses();
+
 		classifiers[2] = new LinearRegression();
 		classifiers[3] = new MultilayerPerceptron();
 		classifiers[4] = new SimpleLinearRegression();
@@ -297,18 +303,16 @@ public class WekaExperiment {
 		classifiers[19] = new REPTree();
 
         // misc
-        // classifiers[20] = new ElasticNet();
-        // classifiers[21] = new IsotonicRegression();
-        // classifiers[22] = new LeastMedSq();
         classifiers[20] = new IBk();
         classifiers[21] = new KStar();
         classifiers[22] = new LWL();
         classifiers[23] = new DecisionStump();
-        // classifiers[27] = new DPCTree();
         classifiers[24] = new RandomForest();
         classifiers[25] = new AdditiveRegression();
-        // classifiers[30] = new IterativeAbsoluteErrorRegression();
-        classifiers[26] = new AttributeSelectedClassifier();
+		classifiers[26] = new ElasticNet();
+		classifiers[27] = new IsotonicRegression();
+		classifiers[28] = new LeastMedSq();
+		classifiers[29] = new IterativeAbsoluteErrorRegression();
 
 		return classifiers;
 	}
@@ -344,8 +348,6 @@ public class WekaExperiment {
 					if (r == null) {
 						data[j + 1] = "NaN";
 					} else if (!r.getClassifierCol().contains(currClassifierName)) {
-						System.out.println(r.getClassifierCol());
-						System.out.println(currClassifierName);
 						data[j + 1] = "NaN";
 						k--;
 					} else {
