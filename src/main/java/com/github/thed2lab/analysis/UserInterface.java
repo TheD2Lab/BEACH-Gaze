@@ -1052,7 +1052,6 @@ public class UserInterface {
     }
 
     private void runAnalysis() {
-        System.out.println(windowSettings);
         try {
             // Append a results folder to the output directory path
             String resultsDirectory = analyticsOutputDirectory + "/results";
