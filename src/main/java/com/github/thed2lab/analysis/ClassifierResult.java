@@ -1,3 +1,6 @@
+/*
+ * BEACH-Gaze is open-source software issued under the GNU General Public License.
+ */
 package com.github.thed2lab.analysis;
 
 import weka.classifiers.*;
