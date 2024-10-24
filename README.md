@@ -2,7 +2,7 @@
 
 # Abstract
 
-The purpose of this codebase is to provide an eye gaze analysis tool that utilizes machine learning algorithms to predict the fatigue level of participants. The codebase is compatible with Gazepoint's GP3 Desktop and GP3HD V2 eyetrackers and uses the WEKA software collection for its data mining procedures.
+The purpose of this codebase is to provide an eye gaze analysis tool that utilizes machine learning algorithms to predict the fatigue level of participants. The codebase is compatible with Gazepoint's GP3 and GP3HD eyetrackers and uses the WEKA software collection for its data mining procedures.
 
 # Setup
 
