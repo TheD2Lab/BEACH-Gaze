@@ -41,7 +41,7 @@ public class Saccades {
         
         Double[] allSaccadeLengths = getAllSaccadeLengths(allCoordinates);
         ArrayList<Double> allSaccadeDurations = getAllSaccadeDurations(saccadeDetails);
-
+        ArrayList<Double> allSaccadeAmplitudes = getAllSaccadeAmplitudes(allCoordinates);
         
         results.put(
             "total_number_of_saccades", //Output Header
@@ -106,6 +106,36 @@ public class Saccades {
         results.put(
             "max_saccade_duration", 
             String.valueOf(DescriptiveStats.getMaxOfDoubles(allSaccadeDurations))
+            );
+        
+        results.put(
+            "sum_of_all_saccade_amplitudes", 
+            String.valueOf(DescriptiveStats.getSumOfDoubles(allSaccadeAmplitudes))
+            );
+        
+        results.put(
+            "mean_saccade_amplitude", 
+            String.valueOf(DescriptiveStats.getMeanOfDoubles(allSaccadeAmplitudes))
+            );
+        
+        results.put(
+            "median_saccade_amplitude", 
+            String.valueOf(DescriptiveStats.getMedianOfDoubles(allSaccadeAmplitudes))
+            );
+
+        results.put(
+            "stdev_of_saccade_damplitude", 
+            String.valueOf(DescriptiveStats.getStDevOfDoubles(allSaccadeAmplitudes))
+            );
+                
+        results.put(
+            "min_saccade_amplitude", 
+            String.valueOf(DescriptiveStats.getMinOfDoubles(allSaccadeAmplitudes))
+            );
+
+        results.put(
+            "max_saccade_amplitude", 
+            String.valueOf(DescriptiveStats.getMaxOfDoubles(allSaccadeAmplitudes))
             );
             
         results.put(
@@ -176,4 +206,33 @@ public class Saccades {
 		double saccadeDuration = DescriptiveStats.getSumOfDoubles(allSaccadeDurations);
 		return fixationDuration/saccadeDuration;
 	}
+
+    public static ArrayList<Double> getAllSaccadeAmplitudes(ArrayList<Coordinate> allCoordinates) {
+        if (allCoordinates.size() == 0 || allCoordinates.size() == 1) return new ArrayList<Double>();
+        
+        ArrayList<Double> allSaccadeAmplitudes = new ArrayList<>();
+
+        final double PIXELS_TO_CM = 0.0264583333; // Convert from pixels to cms
+        final double PARTICIPANT_DISTANCE = 65; // assume an average distance of 65cm from the participant to the screen
+        final double RADIAN_TO_DEGREES = 180/Math.PI;
+
+        for (int i = 1; i < allCoordinates.size(); i++) {
+			Coordinate currCoordinate = allCoordinates.get(i);
+			Coordinate prevCoordinate = allCoordinates.get(i - 1);
+
+            if (prevCoordinate.fid == currCoordinate.fid - 1) {
+                double x1 = currCoordinate.x;
+                double y1 = currCoordinate.y;
+                double x2 = prevCoordinate.x;
+                double y2 = prevCoordinate.y;
+                
+                double dx = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) * PIXELS_TO_CM;
+                double amplitude = RADIAN_TO_DEGREES * Math.atan(dx/PARTICIPANT_DISTANCE);
+                
+                allSaccadeAmplitudes.add(amplitude);
+            }
+		}
+        
+        return allSaccadeAmplitudes;
+    }
 }
