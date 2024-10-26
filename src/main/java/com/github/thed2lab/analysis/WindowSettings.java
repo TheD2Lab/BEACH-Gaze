@@ -38,9 +38,10 @@ public class WindowSettings {
         this.hoppingHopSize = 30;
 
         this.eventEnabled = false;
-        this.eventTimeout = 4;
-        this.eventMaxDuration = 60;
-        this.eventBaselineDuration = 120;
+        this.eventTimeout = 10;
+        this.eventMaxDuration = 90;
+        this.eventBaselineDuration = 30;
+        this.event = "";
     }
 
     @Override
@@ -48,6 +49,6 @@ public class WindowSettings {
         return "Tumbling: " + tumblingEnabled + " Window Size: " +  tumblingWindowSize + "\n" +
                 "Expanding: " + expandingEnabled + " Window Size: " +  expandingWindowSize +"\n" +
                 "Hopping: " + hoppingEnabled + " Window Size: " + hoppingWindowSize + " Hop Size: " + hoppingHopSize + "\n" +
-                "Event: " + eventEnabled + ", " + event + " Timeout: " + eventTimeout + " Max Duration: " + eventMaxDuration + " Baseline Duration: " + eventBaselineDuration;
+                "Session (Event): " + eventEnabled + ", " + event + " Timeout: " + eventTimeout + " Max Duration: " + eventMaxDuration + " Baseline Duration: " + eventBaselineDuration;
     }
 }

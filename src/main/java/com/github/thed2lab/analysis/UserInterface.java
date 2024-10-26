@@ -341,8 +341,8 @@ public class UserInterface {
         componentGBC.gridwidth = 1;
         windowPanel1.add(hoppingHopSizeField, componentGBC);
 
-        eventCheckBox = new JCheckBox("Event-Based");
-        String eventToolTip = "An event-based view of the gaze data using a session window that is non-overlapping and non-fixed in size.";
+        eventCheckBox = new JCheckBox("Session");
+        String eventToolTip = "An session view of the gaze data using a session window that is non-overlapping and non-fixed in size.";
         eventCheckBox.setToolTipText("<html><p width=\"500\">" + eventToolTip + "</p></html>");
         eventCheckBox.setFont(STANDARD_FONT);
         componentGBC.gridx = 0;
@@ -359,7 +359,7 @@ public class UserInterface {
         windowPanel2.add(timeoutLabel, componentGBC);
 
         eventTimeoutField = new JTextField(windowSettings.eventTimeout + "", 10); // Default value
-        eventTimeoutField.setToolTipText("Enter the timeout length in seconds for event-based windows.");
+        eventTimeoutField.setToolTipText("Enter the timeout length in seconds for session windows.");
         eventTimeoutField.setFont(STANDARD_FONT);
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 1;
@@ -376,7 +376,7 @@ public class UserInterface {
         windowPanel2.add(maxDurationLabel, componentGBC);
 
         eventMaxDurationField = new JTextField(windowSettings.eventMaxDuration + "", 10); // Default value
-        eventMaxDurationField.setToolTipText("Enter the maximum duration in seconds for event-based windows.");
+        eventMaxDurationField.setToolTipText("Enter the maximum duration in seconds for session windows.");
         eventMaxDurationField.setFont(STANDARD_FONT);
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 1;
@@ -393,7 +393,7 @@ public class UserInterface {
         windowPanel2.add(baselineDurationLabel, componentGBC);
 
         eventBaselineDurationField = new JTextField(windowSettings.eventBaselineDuration + "", 10); // Default value
-        eventBaselineDurationField.setToolTipText("Enter the baseline duration in seconds for event-based windows.");
+        eventBaselineDurationField.setToolTipText("Enter the baseline duration in seconds for session windows.");
         eventBaselineDurationField.setFont(STANDARD_FONT);
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 1;
@@ -415,7 +415,7 @@ public class UserInterface {
 
         eventComboBox = new JComboBox<String>(itemSet.toArray(new String[itemSet.size()]));
         windowSettings.event = (String) eventComboBox.getSelectedItem();
-        eventComboBox.setToolTipText("Select the event-defining analytic for event-based windows.");
+        eventComboBox.setToolTipText("Select the event-defining analytic for session windows.");
         eventComboBox.setFont(STANDARD_FONT);
         componentGBC.insets = new Insets(0, 0, 0, 0);
         componentGBC.gridx = 1;
@@ -498,7 +498,7 @@ public class UserInterface {
             Window settings allow users to perform window-based analyses of the DGMs, wherein the participant’s gaze file can be analyzed over time by: <br/> <br/>
             •	taking a scheduled digest view of the gaze data using a tumbling window that is non-overlapping and fixed in size. <br/>
             •	taking the most recent snapshot view of the gaze data using a hopping window that is overlapping and fixed in size. <br/>
-            •	taking an event-based view of the gaze data using a session window that is non-overlapping and non-fixed in size. <br/>
+            •	taking an session view of the gaze data using a session window that is non-overlapping and non-fixed in size. <br/>
             •	taking a cumulative view of the gaze data using an expanding window that is overlapping and non-fixed in size. <br/> <br/>
             To enable a window, simply select the checkbox appearing next to the window’s name and enter the desired parameters corresponding to each window. 
             All window parameters are defined in seconds. Once users have selected one or more files and filled out their desired fields, they can press the “Run Analysis” 
@@ -585,7 +585,7 @@ public class UserInterface {
 
         windowsHelpPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        JLabel eventLabel = new JLabel("Event-Based Window");
+        JLabel eventLabel = new JLabel("Session Window");
         eventLabel.setFont(BOLD_FONT);
         windowsHelpPanel.add(eventLabel);
 
@@ -605,7 +605,7 @@ public class UserInterface {
                 •	POGD, the duration of a fixation (in seconds); and <br/>
                 •	BKPMIN, the number of blinks in the previous 60 second period of time (count). <br/> <br/>
 
-                A non-overlapping, non-fixed-size session window is used to achieve event-based gaze analytics, shown in Fig. 4. 
+                A non-overlapping, non-fixed-size session window is used to achieve session gaze analytics, shown in Fig. 4. 
                 A session window begins when the first event is found; it then keeps searching for the next event within a specified time period. 
                 If nothing is found, it would close at a specified timeout (e.g., window 1); if another event is found, the session window would extend the 
                 search within another timeout period and repeat this process (e.g., window 3) until a specified maximum duration (e.g., window 2). For example, 
@@ -623,7 +623,7 @@ public class UserInterface {
 
         String fig4Description = """
         <html><p width=\"750\">
-                Fig. 4. Taking an event-based view of the gaze data using a session window that is non-overlapping and non-fixed in size.
+                Fig. 4. Taking an session view of the gaze data using a session window that is non-overlapping and non-fixed in size.
         <html><p width=\"750\">
         """;
         JLabel fig4DescriptionLabel = new JLabel(fig4Description);
