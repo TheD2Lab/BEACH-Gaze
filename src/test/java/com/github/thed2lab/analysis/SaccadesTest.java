@@ -221,6 +221,13 @@ public class SaccadesTest {
       expectedResults.put("min_saccade_duration", 0.00598);
       expectedResults.put("max_saccade_duration", 0.03028);
 
+      expectedResults.put("sum_of_all_saccade_amplitudes", 58.834398303511215);
+      expectedResults.put("mean_saccade_amplitude", 3.677149893969451);
+      expectedResults.put("median_saccade_amplitude", 2.781254831659127);
+      expectedResults.put("stdev_of_saccade_amplitude", 2.4654446860609887);
+      expectedResults.put("min_saccade_amplitude", 0.48295537661957966);
+      expectedResults.put("max_saccade_amplitude", 8.094871649121);
+
       expectedResults.put("scanpath_duration", 4.95373);
       expectedResults. put("fixation_to_saccade_ratio", 24.9479859620);
 

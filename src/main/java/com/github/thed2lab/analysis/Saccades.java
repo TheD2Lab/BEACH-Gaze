@@ -124,7 +124,7 @@ public class Saccades {
             );
 
         results.put(
-            "stdev_of_saccade_damplitude", 
+            "stdev_of_saccade_amplitude", 
             String.valueOf(DescriptiveStats.getStDevOfDoubles(allSaccadeAmplitudes))
             );
                 
