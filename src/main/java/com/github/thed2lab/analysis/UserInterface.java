@@ -125,12 +125,12 @@ public class UserInterface {
         frame.setLayout(new BorderLayout());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        try {
-            String imageFilePath = System.getProperty("user.dir") + "/img/";
-            frame.setIconImage(ImageIO.read(new File(imageFilePath + "d2logo.jpg")));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // try {
+        //     String imageFilePath = System.getProperty("user.dir") + "/img/";
+        //     frame.setIconImage(ImageIO.read(new File(imageFilePath + "logo.jpg")));
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        // }
     }
 
     private void buildGazePanel() {
