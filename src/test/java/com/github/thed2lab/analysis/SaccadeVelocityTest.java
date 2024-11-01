@@ -59,7 +59,7 @@ public class SaccadeVelocityTest {
       final String GAZE_PATH = "./src/test/resources/valid_gaze_screenApplied.csv";
       final String FIXATION_PATH = "./src/test/resources/valid_fixation_screenApplied.csv";
       final double EXPECTED_AVG_PEAK = 179.96919273273;
-      final String KEY = "average_peak_saccade_velocity";
+      final String KEY = "mean_peak_saccade_velocity";
       DataEntry gazeData = FileHandler.buildDataEntry(new File(GAZE_PATH));
       DataEntry fixationData = FileHandler.buildDataEntry(new File(FIXATION_PATH));
       double actualAvgPeak = Double.parseDouble(SaccadeVelocity.analyze(gazeData, fixationData).get(KEY));
@@ -71,7 +71,7 @@ public class SaccadeVelocityTest {
       final String GAZE_PATH = "./src/test/resources/filtered_by_validity.csv";
       final String FIXATION_PATH = "./src/test/resources/aoi_a_fixation.csv";
       final double EXPECTED_AVG_PEAK = 133.30276061352;
-      final String KEY = "average_peak_saccade_velocity";
+      final String KEY = "mean_peak_saccade_velocity";
       DataEntry gazeData = DataFilter.applyScreenSize(FileHandler.buildDataEntry(new File(GAZE_PATH)), SCREEN_WIDTH, SCREEN_HEIGHT);
       DataEntry fixationData = FileHandler.buildDataEntry(new File(FIXATION_PATH));
       double actualAvgPeak = Double.parseDouble(SaccadeVelocity.analyze(gazeData, fixationData).get(KEY));

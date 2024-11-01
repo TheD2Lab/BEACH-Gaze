@@ -21,7 +21,7 @@ public class Analysis {
     private final static int MIN_PATTERN_LENGTH = 3;
     private final static int MAX_PATTERN_LENGTH = 7;
     private final static int MIN_PATTERN_FREQUENCY = 2;
-    private final static int MIN_SEQUENCE_SIZE = 3;
+    private final static int MIN_SEQUENCE_SIZE = 2;
 
     private Parameters params;
     
