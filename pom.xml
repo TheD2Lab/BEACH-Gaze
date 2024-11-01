@@ -5,13 +5,12 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.github.thed2lab</groupId>
+  <groupId>com.github.lab</groupId>
   <artifactId>beach-gaze</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <name>BEACH-gaze</name>
   <!-- FIXME change it to the project's website -->
-  <url>https://github.com/TheD2Lab/BEACH-Gaze</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
