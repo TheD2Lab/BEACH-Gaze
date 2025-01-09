@@ -39,8 +39,8 @@ public class SequencesTest {
 
    @Test
    public void testGetExpandedSequenceDetails_containsUndefinedArea() {
-      final String EXPECTED_EXPANDED = "ABA";
-      final String EXPECTED_ASCII = "A, AOI\nB, Undefined Area\n";
+      final String EXPECTED_EXPANDED = "BAB";
+      final String EXPECTED_ASCII = "A, Undefined Area\nB, AOI\n";
       
       DataEntry fixations = new DataEntry(new String[]{"AOI"});
       fixations.process(List.of("AOI"));
