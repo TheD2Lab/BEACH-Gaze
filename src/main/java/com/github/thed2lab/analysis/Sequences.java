@@ -6,6 +6,8 @@ package com.github.thed2lab.analysis;
 import static com.github.thed2lab.analysis.Constants.AOI_LABEL;
 
 import java.util.HashMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -44,7 +46,7 @@ public class Sequences {
         FileHandler.writeToText(collapsedSequence, outputDirectory, "collapsedSequence");
         FileHandler.writeToText(aoiDescriptions, outputDirectory, "aoiDescriptions");
 
-        return  sequence;
+        return sequence;
     }
 
     /**
@@ -57,21 +59,32 @@ public class Sequences {
         final int ASCII_OFFSET = 65; // Capital "A"
         String aoiDescriptions = "";
         String sequence = "";
-        HashMap<String, Integer> aoiLetters = new HashMap<>();
+        HashMap<String, Character> aoiMappings = new HashMap<>();
+        SortedSet<String> aoiSet = new TreeSet<String>();
+
+        // Iterate through data rows to create sorted set of AOI names.
+        for (int i = 0; i < fixations.rowCount(); i++) {
+            String aoi = fixations.getValue(AOI_LABEL, i);
+            aoiSet.add(aoi);
+        }
+
+        // Map AOIs to a character
+        int count = 0;
+        for (String aoi : aoiSet) {
+            String aoiName = aoi == "" ? "Undefined Area" : aoi;
+            int asciiValue = count + ASCII_OFFSET;
+            char c = (char)asciiValue; 
+
+            aoiMappings.put(aoiName, c);
+            aoiDescriptions += c + ", " + aoiName + "\n";
+            count++;
+        }
 
         // Generate sequence
         for (int i = 0; i < fixations.rowCount(); i++) {
             String aoi = fixations.getValue(AOI_LABEL, i);
-
-            if (!aoiLetters.containsKey(aoi)) {
-                aoiLetters.put(aoi, aoiLetters.size() + ASCII_OFFSET);
-
-                String description = aoi == "" ? "Undefined Area" : aoi;
-                aoiDescriptions += (char)(aoiLetters.size() + ASCII_OFFSET - 1) + ", " +  description  + "\n";
-            }
-            
-            int asciiValue = aoiLetters.get(aoi);
-            char c = (char)asciiValue;
+            String aoiName = aoi == "" ? "Undefined Area" : aoi;
+            char c = aoiMappings.get(aoiName);
             sequence += c;
         }
 
