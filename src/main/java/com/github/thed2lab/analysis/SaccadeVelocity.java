@@ -189,6 +189,17 @@ public class SaccadeVelocity {
 		return peakVelocity;
 	}
 
+    /**
+	 * Returns the mean velocity of a given saccade calculated using a two point difference algorithm.
+	 * Note: n data points produce n-1 velocity measurements between consecutive points.
+	 *
+	 * @param	saccadePoints	A list of saccade data points, where each data point is a double array.
+	 * 							[0] = X position
+	 * 							[1] = Y position
+	 * 							[2] = Time of data point
+	 *
+	 * @return	The mean velocity of a saccade, excluding velocities above threshold. Returns NaN if fewer than 2 points.
+	 */
     static double getMeanVelocity(List<Double[]> saccadePoints) {
 		if (saccadePoints.size() == 0 || saccadePoints.size() == 1) {
 			return Double.NaN;
@@ -223,6 +234,6 @@ public class SaccadeVelocity {
             }
 		}
 		
-		return totalVelocity/(saccadePoints.size() - discardedDataCount);
+		return totalVelocity/(saccadePoints.size() - 1 - discardedDataCount);
 	}
 }
