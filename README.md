@@ -1,12 +1,9 @@
+# About
 **B**each **E**nvironment for the **A**nalyti**c**s of **H**uman **Gaze** (BEACH-Gaze) provides reuseable and extensible support to the broader scientific community interested in descriptive and predictive gaze analytics applied to a wide range of domains. BEACH-Gaze is open-source software issued under the GNU General Public License.
 BEACH-Gaze provides sequential gaze analytics through window segmentation in its data processing and analysis pipeline, which can be used to achieve simulations of real-time gaze-based systems. Additionally, it integrates a range of established machine learning models, allowing researchers from diverse disciplines to generate gaze-enabled predictions without ad-vanced technical expertise. The overall goal is to simplify technical details and to aid the broader community interested in eye tracking research and applications in data inter-pretation, and to leverage knowledge gained from eye gaze in the creation of machine intelligence. 
 
 # How to Cite
-Bo Fu, Kayla Chu, Angelo Ryan Soriano, Peter Gatsby, Nicolas Guardado Guardado, Ashley Jones, Matthew Halderman, BEACH-Gaze: Supporting Descriptive and Predictive Gaze Analytics in the Era of Artificial Intelligence and Advanced Data Science, Journal of Eye Movement Research, 2025 (to appear)
-
-# Abstract
-
-The purpose of this codebase is to provide an eye gaze analysis tool that utilizes machine learning algorithms to predict the fatigue level of participants. The codebase is compatible with Gazepoint's GP3 and GP3HD eyetrackers and uses the WEKA software collection for its data mining procedures.
+Bo Fu, Kayla Chu, Angelo Ryan Soriano, Peter Gatsby, Nicolas Guardado Guardado, Ashley Jones, Matthew Halderman, BEACH-Gaze: Supporting Descriptive and Predictive Gaze Analytics in the Era of Artificial Intelligence and Advanced Data Science, Journal of Eye Movement Research 18, no. 6: 67, 2025. doi:10.3390/jemr180600672025
 
 # Setup
 
