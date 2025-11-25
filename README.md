@@ -3,7 +3,7 @@
 BEACH-Gaze provides sequential gaze analytics through window segmentation in its data processing and analysis pipeline, which can be used to achieve simulations of real-time gaze-based systems. Additionally, it integrates a range of established machine learning models, allowing researchers from diverse disciplines to generate gaze-enabled predictions without advanced technical expertise. The overall goal is to simplify technical details and to aid the broader community interested in eye tracking research and applications in data interpretation, and to leverage knowledge gained from eye gaze in the creation of machine intelligence. 
 
 # How to Cite
-Bo Fu, Kayla Chu, Angelo Ryan Soriano, Peter Gatsby, Nicolas Guardado Guardado, Ashley Jones, Matthew Halderman, BEACH-Gaze: Supporting Descriptive and Predictive Gaze Analytics in the Era of Artificial Intelligence and Advanced Data Science, Journal of Eye Movement Research 18, no. 6: 67, 2025. doi:10.3390/jemr180600672025 [see [PDF](https://www.mdpi.com/1995-8692/18/6/67)]
+Bo Fu, Kayla Chu, Angelo Ryan Soriano, Peter Gatsby, Nicolas Guardado Guardado, Ashley Jones, Matthew Halderman, BEACH-Gaze: Supporting Descriptive and Predictive Gaze Analytics in the Era of Artificial Intelligence and Advanced Data Science, Journal of Eye Movement Research 18, no. 6: 67, 2025. doi:10.3390/jemr18060067 [see [PDF](https://www.mdpi.com/1995-8692/18/6/67)]
 
 # Setup
 
