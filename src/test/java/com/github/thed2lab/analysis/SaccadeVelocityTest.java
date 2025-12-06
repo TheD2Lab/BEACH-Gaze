@@ -31,14 +31,14 @@ public class SaccadeVelocityTest {
    }
 
    @Test
-   public void testGetPeakVelocity_aboveThreshold_return0() {
+   public void testGetPeakVelocity_aboveThreshold_returnNaN() {
       List<Double[]> saccadePoints = List.of(
          new Double[]{0., 0., 0.},
          new Double[]{0., 10., 0.0001}
       );
-      // 2332.21914 > 700 => return 0
-      boolean isZero = SaccadeVelocity.getPeakVelocity(saccadePoints) == 0;
-      assertTrue(isZero);
+      // 2332.21914 > 700 => return NaN (excluded from statistics)
+      boolean isNaN = Double.isNaN(SaccadeVelocity.getPeakVelocity(saccadePoints));
+      assertTrue(isNaN);
    }
 
    @Test
