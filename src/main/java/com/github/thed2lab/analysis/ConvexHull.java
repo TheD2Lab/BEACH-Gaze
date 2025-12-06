@@ -180,9 +180,8 @@ public class ConvexHull {
                     return 0;
                 }
 
-                // use longs to guard against int-underflow
-                double thetaA = Math.atan2((long)a.y - lowest.y, (long)a.x - lowest.x);
-                double thetaB = Math.atan2((long)b.y - lowest.y, (long)b.x - lowest.x);
+                double thetaA = Math.atan2(a.y - lowest.y, a.x - lowest.x);
+                double thetaB = Math.atan2(b.y - lowest.y, b.x - lowest.x);
 
                 if(thetaA < thetaB) {
                     return -1;
@@ -193,11 +192,10 @@ public class ConvexHull {
                 else {
                     // collinear with the 'lowest' point, let the point closest to it come first
 
-                    // use longs to guard against int-over/underflow
-                    double distanceA = Math.sqrt((((long)lowest.x - a.x) * ((long)lowest.x - a.x)) +
-                                                (((long)lowest.y - a.y) * ((long)lowest.y - a.y)));
-                    double distanceB = Math.sqrt((((long)lowest.x - b.x) * ((long)lowest.x - b.x)) +
-                                                (((long)lowest.y - b.y) * ((long)lowest.y - b.y)));
+                    double distanceA = Math.sqrt(((lowest.x - a.x) * (lowest.x - a.x)) +
+                                                ((lowest.y - a.y) * (lowest.y - a.y)));
+                    double distanceB = Math.sqrt(((lowest.x - b.x) * (lowest.x - b.x)) +
+                                                ((lowest.y - b.y) * (lowest.y - b.y)));
 
                     if(distanceA < distanceB) {
                         return -1;
@@ -235,9 +233,8 @@ public class ConvexHull {
      */
     protected static Turn getTurn(Point2D.Double a, Point2D.Double b, Point2D.Double c) {
 
-        // use longs to guard against int-over/underflow
-        long crossProduct = (long) ((((long)b.x - a.x) * ((long)c.y - a.y)) -
-                            (((long)b.y - a.y) * ((long)c.x - a.x)));
+        double crossProduct = ((b.x - a.x) * (c.y - a.y)) -
+                              ((b.y - a.y) * (c.x - a.x));
 
         if(crossProduct > 0) {
             return Turn.COUNTER_CLOCKWISE;

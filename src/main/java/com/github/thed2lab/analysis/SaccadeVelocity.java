@@ -159,13 +159,14 @@ public class SaccadeVelocity {
 		if (saccadePoints.size() == 0 || saccadePoints.size() == 1) {
 			return Double.NaN;
 		}
-		
+
 		final double PIXELS_TO_CM = 0.0264583333; // Convert from pixels to cms
 		final double VELOCITY_THRESHOLD = 700; // Maximum possible saccadic velocity
         final double PARTICIPANT_DISTANCE = 65; // assume an average distance of 65cm from the participant to the screen
         final double RADIAN_TO_DEGREES = 180/Math.PI;
         double peakVelocity = 0;
-		
+        boolean foundValidVelocity = false;
+
 		for (int i = 1; i < saccadePoints.size(); i++) {
 			Double[] currPoint = saccadePoints.get(i);
 			Double[] prevPoint = saccadePoints.get(i - 1);
@@ -174,19 +175,22 @@ public class SaccadeVelocity {
 			double y1 = currPoint[1];
 			double x2 = prevPoint[0];
 			double y2 = prevPoint[1];
-			
+
 			double dx = Math.sqrt(Math.pow(Math.abs(x1 - x2), 2) + Math.pow(Math.abs(y1 - y2), 2)) * PIXELS_TO_CM;
 			double dt = Math.abs(currPoint[2] - prevPoint[2]);
 			double amplitude = RADIAN_TO_DEGREES * Math.atan(dx/PARTICIPANT_DISTANCE);
-			
+
 			double velocity = amplitude/dt;
-			
-			if (velocity > peakVelocity && velocity <= VELOCITY_THRESHOLD) {
-				peakVelocity = velocity;
+
+			if (velocity <= VELOCITY_THRESHOLD) {
+				if (velocity > peakVelocity) {
+					peakVelocity = velocity;
+				}
+				foundValidVelocity = true;
 			}
 		}
-		
-		return peakVelocity;
+
+		return foundValidVelocity ? peakVelocity : Double.NaN;
 	}
 
     /**
