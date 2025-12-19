@@ -65,16 +65,18 @@ public class GazeEntropy {
 
         var results = new LinkedHashMap<String,String>();
 
-        results.put(
-            "stationary_entropy", //Output Header
-            String.valueOf(getStationaryEntropy(aoiProbability)) //Output Value
-            );
+        // Return NaN if no fixations/AOIs exist, otherwise calculate entropy
+        double stationaryEntropyValue = aoiProbability.isEmpty()
+            ? Double.NaN
+            : getStationaryEntropy(aoiProbability);
 
-        results.put(
-            "transition_entropy", //Output Header
-            String.valueOf(getTransitionEntropy(aoiProbability, transitionProbability)) //Output Value
-            );
-    
+        double transitionEntropyValue = transitionProbability.isEmpty()
+            ? Double.NaN
+            : getTransitionEntropy(aoiProbability, transitionProbability);
+
+        results.put("stationary_entropy", String.valueOf(stationaryEntropyValue));
+        results.put("transition_entropy", String.valueOf(transitionEntropyValue));
+
         return results;
     }
 
