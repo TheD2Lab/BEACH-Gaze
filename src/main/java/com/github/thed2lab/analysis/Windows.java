@@ -43,9 +43,6 @@ public class Windows {
     public static void generateWindows(DataEntry allGaze, String outputDirectory, WindowSettings settings) {
         double time0 = Double.valueOf(allGaze.getValue(TIMESTAMP, 0));
 
-        // Generate baseline file
-        DataEntry baselineData = generateBaselineFiles(allGaze, outputDirectory + "/baseline", settings.eventBaselineDuration);
-
         // Tumbling Window
         if (settings.tumblingEnabled) {
             List<DataEntry> windows = spliceTumblingWindow(allGaze, settings.tumblingWindowSize);
@@ -64,10 +61,11 @@ public class Windows {
             outputWindowFiles(windows, time0, outputDirectory + "/hopping");
         }
 
-        // Event Window
+        // Event Window (baseline only needed for event-based windowing)
         if (settings.eventEnabled) {
+            DataEntry baselineData = generateBaselineFiles(allGaze, outputDirectory + "/baseline", settings.eventBaselineDuration);
             double baselineValue = getEventBaselineValue(baselineData, settings.event);
-            List<DataEntry> windows  = spliceEventWindow(allGaze, settings, baselineValue);
+            List<DataEntry> windows = spliceEventWindow(allGaze, settings, baselineValue);
             outputWindowFiles(windows, time0, outputDirectory + "/event");
         }
     }
