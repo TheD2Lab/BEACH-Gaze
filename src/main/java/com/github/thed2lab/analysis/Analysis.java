@@ -9,7 +9,9 @@ import static com.github.thed2lab.analysis.Constants.SCREEN_WIDTH;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The Analysis class drives the entire analysis on one or multiple files of gaze data.
@@ -44,6 +46,12 @@ public class Analysis {
             File[] inputFiles = params.getInputFiles();
             List<String> expandedSequences = new ArrayList<>();
             List<List<String>> allParticipantDGMs = new ArrayList<>();
+            // Stores per-participant AOI metrics: aoiName -> {metricName -> value}
+            List<Map<String, Map<String, String>>> allParticipantAoiData = new ArrayList<>();
+            // Union of all AOI names across participants, preserving insertion order
+            LinkedHashSet<String> allAoiNames = new LinkedHashSet<>();
+            // DGM header names (without "aoi" column) used for AOI prefixing
+            List<String> aoiDgmHeaders = null;
 
             WindowSettings settings = params.getWindowSettings();
 
@@ -60,12 +68,12 @@ public class Analysis {
                 DataEntry validGaze = DataFilter.filterByValidity(allGaze);
                 DataEntry fixations = DataFilter.filterByFixations(allGaze);
                 DataEntry validFixations = DataFilter.filterByValidity(fixations);
-                
+
                 // Write DataEntrys to file
                 validGaze.writeToCSV(pDirectory, pName + "_valid_all_gaze");
                 validFixations.writeToCSV(pDirectory, pName + "_valid_fixations");
                 fixations.writeToCSV(pDirectory, pName + "_fixations");
-                
+
                 // Generate DGMs
                 List<List<String>> descriptiveGazeMeasures = generateResults(allGaze, fixations);
                 FileHandler.writeToCSV(descriptiveGazeMeasures, pDirectory, pName + "_DGMs");
@@ -83,7 +91,44 @@ public class Analysis {
                 allParticipantDGMs.add(dgms);
 
                 // Generate AOIs
-                AreaOfInterests.generateAOIs(allGaze, fixations, pDirectory, pName);
+                List<List<String>> aoiMetrics = AreaOfInterests.generateAOIs(allGaze, fixations, pDirectory, pName);
+
+                // Collect AOI data for combined output
+                if (aoiMetrics != null && aoiMetrics.size() > 1) {
+                    List<String> aoiHeaders = aoiMetrics.get(0);
+                    // Find the index of the "aoi" column
+                    int aoiColIndex = aoiHeaders.indexOf("aoi");
+
+                    // Capture DGM headers (excluding "aoi") on first encounter
+                    if (aoiDgmHeaders == null) {
+                        aoiDgmHeaders = new ArrayList<>();
+                        for (int h = 0; h < aoiHeaders.size(); h++) {
+                            if (h != aoiColIndex) {
+                                aoiDgmHeaders.add(aoiHeaders.get(h));
+                            }
+                        }
+                    }
+
+                    // Build map: aoiName -> {metricName -> value}
+                    Map<String, Map<String, String>> participantAoiMap = new LinkedHashMap<>();
+                    for (int row = 1; row < aoiMetrics.size(); row++) {
+                        List<String> rowData = aoiMetrics.get(row);
+                        String aoiName = rowData.get(aoiColIndex);
+                        allAoiNames.add(aoiName);
+
+                        Map<String, String> metricsMap = new LinkedHashMap<>();
+                        for (int col = 0; col < aoiHeaders.size(); col++) {
+                            if (col != aoiColIndex) {
+                                metricsMap.put(aoiHeaders.get(col), rowData.get(col));
+                            }
+                        }
+                        participantAoiMap.put(aoiName, metricsMap);
+                    }
+                    allParticipantAoiData.add(participantAoiMap);
+                } else {
+                    // Participant has no AOIs
+                    allParticipantAoiData.add(new LinkedHashMap<>());
+                }
 
                 // Generate windows
                 Windows.generateWindows(allGaze, pDirectory, settings);
@@ -94,15 +139,15 @@ public class Analysis {
 
                 // Generate patterns
                 List<List<String>> expandedPatterns = Patterns.discoverPatterns(
-                    List.of(expandedSeq), 
-                    MIN_PATTERN_LENGTH, 
-                    MAX_PATTERN_LENGTH, 
-                    1, 
+                    List.of(expandedSeq),
+                    MIN_PATTERN_LENGTH,
+                    MAX_PATTERN_LENGTH,
+                    1,
                     1
                 );
-                
+
                 List<List<String>> collapsedPatterns = Patterns.discoverPatterns(
-                    List.of(Sequences.getCollapsedSequence(expandedSeq)), 
+                    List.of(Sequences.getCollapsedSequence(expandedSeq)),
                     MIN_PATTERN_LENGTH,
                     MAX_PATTERN_LENGTH,
                     1,
@@ -115,6 +160,34 @@ public class Analysis {
 
             // Batch analysis
             if (inputFiles.length > 1) {
+                // Append AOI metrics to combinedDGMs
+                if (aoiDgmHeaders != null && !allAoiNames.isEmpty()) {
+                    // Build prefixed AOI headers and append to the header row
+                    List<String> combinedHeaders = allParticipantDGMs.get(0);
+                    for (String aoiName : allAoiNames) {
+                        for (String metric : aoiDgmHeaders) {
+                            combinedHeaders.add(aoiName + "_" + metric);
+                        }
+                    }
+
+                    // Append AOI values for each participant (row index 1..n maps to allParticipantAoiData index 0..n-1)
+                    for (int p = 0; p < allParticipantAoiData.size(); p++) {
+                        List<String> participantRow = allParticipantDGMs.get(p + 1);
+                        Map<String, Map<String, String>> participantAoiMap = allParticipantAoiData.get(p);
+
+                        for (String aoiName : allAoiNames) {
+                            Map<String, String> metricsMap = participantAoiMap.get(aoiName);
+                            for (String metric : aoiDgmHeaders) {
+                                if (metricsMap != null && metricsMap.containsKey(metric)) {
+                                    participantRow.add(metricsMap.get(metric));
+                                } else {
+                                    participantRow.add("NaN");
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Generate patterns
                 List<String> collapsedSequences = new ArrayList<String>();
 
@@ -125,7 +198,7 @@ public class Analysis {
                 System.out.println("Analyzing patterns");
                 List<List<String>> expandedPatterns = Patterns.discoverPatterns(expandedSequences, MIN_PATTERN_LENGTH, MAX_PATTERN_LENGTH, MIN_PATTERN_FREQUENCY, MIN_SEQUENCE_SIZE);
                 List<List<String>> collapsedPatterns = Patterns.discoverPatterns(collapsedSequences, MIN_PATTERN_LENGTH, MAX_PATTERN_LENGTH, MIN_PATTERN_FREQUENCY, MIN_SEQUENCE_SIZE);
-                
+
                 // Root directory
                 String directory = params.getOutputDirectory();
 

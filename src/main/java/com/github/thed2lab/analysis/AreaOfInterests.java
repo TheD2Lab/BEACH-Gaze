@@ -19,12 +19,16 @@ public class AreaOfInterests {
     private static final String[] additionalHeaders = {"aoi", "proportion_of_fixations_spent_in_aoi","proportion_of_fixations_durations_spent_in_aoi"};
     private static final String[] perAoiHeaders = {"aoi_pair", "transition_count", "proportion_including_self_transitions", "proportion_excluding_self_transitions"};
     
-    public static void generateAOIs(DataEntry allGazeData, DataEntry fixationData, String outputDirectory, String fileName) {
+    /**
+     * Generates AOI-level analysis files and returns the AOI metrics.
+     * @return the AOI metrics (header row + one row per AOI), or {@code null} if no AOIs exist.
+     */
+    public static List<List<String>> generateAOIs(DataEntry allGazeData, DataEntry fixationData, String outputDirectory, String fileName) {
         Map<String, DataEntry> aoiGazeMap = splitAoiData(allGazeData);
 
         if (aoiGazeMap.size() <= 1) {
             System.out.println("File has no AOIs, no file will be output.");
-            return;
+            return null;
         }
 
         DataEntry filteredFixations = DataFilter.filterByValidity(fixationData);
@@ -37,7 +41,7 @@ public class AreaOfInterests {
                 aoiFixMap.put(key, d);
             }
         }
-        
+
         for (String aoiKey : aoiGazeMap.keySet()) {
             DataEntry aoiData = aoiGazeMap.get(aoiKey);
             aoiData.writeToCSV(outputDirectory + "/AOIs", aoiKey.replace(" ", "_") + "_all_gaze");
@@ -48,6 +52,8 @@ public class AreaOfInterests {
 
         FileHandler.writeToCSV(aoiMetrics, outputDirectory, fileName + "_AOI_DGMs");
         FileHandler.writeToCSV(pairResults, outputDirectory, fileName+"_AOI_Transitions");
+
+        return aoiMetrics;
     }
 
     static Map<String, DataEntry> splitAoiData(DataEntry allData) {
