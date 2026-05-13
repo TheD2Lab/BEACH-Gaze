@@ -8,25 +8,33 @@ import static com.github.thed2lab.analysis.Constants.FIXATION_X;
 import static com.github.thed2lab.analysis.Constants.FIXATION_Y;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 public class Angles {
-	
-	static public LinkedHashMap<String,String> analyze(DataEntry data) {
-		LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
-		ArrayList<Coordinate> allCoordinates = new ArrayList<>();
 
-		for (int row = 0; row < data.rowCount(); row++) {
-			Coordinate eachCoordinate = new Coordinate(
-				Double.valueOf(data.getValue(FIXATION_X, row)),
-				Double.valueOf(data.getValue(FIXATION_Y, row)),
-				Integer.valueOf(data.getValue(FIXATION_ID, row))
-			);
-			allCoordinates.add(eachCoordinate);
-		}
+	static public LinkedHashMap<String,String> analyze(DataEntry data) {
+		return analyze(data, null);
+	}
+
+	/**
+	 * Computes absolute and relative angle DGMs for an area (whole screen or AOI).
+	 * @param data fixations confined to the target area; absolute angles are computed
+	 * from this list and relative-angle triplets are credited to this area when their
+	 * middle fixation's id appears here.
+	 * @param allScreenData whole-screen fixations used to source consecutive A->B->C
+	 * triplets for the relative-angle metric. If {@code null} (legacy callers) the
+	 * triplet hunt falls back to {@code data} itself, preserving prior behavior.
+	 */
+	static public LinkedHashMap<String,String> analyze(DataEntry data, DataEntry allScreenData) {
+		LinkedHashMap<String,String> results = new LinkedHashMap<String,String>();
+		ArrayList<Coordinate> allCoordinates = toCoordinates(data);
 
 		ArrayList<Double> allAbsoluteDegrees = getAllAbsoluteAngles(allCoordinates);
-		ArrayList<Double> allRelativeDegrees = getAllRelativeAngles(allCoordinates);
+		ArrayList<Double> allRelativeDegrees = (allScreenData == null)
+			? getAllRelativeAngles(allCoordinates)
+			: getAllRelativeAngles(allCoordinates, toCoordinates(allScreenData));
 		//Absolute Degrees
 		results.put(
 			"sum_of_all_absolute_degrees", //Output Header
@@ -136,6 +144,48 @@ public class Angles {
 		}
 
 		return allAbsoluteDegrees;
+	}
+
+	private static ArrayList<Coordinate> toCoordinates(DataEntry data) {
+		ArrayList<Coordinate> coords = new ArrayList<>();
+		for (int row = 0; row < data.rowCount(); row++) {
+			coords.add(new Coordinate(
+				Double.valueOf(data.getValue(FIXATION_X, row)),
+				Double.valueOf(data.getValue(FIXATION_Y, row)),
+				Integer.valueOf(data.getValue(FIXATION_ID, row))
+			));
+		}
+		return coords;
+	}
+
+	// Whole-screen-aware overload. Hunts A->B->C triplets in the whole-screen
+	// fixation list (where consecutive ids are common) and credits a triplet to
+	// this area whenever B's fid is present in the area's fixation list. Per-AOI
+	// fixation ids are rarely consecutive, so the in-area-only triplet hunt
+	// collapses sparse AOIs to (sum=0, mean=NaN). Sourcing triplets from the
+	// whole screen makes the metric "turn angle at this AOI" rather than "turn
+	// angle while staying inside this AOI".
+	public static ArrayList<Double> getAllRelativeAngles(
+		ArrayList<Coordinate> areaCoordinates,
+		ArrayList<Coordinate> allScreenCoordinates
+	) {
+		Set<Integer> areaFids = new HashSet<>();
+		for (Coordinate c : areaCoordinates) areaFids.add(c.fid);
+
+		ArrayList<Double> allRelativeDegrees = new ArrayList<>();
+		for (int i = 1; i < allScreenCoordinates.size() - 1; i++) {
+			Coordinate a = allScreenCoordinates.get(i - 1);
+			Coordinate b = allScreenCoordinates.get(i);
+			Coordinate c = allScreenCoordinates.get(i + 1);
+			if (a.fid + 1 != b.fid || b.fid + 1 != c.fid) continue;
+			if (!areaFids.contains(b.fid)) continue;
+			ArrayList<Coordinate> triplet = new ArrayList<>(3);
+			triplet.add(a);
+			triplet.add(b);
+			triplet.add(c);
+			allRelativeDegrees.addAll(getAllRelativeAngles(triplet));
+		}
+		return allRelativeDegrees;
 	}
 
 	//given three points A, B and C with (X1, Y1) (X2, Y2) and (X3, Y3) respectively

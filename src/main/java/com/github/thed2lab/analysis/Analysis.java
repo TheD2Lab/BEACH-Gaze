@@ -252,15 +252,16 @@ public class Analysis {
     private static List<List<String>> generateResultsHelper(DataEntry allGaze, DataEntry areaGaze, DataEntry areaFixations) {
         // an argument could be made to filter before entering this function; there is a code smell due to blink rate and saccadeV changing
 
-        DataEntry validAllGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(allGaze), SCREEN_WIDTH, SCREEN_HEIGHT); 
+        DataEntry validAllGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(allGaze), SCREEN_WIDTH, SCREEN_HEIGHT);
+        DataEntry validAllFixations = DataFilter.applyScreenSize(DataFilter.filterByValidity(DataFilter.filterByFixations(allGaze)), SCREEN_WIDTH, SCREEN_HEIGHT);
         DataEntry validAreaGaze = DataFilter.applyScreenSize(DataFilter.filterByValidity(areaGaze), SCREEN_WIDTH, SCREEN_HEIGHT);
         DataEntry validAreaFixations = DataFilter.applyScreenSize(DataFilter.filterByValidity(areaFixations), SCREEN_WIDTH, SCREEN_HEIGHT);
-        
+
         LinkedHashMap<String,String> resultsMap = new LinkedHashMap<String, String>();
         resultsMap.putAll(Fixations.analyze(validAreaFixations));
         resultsMap.putAll(Saccades.analyze(validAreaFixations));
         resultsMap.putAll(SaccadeVelocity.analyze(validAllGaze, validAreaFixations));
-        resultsMap.putAll(Angles.analyze(validAreaFixations));
+        resultsMap.putAll(Angles.analyze(validAreaFixations, validAllFixations));
         resultsMap.putAll(ConvexHull.analyze(validAreaFixations));
         resultsMap.putAll(GazeEntropy.analyze(validAreaFixations));
         resultsMap.putAll(Blinks.analyze(areaGaze));    // unfiltered
